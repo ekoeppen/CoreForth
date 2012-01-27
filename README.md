@@ -1,4 +1,5 @@
-= Overview
+Overview
+========
 
 This is a simple Forth for the ARM Cortex M3. It can currently run on the [Stellaris LM3S811 evaluation
 kit](http://www.ti.com/tool/ek-lm3s811), or qemu. Other targets like STM32 based boards should be easy to add.
@@ -11,7 +12,8 @@ The motivation behind CoreForth is to provide a simple platform to explore Corte
 fully fledged Forth implementation (neither is ANS Forth compliance a goal), but there is nothing preventing CoreForth to be taken
 into that direction.
 
-= Forth Implementation
+Forth Implementation
+====================
 
 CoreForth is an indirect threaded Forth. Register r7 is holding the instruction pointer, register r6 is the return stack pointer,
 and the parameter stack is handled via register sp (r13).
@@ -24,7 +26,8 @@ Four macros are used to define words within the assembler source:
 * defvar: Define a variable
 * defconst: Define a constanto
 
-= Board Dependent Code
+Board Dependent Code
+====================
 
 The CoreForth source is split into two parts. The actual Forth implementation in CoreForth.s, and the board dependent code in e.g.
 lm3s811.s. The board dependent code uses .include to bring in the Forth kernel, this is neccessary in order to be able to add new
