@@ -14,10 +14,10 @@ qemu.o: lm3s811.s
 	arm-none-eabi-as -mcpu=cortex-m3 -defsym UART_USE_INTERRUPTS=1 -o $@ $< 
 
 lm3s811.elf: lm3s811.o
-	arm-none-eabi-ld $< -o $@ -Tminimal.ld
+	arm-none-eabi-ld $< -o $@ -Tlm3s811.ld
 
 qemu.elf: qemu.o
-	arm-none-eabi-ld $< -o $@ -Tminimal.ld
+	arm-none-eabi-ld $< -o $@ -Tlm3s811.ld
 
 clean:
 	rm -f *.elf *.bin *.o

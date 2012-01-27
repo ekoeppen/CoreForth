@@ -26,7 +26,8 @@ SECTIONS
     serial_buffer = return_stack_top  + 4 ;
     serial_buffer_tail = serial_buffer + 256 ;
     serial_buffer_head = serial_buffer_tail + 4 ;
-    addr_TIB = serial_buffer_head + 4 ;
+    addr_IVT = serial_buffer_head + 4 ;
+    addr_TIB = addr_IVT + 48 * 4 ;
     addr_DP = addr_TIB + 132 ;
     addr_STATE = addr_DP + 4 ;
     addr_LATEST = addr_STATE + 4 ;
