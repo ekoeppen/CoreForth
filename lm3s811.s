@@ -83,77 +83,6 @@ _start:
     .long uart0_irq_handler + 1       /* UART 0 */
     .space 0xa8
 
-nmi_handler:
-    b .
-
-hardfault_handler:
-    mrs r0, psp
-    b .
-
-memmanage_handler:
-    b .
-
-busfault_handler:
-    b .
-
-usagefault_handler:
-    b .
-
-svc_handler:
-    b .
-
-debugmon_handler:
-    b .
-
-pendsv_handler:
-    b .
-
-systick_handler:
-    b .
-
-gpioa_handler:
-    bx lr
-
-gpiob_handler:
-    bx lr
-
-gpioc_handler:
-    @ store result (prelim., needs to go somewhere sane)
-    ldr r2, =GPIOC + GPIO_MIS
-    ldrb r2, [r2]
-    ldr r0, =addr_DP
-    ldr r0, [r0]
-    add r0, r0, #64
-    str r2, [r0]
-    @  reset interrupt
-    ldr r0, =GPIOC + GPIO_ICR
-    mov r1, #0xff
-    strb r1, [r0]
-    bx lr
-
-gpiod_handler:
-    bx lr
-
-gpioe_handler:
-    bx lr
-
-uart0_irq_handler:
-    ldr r0, =(UART0 + UART_FR)
-    ldr r1, [r0]
-    ldr r2, =UART_RXFE
-    ands r1, r1, r2
-    bne 1f
-    ldr r0, =(UART0 + UART_DR)
-    ldrb r1, [r0]
-    ldr r0, =serial_buffer
-    ldr r2, =serial_buffer_head
-    ldrb r3, [r2]
-    strb r1, [r0, r3]
-    add r3, r3, #1
-    strb r3, [r2]
-    b uart0_irq_handler
-1:  bx lr
-
 @ ---------------------------------------------------------------------
 @ -- Board specific code and initialization ---------------------------
 
@@ -296,6 +225,88 @@ putchar:
     pop {r1, r2, r3, pc}
 
 .include "CoreForth.s"
+
+@ ---------------------------------------------------------------------
+@ -- IRQ handlers -----------------------------------------------------
+
+nmi_handler:
+    b .
+
+hardfault_handler:
+    mrs r0, psp
+    b .
+
+memmanage_handler:
+    b .
+
+busfault_handler:
+    b .
+
+usagefault_handler:
+    b .
+
+svc_handler:
+    b .
+
+debugmon_handler:
+    b .
+
+pendsv_handler:
+    b .
+
+systick_handler:
+    b .
+
+gpioa_handler:
+    bx lr
+
+gpiob_handler:
+    bx lr
+
+gpioc_handler:
+    @ check if a Forth level IRQ handler is defined
+    ldr r0, =addr_IVT + 17 * 4
+    ldr r1, [r0]
+    cmp r1, #0
+    beq 1f
+    mov r7, r0
+    NEXT 
+    
+    @ store result (prelim., needs to go somewhere sane)
+1:  ldr r2, =GPIOC + GPIO_MIS
+    ldrb r2, [r2]
+    ldr r0, =addr_DP
+    ldr r0, [r0]
+    add r0, r0, #64
+    str r2, [r0]
+    @  reset interrupt
+    ldr r0, =GPIOC + GPIO_ICR
+    mov r1, #0xff
+    strb r1, [r0]
+    bx lr
+
+gpiod_handler:
+    bx lr
+
+gpioe_handler:
+    bx lr
+
+uart0_irq_handler:
+    ldr r0, =(UART0 + UART_FR)
+    ldr r1, [r0]
+    ldr r2, =UART_RXFE
+    ands r1, r1, r2
+    bne 1f
+    ldr r0, =(UART0 + UART_DR)
+    ldrb r1, [r0]
+    ldr r0, =serial_buffer
+    ldr r2, =serial_buffer_head
+    ldrb r3, [r2]
+    strb r1, [r0, r3]
+    add r3, r3, #1
+    strb r3, [r2]
+    b uart0_irq_handler
+1:  bx lr
 
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
