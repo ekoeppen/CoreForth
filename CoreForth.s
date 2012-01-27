@@ -82,21 +82,6 @@ var_\label :
     NEXT
     .endm
 
-    .macro defnvar name, namelen, flags=0, label, initial=0
-    .align 2, 0
-    .global nvar_\label
-nvar_\label:
-    .int link
-    .set link,nvar_\label
-    .byte \flags+\namelen
-    .ascii "\name"
-    .align 2, 0
-    .global \label
-\label :
-    .int DOVAR
-    .int \initial
-    .endm
-
 @ ---------------------------------------------------------------------
 @ -- Entry point ------------------------------------------------------
 
