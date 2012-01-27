@@ -41,3 +41,12 @@ The code to initialize the LM3S811 (and similar chips) covers three main areas:
 * Core input/output functions: CoreForth expects the two functions putchar and read\_key to be defined. Currently, a simple
   blocking implementation is used for running on hardware, and an interrupt based implemenation for qemu (this should be the default
 later on). 
+
+Building and Running
+====================
+
+CoreForth is written in GNU Assembler, and the easiest way of compiling and running is to use the bare metal CodeSourcery tool
+chain and qemu-system-arm. The Makefile will generate ELF and binary files, the latter can be flashed using e.g. OpenOCD, the former
+can be run in qemu. A good overview of bare metal programming and qemu can be found on [Franceso Balduzzi's
+blog](http://balau82.wordpress.com/2010/02/14/simplest-bare-metal-program-for-arm/), and using OpenOCD with hardware is explained in
+more detail on [Johan Simonsson's pages](http://fun-tech.se/stm32/index.php).
