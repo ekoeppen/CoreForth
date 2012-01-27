@@ -137,11 +137,36 @@ gpiod_handler:
 gpioe_handler:
     bx lr
 
+uart0_irq_handler:
+    ldr r0, =(UART0 + UART_FR)
+    ldr r1, [r0]
+    ldr r2, =UART_RXFE
+    ands r1, r1, r2
+    bne 1f
+    ldr r0, =(UART0 + UART_DR)
+    ldrb r1, [r0]
+    ldr r0, =serial_buffer
+    ldr r2, =serial_buffer_head
+    ldrb r3, [r2]
+    strb r1, [r0, r3]
+    add r3, r3, #1
+    strb r3, [r2]
+    b uart0_irq_handler
+1:  bx lr
+
 @ ---------------------------------------------------------------------
 @ -- Board specific code and initialization ---------------------------
 
 init_board:
     push {lr}
+    @ reset the interrupt vector table
+    ldr r0, =addr_IVT
+    mov r1, #0
+    mov r2, 48
+1:  str r1, [r0], #4
+    subs r2, r2, #1
+    bgt 1b
+
     @ enable PIC interrupts
     mov r0, #0
     msr primask, r0
@@ -220,6 +245,7 @@ init_board:
     str r1, [r0]
 
     pop {pc}
+    .align 2, 0
     .ltorg
 
 delay:
@@ -227,23 +253,6 @@ delay:
     subs r0, r0, #1
     bgt delay
     pop {pc}
-
-uart0_irq_handler:
-    ldr r0, =(UART0 + UART_FR)
-    ldr r1, [r0]
-    ldr r2, =UART_RXFE
-    ands r1, r1, r2
-    bne 1f
-    ldr r0, =(UART0 + UART_DR)
-    ldrb r1, [r0]
-    ldr r0, =serial_buffer
-    ldr r2, =serial_buffer_head
-    ldrb r3, [r2]
-    strb r1, [r0, r3]
-    add r3, r3, #1
-    strb r3, [r2]
-    b uart0_irq_handler
-1:  bx lr
 
 read_key_interrupt:
 2:  ldr r1, =serial_buffer_tail
@@ -290,6 +299,8 @@ putchar:
 
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
+
+    defconst "IVT", 3, , IVT, addr_IVT
 
     defcode "GPIOA", 5, , GPIO_A
     ldr r0, =GPIOA
