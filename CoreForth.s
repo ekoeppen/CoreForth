@@ -370,7 +370,7 @@ stack_underflow_message_end:
 @ ---------------------------------------------------------------------
 @ -- Memory operations -----------------------------------------------
 
-    defcode "CHAR", 1, 1, CHAR
+    defcode "CHAR", 4, , CHAR
     mov r0, #1
     push {r0}
     NEXT
