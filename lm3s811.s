@@ -269,6 +269,9 @@ gpioc_handler:
     ldr r1, [r0]
     cmp r1, #0
     beq 1f
+    @ invoke Forth level handler
+    @ TODO: save PSP and IP, set PSP to something useful (beware nested interrupts)
+    @ define proper exit routine. The code below won't really work yet
     mov r7, r0
     NEXT 
     
