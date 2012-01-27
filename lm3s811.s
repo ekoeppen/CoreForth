@@ -295,7 +295,18 @@ gpioe_handler:
     bx lr
 
 uart0_irq_handler:
-    ldr r0, =(UART0 + UART_FR)
+    ldr r0, =addr_IVT + 20 * 4
+    ldr r1, [r0]
+    cmp r1, #0
+    beq 2f
+    push {r6, r7, lr}
+    ldr r1, =addr_DP
+    ldr r1, [r1]
+    add r6, r1, #128
+    mov r7, r0
+    NEXT 
+    
+2:  ldr r0, =(UART0 + UART_FR)
     ldr r1, [r0]
     ldr r2, =UART_RXFE
     ands r1, r1, r2
@@ -449,6 +460,12 @@ uart0_irq_handler:
     NEXT
 
     .ltorg
+
+    defcode "RETI", 4, , RETI
+    pop {r6, r7, pc}
+
+    defword "IRQTEST", 7, , IRQTEST
+    .word LIT, 0, IVT, LIT, 0x14, CELLS, ADD, STORE, RETI
 
     defword "COLD", 4, , COLD
     .word LIT, 16, BASE, STORE, QUIT
