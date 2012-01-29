@@ -24,7 +24,7 @@ SECTIONS
     stack_top = 0x20000000 + 1024;
     return_stack_top = stack_top + 256 ;
     serial_buffer = return_stack_top  + 4 ;
-    serial_buffer_tail = serial_buffer + 256 ;
+    serial_buffer_tail = serial_buffer + 128 ;
     serial_buffer_head = serial_buffer_tail + 4 ;
     addr_IVT = serial_buffer_head + 4 ;
     addr_TIB = addr_IVT + 48 * 4 ;
@@ -35,19 +35,7 @@ SECTIONS
     addr_BASE = addr_S0 + 4 ;
     addr_ININDEX = addr_BASE + 4 ;
     data_start = addr_ININDEX + 4 ;
-        
 
-/*
-    .ram_initialized 0x20000000: AT (LOADADDR(.flash) + SIZEOF(.flash)) {
-         *(.data)
-    }
-
-    .ram : {
-        *(.bss)
-    }
-
-    stack_top = 0x20000000 + 1024;
-    return_stack_top = stack_top + 256;
-    data_start = return_stack_top;
-*/
+    ram_top = 0x20000000 + 0x00002000 ;
+    irq_stack_top = ram_top ;
 }
