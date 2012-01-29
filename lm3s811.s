@@ -252,6 +252,21 @@ putchar:
 @ ---------------------------------------------------------------------
 @ -- IRQ handlers -----------------------------------------------------
 
+generic_forth_handler:
+    ldr r0, =addr_IVT
+    mrs r1, ipsr
+    sub r1, r1, #1
+    lsl r1, #2
+    add r0, r0, r1
+    ldr r2, [r0]
+    cmp r2, #0
+    beq 1f
+    push {r4 - r12, lr}
+    ldr r6, =irq_stack_top
+    mov r7, r0
+    NEXT 
+1:  bx lr
+
 nmi_handler:
     b .
 
@@ -326,7 +341,7 @@ uart0_irq_handler:
     ldr r1, [r0]
     cmp r1, #0
     beq 2f
-    push {r4 - r9, lr}
+    push {r4 - r12, lr}
     ldr r1, =addr_DP
     ldr r1, [r1]
     add r6, r1, #128
@@ -504,7 +519,10 @@ uart0_irq_handler:
     wfi
 
     defcode "RETI", 4, , RETI
-    pop {r4 - r9, pc}
+    pop {r4 - r12, pc}
+
+    defword ";I", 2, F_IMMED, SEMICOLONI
+    .word LIT, RETI, COMMA, REVEAL, LBRACKET, EXIT
 
     defword "IRQTEST", 7, , IRQTEST
     .word LIT, 0, IVT, LIT, 0x14, CELLS, ADD, STORE, RETI
