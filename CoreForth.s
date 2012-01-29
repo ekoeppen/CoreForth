@@ -8,6 +8,7 @@
     .set F_LENMASK,         0x1f
 
     .set link,                 0
+    .set compiled_here, ram_start      
 
 @ ---------------------------------------------------------------------
 @ -- Macros -----------------------------------------------------------
@@ -66,13 +67,13 @@ code_\label :
     @ parameter field follows
     .endm
 
-    .macro defvar name, namelen, flags=0, label, initial=0
+    .macro defvar name, namelen, flags=0, label, size=4
     defcode \name,\namelen,\flags,\label
-    ldr r0, =var_\label  @ load address
+    .set addr_\label, compiled_here
+    ldr r0, =addr_\label
     push {r0}
     NEXT
-var_\label :
-    .int \initial
+    .set compiled_here, compiled_here + \size
     .endm
 
     .macro defconst name, namelen, flags=0, label, value
@@ -90,16 +91,7 @@ reset_handler:
     ldr r0, =start_prompt
     mov r1, #(start_prompt_end - start_prompt)
     bl putstring
-    ldr r0, =name_COLD
-    ldr r1, =addr_LATEST
-    str r0, [r1]
-    ldr r0, =data_start
-    ldr r1, =addr_DP
-    str r0, [r1]
-    mov r0, #10
-    ldr r1, =addr_BASE
-    str r0, [r1]
-    ldr r6, =return_stack_top
+    ldr r6, =addr_RTOS
     ldr r7, =cold_start
     NEXT
 start_prompt:
@@ -107,6 +99,9 @@ start_prompt:
 start_prompt_end:
     .align 2, 0
 cold_start:
+    .word LIT, 10, BASE, STORE
+    .word LIT, data_start, DP, STORE
+    .word LIT, last_word, LATEST, STORE
     .word COLD
 
     .ltorg
@@ -232,7 +227,7 @@ readline_end:
     pop {r4, r5, r6, pc}
 
 printstack:
-    ldr r0, =stack_top
+    ldr r0, =addr_TOS
     cmp sp, r0
     push {r4, lr}
     blt 1f
@@ -241,7 +236,7 @@ printstack:
     mov r1, #(stack_underflow_message_end - stack_underflow_message)
     bl putstring
 2:  pop {r4, pc}
-1:  ldr r4, =stack_top
+1:  ldr r4, =addr_TOS
     sub r4, r4, #4
 printstack_loop:
     ldr r0, [r4]
@@ -1168,13 +1163,17 @@ see_done:
 @ ---------------------------------------------------------------------
 @ -- User variables ---------------------------------------------------
 
-    defconst "STATE", 5, , STATE, addr_STATE
-    defconst "DP", 2, , DP, addr_DP
-    defconst "LATEST", 6, , LATEST, addr_LATEST
-    defconst "S0", 2, , SZ, addr_S0
-    defconst "BASE", 4, , BASE, addr_BASE
-    defconst ">IN", 3, , ININDEX, addr_ININDEX
-    defconst "TIB", 3, , TIB, addr_TIB
+    defvar "STACK", 5, , STACK, 1024
+    defvar "TOS", 3, , TOS, 0
+    defvar "RSTACK", 6, , RSTACK, 256
+    defvar "RTOS", 3, , RTOS, 0
+    defvar "STATE", 5, , STATE
+    defvar "DP", 2, , DP
+    defvar "LATEST", 6, , LATEST
+    defvar "S0", 2, , SZ
+    defvar "BASE", 4, , BASE
+    defvar ">IN", 3, , ININDEX
+    defvar "TIB", 3, , TIB, 132
 
     .ltorg
 

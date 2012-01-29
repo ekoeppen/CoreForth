@@ -60,7 +60,7 @@
     .global _start
     .global reset_handler
 _start:
-    .long stack_top                   /* Top of Stack                 */
+    .long addr_TOS                    /* Top of Stack                 */
     .long reset_handler + 1           /* Reset Handler                */
     .long nmi_handler + 1             /* NMI Handler                  */
     .long hardfault_handler + 1       /* Hard Fault Handler           */
@@ -189,6 +189,10 @@ init_board:
     ldr r0, =(UART0 + UART_IMSC)
     mov r1, #0x10   @ trigger only receive interrupts
     str r1, [r0]
+    mov r1, #0
+    ldr r0, =addr_SBUF_HEAD
+    str r1, [r0]
+    ldr r0, =addr_SBUF_TAIL
 .endif
 
     @ enable the UART
@@ -207,15 +211,15 @@ delay:
     pop {pc}
 
 read_key_interrupt:
-2:  ldr r1, =serial_buffer_tail
+2:  ldr r1, =addr_SBUF_TAIL
     ldrb r3, [r1]
-    ldr r2, =serial_buffer_head
+    ldr r2, =addr_SBUF_HEAD
     ldrb r2, [r2]
     cmp r2, r3
     bne 1f
     wfi
     b 2b
-1:  ldr r0, =serial_buffer
+1:  ldr r0, =addr_SBUF
     ldrb r0, [r0, r3]
     add r3, r3, #1
     strb r3, [r1]
@@ -309,8 +313,8 @@ uart0_handler:
     bne 1f
     ldr r0, =(UART0 + UART_DR)
     ldrb r1, [r0]
-    ldr r0, =serial_buffer
-    ldr r2, =serial_buffer_head
+    ldr r0, =addr_SBUF
+    ldr r2, =addr_SBUF_HEAD
     ldrb r3, [r2]
     strb r1, [r0, r3]
     add r3, r3, #1
@@ -349,8 +353,6 @@ adcomp_handler:
 
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
-
-    defconst "IVT", 3, , IVT, addr_IVT
 
     defcode "GPIOA", 5, , GPIO_A
     ldr r0, =GPIOA
@@ -509,3 +511,12 @@ adcomp_handler:
 
     defword "COLD", 4, , COLD
     .word LIT, 16, BASE, STORE, QUIT
+
+    defvar "SBUF", 4, , SBUF, 128
+    defvar "SBUF-HEAD", 9, , SBUF_HEAD
+    defvar "SBUF-TAIL", 9, , SBUF_TAIL
+    defvar "IVT", 3, , IVT, 48 * 4
+
+    .set last_word, link
+    .set data_start, compiled_here 
+
