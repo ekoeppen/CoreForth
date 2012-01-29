@@ -82,7 +82,29 @@ _start:
     .long gpiod_handler + 1           /* GPIO D */
     .long gpioe_handler + 1           /* GPIO E */
     .long uart0_irq_handler + 1       /* UART 0 */
-    .space 0xa8
+    .long 0                           /* UART 1 */
+    .long 0                           /* SSI */
+    .long 0                           /* I2C */
+    .long 0                           /* Reserved */
+    .long 0                           /* PWM Generator 0 */
+    .long 0                           /* PWM Generator 1 */
+    .long 0                           /* PWM Generator 2 */
+    .long 0                           /* Reserved */
+    .long 0                           /* ADC0 Sequence 0 */
+    .long 0                           /* ADC0 Sequence 1 */
+    .long 0                           /* ADC0 Sequence 2 */
+    .long 0                           /* ADC0 Sequence 3 */
+    .long 0                           /* Watchdog Timer 0 */
+    .long 0                           /* Timer 0A */
+    .long 0                           /* Timer 0B */
+    .long 0                           /* Timer 1A */
+    .long 0                           /* Timer 1B */
+    .long 0                           /* Timer 2A */
+    .long 0                           /* Timer 2B */
+    .long 0                           /* Analog Comparator 0 */
+    .long 0                           /* Reserved */
+    .long 0                           /* System Control */
+    .long 0                           /* Flash Memory Control */
 
 @ ---------------------------------------------------------------------
 @ -- Board specific code and initialization ---------------------------
