@@ -501,6 +501,9 @@ cmove_loop:
     defword "S\"", 2, F_IMMED, SQUOTE
     .word LIT, XSQUOTE, COMMA, LIT, '"', WORD, FETCHBYTE, INCR, ALIGNED, ALLOT, EXIT 
 
+    defword "PAD", 3, , PAD
+    .word HERE, LIT, 256, ADD, EXIT
+
 @ ---------------------------------------------------------------------
 @ -- Arithmetic ------------------------------------------------------
 
@@ -1161,13 +1164,6 @@ see_loop:
 see_not_found:
 see_done:
     .word EXIT
-
-    defcode "BYE", 3, , BYE
-    ldr r0, =0xfffffff
-    bx r0
-
-    defcode "HALT", 4, , HALT
-    wfi
 
 @ ---------------------------------------------------------------------
 @ -- User variables ---------------------------------------------------

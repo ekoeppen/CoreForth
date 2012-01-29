@@ -478,6 +478,9 @@ uart0_irq_handler:
 
     .ltorg
 
+    defcode "WFI", 3, , WFI
+    wfi
+
     defcode "RETI", 4, , RETI
     pop {r4 - r9, pc}
 
