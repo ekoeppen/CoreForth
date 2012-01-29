@@ -81,27 +81,27 @@ _start:
     .long gpioc_handler + 1           /* GPIO C */
     .long gpiod_handler + 1           /* GPIO D */
     .long gpioe_handler + 1           /* GPIO E */
-    .long uart0_irq_handler + 1       /* UART 0 */
-    .long 0                           /* UART 1 */
-    .long 0                           /* SSI */
-    .long 0                           /* I2C */
+    .long uart0_handler + 1           /* UART 0 */
+    .long uart1_handler + 1           /* UART 1 */
+    .long ssi_handler + 1             /* SSI */
+    .long i2c_handler + 1             /* I2C */
     .long 0                           /* Reserved */
-    .long 0                           /* PWM Generator 0 */
-    .long 0                           /* PWM Generator 1 */
-    .long 0                           /* PWM Generator 2 */
+    .long pwm0_handler + 1            /* PWM Generator 0 */
+    .long pwm1_handler + 1            /* PWM Generator 1 */
+    .long pwm2_handler + 1            /* PWM Generator 2 */
     .long 0                           /* Reserved */
-    .long 0                           /* ADC0 Sequence 0 */
-    .long 0                           /* ADC0 Sequence 1 */
-    .long 0                           /* ADC0 Sequence 2 */
-    .long 0                           /* ADC0 Sequence 3 */
-    .long 0                           /* Watchdog Timer 0 */
-    .long 0                           /* Timer 0A */
-    .long 0                           /* Timer 0B */
-    .long 0                           /* Timer 1A */
-    .long 0                           /* Timer 1B */
-    .long 0                           /* Timer 2A */
-    .long 0                           /* Timer 2B */
-    .long 0                           /* Analog Comparator 0 */
+    .long adcseq0_handler + 1         /* ADC0 Sequence 0 */
+    .long adcseq1_handler + 1         /* ADC0 Sequence 1 */
+    .long adcseq2_handler + 1         /* ADC0 Sequence 2 */
+    .long adcseq3_handler + 1         /* ADC0 Sequence 3 */
+    .long watchdog_handler + 1        /* Watchdog Timer 0 */
+    .long timer0a_handler + 1         /* Timer 0A */
+    .long timer0b_handler + 1         /* Timer 0B */
+    .long timer1a_handler + 1         /* Timer 1A */
+    .long timer1b_handler + 1         /* Timer 1B */
+    .long timer2a_handler + 1         /* Timer 2A */
+    .long timer2b_handler + 1         /* Timer 2B */
+    .long adcomp_handler + 1          /* Analog Comparator 0 */
     .long 0                           /* Reserved */
     .long 0                           /* System Control */
     .long 0                           /* Flash Memory Control */
@@ -252,6 +252,11 @@ putchar:
 @ ---------------------------------------------------------------------
 @ -- IRQ handlers -----------------------------------------------------
 
+@ Generic handler which checks if a Forth word is defined to handle the
+@ IRQ. If not, this handler will simply return. Note that this will
+@ usually lock up the system as the interrupt will be retriggered, the
+@ generic handler is not clearing the interrupt.
+
 generic_forth_handler:
     ldr r0, =addr_IVT
     mrs r1, ipsr
@@ -295,59 +300,8 @@ pendsv_handler:
 systick_handler:
     b .
 
-gpioa_handler:
-    bx lr
-
-gpiob_handler:
-    bx lr
-
-gpioc_handler:
-    @ check if a Forth level IRQ handler is defined
-    ldr r0, =addr_IVT + 17 * 4
-    ldr r1, [r0]
-    cmp r1, #0
-    beq 1f
-    @ invoke Forth level handler
-    @ TODO: save PSP and IP, set PSP to something useful (beware nested interrupts)
-    @ define proper exit routine. The code below won't really work yet
-    mov r7, r0
-    NEXT 
-    
-    @ store result (prelim., needs to go somewhere sane)
-1:  ldr r2, =GPIOC + GPIO_MIS
-    ldrb r2, [r2]
-    ldr r0, =addr_DP
-    ldr r0, [r0]
-    add r0, r0, #64
-    str r2, [r0]
-    @  reset interrupt
-    ldr r0, =GPIOC + GPIO_ICR
-    mov r1, #0xff
-    strb r1, [r0]
-    bx lr
-
-gpiod_handler:
-    bx lr
-
-gpioe_handler:
-    bx lr
-
-uart0_irq_handler:
-    ldr r0, =addr_IVT
-    mrs r1, ipsr
-    sub r1, r1, #1
-    lsl r1, #2
-    add r0, r0, r1
-    ldr r1, [r0]
-    cmp r1, #0
-    beq 2f
-    push {r4 - r12, lr}
-    ldr r1, =addr_DP
-    ldr r1, [r1]
-    add r6, r1, #128
-    mov r7, r0
-    NEXT 
-    
+.if UART_USE_INTERRUPTS == 1
+uart0_handler:
 2:  ldr r0, =(UART0 + UART_FR)
     ldr r1, [r0]
     ldr r2, =UART_RXFE
@@ -363,6 +317,35 @@ uart0_irq_handler:
     strb r3, [r2]
     b 2b
 1:  bx lr
+.else
+uart0_handler:
+    b generic_forth_handler
+.endif
+
+gpioa_handler:
+gpiob_handler:
+gpioc_handler:
+gpiod_handler:
+gpioe_handler:
+uart1_handler:
+ssi_handler:
+i2c_handler:
+pwm0_handler:
+pwm1_handler:
+pwm2_handler:
+adcseq0_handler:
+adcseq1_handler:
+adcseq2_handler:
+adcseq3_handler:
+watchdog_handler:
+timer0a_handler:
+timer0b_handler:
+timer1a_handler:
+timer1b_handler:
+timer2a_handler:
+timer2b_handler:
+adcomp_handler:
+    b generic_forth_handler
 
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
