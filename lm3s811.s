@@ -524,8 +524,5 @@ uart0_irq_handler:
     defword ";I", 2, F_IMMED, SEMICOLONI
     .word LIT, RETI, COMMA, REVEAL, LBRACKET, EXIT
 
-    defword "IRQTEST", 7, , IRQTEST
-    .word LIT, 0, IVT, LIT, 0x14, CELLS, ADD, STORE, RETI
-
     defword "COLD", 4, , COLD
     .word LIT, 16, BASE, STORE, QUIT
