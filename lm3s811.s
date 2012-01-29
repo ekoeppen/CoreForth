@@ -29,6 +29,7 @@
 
     .set NVIC,        0xe000e000
     .set NVIC_SETENA_BASE, 0x100
+    .set NVIC_ACTIVE_BASE, 0x300
 
     .set GPIOA,       0x40004000
     .set GPIOB,       0x40005000
@@ -295,11 +296,15 @@ gpioe_handler:
     bx lr
 
 uart0_irq_handler:
-    ldr r0, =addr_IVT + 20 * 4
+    ldr r0, =addr_IVT
+    mrs r1, ipsr
+    sub r1, r1, #1
+    lsl r1, #2
+    add r0, r0, r1
     ldr r1, [r0]
     cmp r1, #0
     beq 2f
-    push {r6, r7, lr}
+    push {r4 - r9, lr}
     ldr r1, =addr_DP
     ldr r1, [r1]
     add r6, r1, #128
@@ -319,7 +324,7 @@ uart0_irq_handler:
     strb r1, [r0, r3]
     add r3, r3, #1
     strb r3, [r2]
-    b uart0_irq_handler
+    b 2b
 1:  bx lr
 
 @ ---------------------------------------------------------------------
@@ -459,10 +464,22 @@ uart0_irq_handler:
     strb r1, [r0]
     NEXT
 
+    defcode "NVIC", 4, , _NVIC
+    ldr r0, =NVIC
+    push {r0}
+    NEXT
+
+    defcode "NVIC-SETENA", 11, , NVIC_SETENA
+    ldr r0, =NVIC
+    ldr r1, =NVIC_SETENA_BASE
+    add r0, r1, r0
+    push {r0}
+    NEXT
+
     .ltorg
 
     defcode "RETI", 4, , RETI
-    pop {r6, r7, pc}
+    pop {r4 - r9, pc}
 
     defword "IRQTEST", 7, , IRQTEST
     .word LIT, 0, IVT, LIT, 0x14, CELLS, ADD, STORE, RETI
