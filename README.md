@@ -23,8 +23,8 @@ Four macros are used to define words within the assembler source:
 * defcode: Define a word implemented in assembler. The code field pointer points to the words' body.
 * defword: Define a word implemented in indirected threaded code, each cell contains the code field pointer of the word to invoke.
   The code field pointer points to the DOCOL function
-* defvar: Define a variable
-* defconst: Define a constanto
+* defvar: Define a variable, the space is allocated at HERE from RAM.
+* defconst: Define a constant
 
 Board Dependent Code
 ====================
