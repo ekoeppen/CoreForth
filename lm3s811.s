@@ -502,6 +502,7 @@ adcomp_handler:
 
     defcode "WFI", 3, , WFI
     wfi
+    NEXT
 
     defcode "RETI", 4, , RETI
     pop {r4 - r12, pc}
@@ -512,11 +513,9 @@ adcomp_handler:
     defword "COLD", 4, , COLD
     .word LIT, 16, BASE, STORE, QUIT
 
-.if UART_USE_INTERRUPTS == 1
     defvar "SBUF", 4, , SBUF, 128
     defvar "SBUF-HEAD", 9, , SBUF_HEAD
     defvar "SBUF-TAIL", 9, , SBUF_TAIL
-.endif
     defvar "IVT", 3, , IVT, 48 * 4
 
     .set last_word, link
