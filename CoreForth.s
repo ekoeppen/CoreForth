@@ -852,6 +852,9 @@ is_number:
     defword "\'", 1, , TICK
     .word BL, WORD, FIND, DROP, EXIT  @ TODO abort if not found
 
+    defword "[\']", 3, F_IMMED, BRACKETTICK
+    .word TICK, LIT, LIT, COMMA, COMMA, EXIT  
+
     defword "CREATE", 6, , CREATE
     .word LATEST, FETCH
     .word HERE, LATEST, STORE       @ update latest
@@ -895,12 +898,13 @@ is_number:
     add r5, r5, #1
     cmp r0, #64
     ble 11f
-    cmp r1, #90
+    cmp r0, #90
     bgt 11f
     orr r0, r2
 11: cmp r1, #64
     ble 12f
     cmp r1, #90
+    bgt 12f
     orr r1, r2
 12: mov r8, r0
     mov r9, r1
