@@ -1075,6 +1075,8 @@ interpret_eol:
 prompt:
     .ascii " ok "
 
+    .align 2, 0
+
     defword "FORGET", 6, , FORGET
     /* BL WORD DROP FIND DROP >LINK @ LATEST ! */
     .word BL, WORD, FIND, DROP, TOLINK, FETCH, LATEST, STORE, EXIT
