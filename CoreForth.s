@@ -672,14 +672,14 @@ cmove_loop:
 
     defconst "#TIB", 4, , TIBSIZE, 128
 
+    defword "SOURCE", 5, , SOURCE
+    .word XSOURCE, FETCH, EXIT
+
     .ltorg
 
     defcode ".S", 2, , PRINTSTACK
     bl printstack
     NEXT
-
-    defword "SOURCE", 6, , SOURCE
-    .word TIB, EXIT
 
     defcode "EMIT", 4, , EMIT
     pop {r0}
@@ -1049,11 +1049,8 @@ word_end_found:
     add r1, r1, #1
     mov pc, r1
 
-    defword "INTERPRET", 9, , INTERPRET @ TODO restructure this
-    .word LIT, 0, DUP, ININDEX, STORE
+    defword "(INTERPRET)", 11, , XINTERPRET @ TODO restructure this
     .word STATE, STORE
-    .word TIB, TIBSIZE, TWODUP, BLANK, TWODUP, ADD, LIT, 0, SWAP, STOREBYTE
-    .word ACCEPT, DROP, SPACE
 interpret_loop:
     .word BL, WORD, DUP, FETCHBYTE, ZBRANCH, interpret_eol
     .word FIND, QDUP, ZBRANCH, interpret_check_number
@@ -1069,9 +1066,19 @@ interpret_check_number:
     .word STATE, FETCH, ZBRANCH, interpret_loop
     .word LIT, LIT, COMMA, COMMA, BRANCH, interpret_loop
 interpret_not_found:
-    .word COUNT, TYPE, LIT, '?', EMIT, CR, EXIT
+    .word LIT, 0, EXIT
 interpret_eol:
+    .word LIT, -1, EXIT
+
+    defword "INTERPRET", 9, , INTERPRET
+    .word TIB, XSOURCE, STORE
+    .word LIT, 0, DUP, ININDEX, STORE
+    .word SOURCE, TIBSIZE, TWODUP, BLANK, TWODUP, ADD, LIT, 0, SWAP, STOREBYTE
+    .word ACCEPT, DROP, SPACE
+    .word XINTERPRET, ZBRANCH, interpret_error
     .word DROP, LIT, prompt, LIT, 4, TYPE, CR, EXIT
+interpret_error:
+    .word COUNT, TYPE, LIT, '?', EMIT, CR, EXIT
 prompt:
     .ascii " ok "
 
@@ -1180,6 +1187,7 @@ see_done:
     defvar "BASE", 4, , BASE
     defvar ">IN", 3, , ININDEX
     defvar "TIB", 3, , TIB, 132
+    defvar "(SOURCE)", 7, , XSOURCE
 
     .ltorg
 
