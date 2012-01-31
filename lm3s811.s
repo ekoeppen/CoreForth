@@ -518,6 +518,12 @@ adcomp_handler:
     defvar "SBUF-TAIL", 9, , SBUF_TAIL
     defvar "IVT", 3, , IVT, 48 * 4
 
+    /* Onboard button words */
+    /*
+        : button0-irq   10 gpioc gpio-icr c! FF pad ! ;i
+        : button0-enable   nvic-setena dup c@ 4 or swap c! ['] button0-irq ivt 11 cells + ! 10 gpioc gpio-im c! ;
+    */
+
     .set last_word, link
     .set data_start, compiled_here 
 
