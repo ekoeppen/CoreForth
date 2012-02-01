@@ -511,7 +511,17 @@ adcomp_handler:
     .word LIT, RETI, COMMA, REVEAL, LBRACKET, EXIT
 
     defword "COLD", 4, , COLD
-    .word LIT, 16, BASE, STORE, QUIT
+    .word LIT, 16, BASE, STORE
+    .word LIT, words, EVALUATE
+    .word QUIT
+
+words:
+    .ascii "
+: button0-irq   10 gpioc gpio-icr c! FF pad ! ;i
+: button0-enable   nvic-setena dup c@ 4 or swap c! ['] button0-irq ivt 11 cells + ! 10 gpioc gpio-im c! ;
+"
+    .byte 0
+    .align 2, 0
 
     defvar "SBUF", 4, , SBUF, 128
     defvar "SBUF-HEAD", 9, , SBUF_HEAD
