@@ -516,12 +516,7 @@ adcomp_handler:
     .word QUIT
 
 words:
-    .ascii "
-: button0-irq   10 gpioc gpio-icr c! FF pad ! ;i
-: button0-enable   nvic-setena dup c@ 4 or swap c! ['] button0-irq ivt 11 cells + ! 10 gpioc gpio-im c! ;
-"
-    .byte 0
-    .align 2, 0
+    .include "lm3s811.gen.s"
 
     defvar "SBUF", 4, , SBUF, 128
     defvar "SBUF-HEAD", 9, , SBUF_HEAD
