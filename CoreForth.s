@@ -1060,6 +1060,9 @@ interpret_error:
 prompt:
     .ascii " ok "
 
+    defword "EVALUATE", 8, , EVALUATE
+    .word XSOURCE, STORE, LIT, 0, ININDEX, STORE, XINTERPRET, TWODROP, EXIT
+
     .align 2, 0
 
     defword "FORGET", 6, , FORGET
