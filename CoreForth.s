@@ -222,8 +222,8 @@ readline_addchar:
     add r5, r5, #1
     subs r6, r6, #1
     bgt readline_loop
-    sub r0, r5, r4
 readline_end:
+    sub r0, r5, r4
     pop {r4, r5, r6, pc}
 
 printstack:
