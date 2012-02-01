@@ -981,10 +981,10 @@ skip_loop_done:
     REPEAT SWAP
     OVER DUP C@ 0 = IF
         DROP DROP DROP
-        HERE 0 OVER ! #TIB >IN ! EXIT
+        HERE 0 OVER ! EXIT
     ENDIF
     BEGIN
-      DUP C@ ROT SWAP OVER <> WHILE
+      DUP C@ ROT SWAP OVER <> ROT DUP C@ ROT AND SWAP ROT ROT WHILE
           SWAP +1 1 >IN +! 0
     REPEAT
     DROP OVER SWAP -
@@ -999,9 +999,9 @@ word_find_start:
     .word BRANCH, word_find_start
 word_start_found:
     .word OVER, DUP, FETCHBYTE, LIT, 0, EQU, ZBRANCH, word_find_end
-    .word DROP, DROP, DROP, HERE, LIT, 0, OVER, STORE, TIBSIZE, ININDEX, STORE, EXIT
+    .word DROP, DROP, DROP, HERE, LIT, 0, OVER, STORE, EXIT
 word_find_end:
-    .word DUP, FETCHBYTE, ROT, SWAP, OVER, NEQU, ZBRANCH, word_end_found
+    .word DUP, FETCHBYTE, ROT, SWAP, OVER, NEQU, ROT, DUP, FETCHBYTE, ROT, AND, SWAP, ROT, ROT, ZBRANCH, word_end_found
     .word SWAP, INCR
     .word LIT, 1, ININDEX, ADDSTORE
     .word BRANCH, word_find_end
