@@ -972,36 +972,16 @@ skip_loop_done:
     .word DROP, EXIT
 
     defword "WORD", 4, , WORD
-/*
-    : word ( c -- c-addr )
-    SOURCE >IN @ +
-    BEGIN                                 ( del addr )
-      DUP C@ ROT SWAP OVER = WHILE       ( addr del )
-          SWAP +1 1 >IN +!                ( del addr+1 )
-    REPEAT SWAP
-    OVER DUP C@ 0 = IF
-        DROP DROP DROP
-        HERE 0 OVER ! EXIT
-    ENDIF
-    BEGIN
-      DUP C@ ROT SWAP OVER <> ROT DUP C@ ROT AND SWAP ROT ROT WHILE
-          SWAP +1 1 >IN +! 0
-    REPEAT
-    DROP OVER SWAP -
-    DUP HERE !
-    HERE +1 SWAP CMOVE HERE ;
-*/
     .word SOURCE, ININDEX, FETCH, ADD
 word_find_start:
-    .word DUP, FETCHBYTE, ROT, SWAP, OVER, EQU, ZBRANCH, word_start_found
+    .word DUP, FETCHBYTE, ROT, SWAP, OVER, EQU, ROT, DUP, FETCHBYTE, DUP, BL, LE, AND, ROT, OR, SWAP, ROT, ROT, ZBRANCH, word_start_found
     .word SWAP, INCR
     .word LIT, 1, ININDEX, ADDSTORE
     .word BRANCH, word_find_start
 word_start_found:
-    .word OVER, DUP, FETCHBYTE, LIT, 0, EQU, ZBRANCH, word_find_end
-    .word DROP, DROP, DROP, HERE, LIT, 0, OVER, STORE, EXIT
+    .word OVER
 word_find_end:
-    .word DUP, FETCHBYTE, ROT, SWAP, OVER, NEQU, ROT, DUP, FETCHBYTE, ROT, AND, SWAP, ROT, ROT, ZBRANCH, word_end_found
+    .word DUP, FETCHBYTE, ROT, SWAP, OVER, NEQU, ROT, DUP, FETCHBYTE, DUP, BL, GE, AND, ROT, AND, SWAP, ROT, ROT, ZBRANCH, word_end_found
     .word SWAP, INCR
     .word LIT, 1, ININDEX, ADDSTORE
     .word BRANCH, word_find_end
@@ -1009,7 +989,6 @@ word_end_found:
     .word DROP, OVER, SUB
     .word DUP, HERE, STORE
     .word HERE, INCR, SWAP, CMOVE
-    .word LIT, 1, ININDEX, ADDSTORE
     .word HERE, EXIT
 
     defcode "LINK>", 5, , FROMLINK
@@ -1050,7 +1029,7 @@ word_end_found:
     mov pc, r1
 
     defword "(INTERPRET)", 11, , XINTERPRET @ TODO restructure this
-    .word STATE, STORE
+    .word LIT, 0, STATE, STORE
 interpret_loop:
     .word BL, WORD, DUP, FETCHBYTE, ZBRANCH, interpret_eol
     .word FIND, QDUP, ZBRANCH, interpret_check_number
@@ -1073,7 +1052,7 @@ interpret_eol:
     defword "INTERPRET", 9, , INTERPRET
     .word TIB, XSOURCE, STORE
     .word LIT, 0, ININDEX, STORE
-    .word SOURCE, TIBSIZE, ACCEPT, DROP, SPACE
+    .word SOURCE, DUP, TIBSIZE, ACCEPT, ADD, LIT, 0, SWAP, STOREBYTE, SPACE
     .word XINTERPRET, ZBRANCH, interpret_error
     .word DROP, LIT, prompt, LIT, 4, TYPE, CR, EXIT
 interpret_error:
