@@ -863,6 +863,9 @@ is_number:
     .word LIT, DOVAR, COMMA         @ set code field
     .word EXIT
 
+    defword "VARIABLE", 8, , VARIABLE
+    .word CREATE, CELL, ALLOT, EXIT
+
     defcode "LIT", 3, , LIT
     ldr r0, [r7]
     add r7, r7, #4
