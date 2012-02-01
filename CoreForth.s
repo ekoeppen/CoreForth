@@ -1072,9 +1072,8 @@ interpret_eol:
 
     defword "INTERPRET", 9, , INTERPRET
     .word TIB, XSOURCE, STORE
-    .word LIT, 0, DUP, ININDEX, STORE
-    .word SOURCE, TIBSIZE, TWODUP, BLANK, TWODUP, ADD, LIT, 0, SWAP, STOREBYTE
-    .word ACCEPT, DROP, SPACE
+    .word LIT, 0, ININDEX, STORE
+    .word SOURCE, TIBSIZE, ACCEPT, DROP, SPACE
     .word XINTERPRET, ZBRANCH, interpret_error
     .word DROP, LIT, prompt, LIT, 4, TYPE, CR, EXIT
 interpret_error:
