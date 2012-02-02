@@ -120,6 +120,16 @@ DOVAR:
     push {r1}
     NEXT
 
+DODOES:
+    REG r6
+    CHR #' '
+    REG r7
+    CHR #' '
+    REG r0
+    CHR #10
+    b .
+    NEXT
+
     defcode "EXIT", 4, , EXIT
     ldr r7, [r6]
     add r6, r6, #4
@@ -855,6 +865,12 @@ is_number:
     defword "[\']", 3, F_IMMED, BRACKETTICK
     .word TICK, LIT, LIT, COMMA, COMMA, EXIT  
 
+    defword "(DOES>)", 7, , XDOES
+    .word RFROM, LATEST, FETCH, FROMLINK, STORE, EXIT 
+
+    defword "DOES>", 5, F_IMMED, DOES
+    .word LIT, XDOES, COMMA, LIT, DODOES, COMMA, EXIT
+
     defword "CREATE", 6, , CREATE
     .word LATEST, FETCH
     .word HERE, LATEST, STORE       @ update latest
@@ -865,6 +881,11 @@ is_number:
 
     defword "VARIABLE", 8, , VARIABLE
     .word CREATE, CELL, ALLOT, EXIT
+
+    defword "CONSTANT", 8, , CONSTANT
+    .word CREATE, COMMA, XDOES
+    b .
+    NEXT
 
     defcode "LIT", 3, , LIT
     ldr r0, [r7]
