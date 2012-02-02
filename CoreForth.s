@@ -884,7 +884,9 @@ is_number:
 
     defword "CONSTANT", 8, , CONSTANT
     .word CREATE, COMMA, XDOES
-    b .
+    add r0, r0, #4
+    ldr r0, [r0]
+    push {r0}
     NEXT
 
     defcode "LIT", 3, , LIT
