@@ -121,13 +121,12 @@ DOVAR:
     NEXT
 
 DODOES:
-    REG r6
-    CHR #' '
-    REG r7
-    CHR #' '
-    REG r0
-    CHR #10
-    b .
+    sub r6, r6, #4
+    str r7, [r6]
+    mov r7, lr
+    add r7, r7, #5
+    add r0, r0, #4
+    push {r0}
     NEXT
 
     defcode "EXIT", 4, , EXIT
@@ -901,7 +900,7 @@ is_number:
     ldr.w r1, [pc, #4]
     .word COMMA
     .word LIT
-    bx r1
+    blx r1
     .short 0
     .word COMMA
     .word LIT, DODOES + 1, COMMA, EXIT
