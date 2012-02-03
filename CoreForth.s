@@ -269,6 +269,27 @@ stack_underflow_message:
 stack_underflow_message_end:
     .ltorg
 
+calc_wide_branch:
+    mov ip, #0x9000
+    ands r1, r0, #0x800000
+    ubfx r2, r0, #1, #11
+    movt ip, #0xffff
+    it ne
+    movne r1, #0x2000
+    orr r3, r2, ip
+    ands r2, r0, #0x400000
+    orr ip, r3, r1
+    it ne
+    movne r2, #0x800
+    ubfx r0, r0, #12, #10
+    orr r1, ip, r2
+    orr r0, r0, #0xf400
+    sxth r3, r1
+    lsls r3, r3, #16
+    adds r0, r3, r0
+    subs r0, r0, #1
+    bx lr
+
 @ ---------------------------------------------------------------------
 @ -- Stack manipulation -----------------------------------------------
 
@@ -846,6 +867,12 @@ is_number:
 
 @ ---------------------------------------------------------------------
 @ -- Compiler and interpreter ----------------------------------------
+
+    defcode "(ABRANCH)", 8, , ASMBRANCH
+    pop {r0}
+    bl calc_wide_branch
+    push {r0}
+    NEXT
 
     defword "HERE", 4, , HERE
     .word DP, FETCH, EXIT
