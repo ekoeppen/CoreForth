@@ -896,7 +896,15 @@ is_number:
     .word RFROM, LATEST, FETCH, FROMLINK, STORE, EXIT 
 
     defword "DOES>", 5, F_IMMED, DOES
-    .word LIT, XDOES, COMMA, LIT, DODOES, COMMA, EXIT
+    .word LIT, XDOES, COMMA
+    .word LIT
+    ldr.w r1, [pc, #4]
+    .word COMMA
+    .word LIT
+    bx r1
+    .short 0
+    .word COMMA
+    .word LIT, DODOES + 1, COMMA, EXIT
 
     defword "CREATE", 6, , CREATE
     .word LATEST, FETCH
