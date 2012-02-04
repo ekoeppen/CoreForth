@@ -35,7 +35,7 @@
     bx r1
     .endm
 
-    .macro defword name, namelen, flags=0, label
+    .macro defword name, namelen, flags=0, label, xt=DOCOL
     .align 2, 0
     .global name_\label
 name_\label :
@@ -46,7 +46,7 @@ name_\label :
     .align  2, 0
     .global \label
 \label :
-    .int DOCOL
+    .int \xt
     @ parameter field follows
     .endm
 
@@ -77,10 +77,18 @@ code_\label :
     .endm
 
     .macro defconst name, namelen, flags=0, label, value
-    defcode \name,\namelen,\flags,\label
-    ldr r0, =\value
-    push {r0}
-    NEXT
+    .align 2, 0
+    .global name_\label
+name_\label :
+    .int link
+    .set link,name_\label
+    .byte \flags+\namelen
+    .ascii "\name"
+    .align 2, 0
+    .global \label
+\label :
+    .int DOCON
+    .word \value
     .endm
 
 @ ---------------------------------------------------------------------
@@ -120,6 +128,11 @@ DOVAR:
     push {r1}
     NEXT
 
+DOCON:
+    ldr r1, [r0, #4]
+    push {r1}
+    NEXT   
+
 DODOES:
     sub r6, r6, #4
     str r7, [r6]
@@ -128,6 +141,13 @@ DODOES:
     add r0, r0, #4
     push {r0}
     NEXT
+
+DOOFFSET:
+    ldr r1, [r0, #4]
+    pop {r2}
+    add r1, r2, r1
+    push {r1}
+    NEXT   
 
     defcode "EXIT", 4, , EXIT
     ldr r7, [r6]

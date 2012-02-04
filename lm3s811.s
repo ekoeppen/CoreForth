@@ -354,128 +354,53 @@ adcomp_handler:
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
 
-    defcode "GPIOA", 5, , GPIO_A
-    ldr r0, =GPIOA
-    push {r0}
-    NEXT
+    defconst "GPIOA", 5, , GPIO_A, GPIOA
+    defconst "GPIOB", 5, , GPIO_B, GPIOB
+    defconst "GPIOC", 5, , GPIO_C, GPIOC
+    defconst "GPIOD", 5, , GPIO_D, GPIOD
+    defconst "GPIOE", 5, , GPIO_E, GPIOE
 
-    defcode "GPIOB", 5, , GPIO_B
-    ldr r0, =GPIOB
-    push {r0}
-    NEXT
+    defword "GPIO-DIR", 8, , _GPIO_DIR, DOOFFSET
+    .word GPIO_DIR
 
-    defcode "GPIOC", 5, , GPIO_C
-    ldr r0, =GPIOC
-    push {r0}
-    NEXT
+    defword "GPIO-AFSEL", 10, , _GPIO_AFSEL, DOOFFSET
+    .word GPIO_AFSEL
 
-    defcode "GPIOD", 5, , GPIO_D
-    ldr r0, =GPIOD
-    push {r0}
-    NEXT
+    defword "GPIO-IS", 7, , _GPIO_IS, DOOFFSET
+    .word GPIO_IS
 
-    defcode "GPIOE", 5, , GPIO_E
-    ldr r0, =GPIOE
-    push {r0}
-    NEXT
+    defword "GPIO-IBE", 8, , _GPIO_IBE, DOOFFSET
+    .word GPIO_IBE
 
-    defcode "GPIO-DIR", 8, , _GPIO_DIR
-    ldr r0, =GPIO_DIR
-    pop {r1}
-    add r0, r0, r1
-    push {r0}
-    NEXT
+    defword "GPIO-IEV", 8, , _GPIO_IEV, DOOFFSET
+    .word GPIO_IEV
 
-    defcode "GPIO-AFSEL", 10, , _GPIO_AFSEL
-    ldr r0, =GPIO_AFSEL
-    pop {r1}
-    add r0, r0, r1
-    push {r0}
-    NEXT
+    defword "GPIO-IM", 7, , _GPIO_IM, DOOFFSET
+    .word GPIO_IM
 
-    defcode "GPIO-IS", 7, , _GPIO_IS
-    ldr r0, =GPIO_IS
-    pop {r1}
-    add r0, r0, r1
-    push {r0}
-    NEXT
+    defword "GPIO-RIS", 8, , _GPIO_RIS, DOOFFSET
+    .word GPIO_RIS
 
-    defcode "GPIO-IBE", 8, , _GPIO_IBE
-    ldr r0, =GPIO_IBE
-    pop {r1}
-    add r0, r0, r1
-    push {r0}
-    NEXT
+    defword "GPIO-MIS", 8, , _GPIO_MIS, DOOFFSET
+    .word GPIO_MIS
 
-    defcode "GPIO-IEV", 8, , _GPIO_IEV
-    ldr r0, =GPIO_IEV
-    pop {r1}
-    add r0, r0, r1
-    push {r0}
-    NEXT
+    defword "GPIO-ICR", 8, , _GPIO_ICR, DOOFFSET
+    .word GPIO_ICR
 
-    defcode "GPIO-IM", 7, , _GPIO_IM
-    ldr r0, =GPIO_IM
-    pop {r1}
-    add r0, r0, r1
-    push {r0}
-    NEXT
+    defword "GPIO-DR2R", 9, , _GPIO_DR2R, DOOFFSET
+    .word GPIO_DR2R
 
-    defcode "GPIO-RIS", 8, , _GPIO_RIS
-    ldr r0, =GPIO_RIS
-    pop {r1}
-    add r0, r0, r1
-    push {r0}
-    NEXT
+    defword "GPIO-ODR", 8, , _GPIO_ODR, DOOFFSET
+    .word GPIO_ODR
 
-    defcode "GPIO-MIS", 8, , _GPIO_MIS
-    ldr r0, =GPIO_MIS
-    pop {r1}
-    add r0, r0, r1
-    push {r0}
-    NEXT
+    defword "GPIO-PUR", 8, , _GPIO_PUR, DOOFFSET
+    .word GPIO_PUR
 
-    defcode "GPIO-ICR", 8, , _GPIO_ICR
-    ldr r0, =GPIO_ICR
-    pop {r1}
-    add r0, r0, r1
-    push {r0}
-    NEXT
+    defword "GPIO-PDR", 8, , _GPIO_PDR, DOOFFSET
+    .word GPIO_PDR
 
-    defcode "GPIO-DR2R", 9, , _GPIO_DR2R
-    ldr r0, =GPIO_DR2R
-    pop {r1}
-    add r0, r0, r1
-    push {r0}
-    NEXT
-
-    defcode "GPIO-ODR", 8, , _GPIO_ODR
-    ldr r0, =GPIO_ODR
-    pop {r1}
-    add r0, r0, r1
-    push {r0}
-    NEXT
-
-    defcode "GPIO-PUR", 8, , _GPIO_PUR
-    ldr r0, =GPIO_PUR
-    pop {r1}
-    add r0, r0, r1
-    push {r0}
-    NEXT
-
-    defcode "GPIO-PDR", 8, , _GPIO_PDR
-    ldr r0, =GPIO_PDR
-    pop {r1}
-    add r0, r0, r1
-    push {r0}
-    NEXT
-
-    defcode "GPIO-DEN", 8, , _GPIO_DEN
-    ldr r0, =GPIO_DEN
-    pop {r1}
-    add r0, r0, r1
-    push {r0}
-    NEXT
+    defword "GPIO-DEN", 8, , _GPIO_DEN, DOOFFSET
+    .word GPIO_DEN
 
     defcode "GPIO-DATA!", 10, , _GPIO_DATA_STORE @ ( value mask gpio -- )
     pop {r1}
@@ -486,10 +411,7 @@ adcomp_handler:
     strb r1, [r0]
     NEXT
 
-    defcode "NVIC", 4, , _NVIC
-    ldr r0, =NVIC
-    push {r0}
-    NEXT
+    defconst "NVIC", 4, , _NVIC, NVIC
 
     defcode "NVIC-SETENA", 11, , NVIC_SETENA
     ldr r0, =NVIC
