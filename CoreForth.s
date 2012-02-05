@@ -722,7 +722,7 @@ cmove_loop:
 
     defconst "#TIB", 4, , TIBSIZE, 128
 
-    defword "SOURCE", 5, , SOURCE
+    defword "SOURCE", 6, , SOURCE
     .word XSOURCE, FETCH, EXIT
 
     .ltorg
@@ -887,7 +887,7 @@ is_number:
 @ ---------------------------------------------------------------------
 @ -- Compiler and interpreter ----------------------------------------
 
-    defcode "(ABRANCH)", 8, , ASMBRANCH
+    defcode "(ABRANCH)", 9, , ASMBRANCH
     pop {r0}
     bl calc_wide_branch
     push {r0}
