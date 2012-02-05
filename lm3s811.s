@@ -24,6 +24,7 @@
 
     .set SYSCTL,      0x400fe000
     .set SYSCTL_RCC,      0x0060
+    .set SYSCTL_RCGC0,    0x0100
     .set SYSCTL_RCGC1,    0x0104
     .set SYSCTL_RCGC2,    0x0108
 
@@ -131,15 +132,18 @@ init_board:
 .endif
     str r1, [r0]
 
-    @ enable clocks on all timers, UARTS, SSI and I2C and GPIO ports
+    @ enable clocks on all timers, UARTS, ADC, PWM, SSI and I2C and GPIO ports
     ldr r0, =(SYSCTL + SYSCTL_RCC)
     ldr r1, =0x078e3ac0
     str r1, [r0]
+    ldr r0, =(SYSCTL + SYSCTL_RCGC0)
+    ldr r1, =0x00110000
+    str r1, [r0]
     ldr r0, =(SYSCTL + SYSCTL_RCGC1)
-    ldr r1, =0x0007113
+    ldr r1, =0x00071013
     str r1, [r0]
     ldr r0, =(SYSCTL + SYSCTL_RCGC2)
-    mov r1, #63
+    mov r1, #0x1f
     str r1, [r0]
 
     mov r0, #32
