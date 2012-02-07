@@ -844,6 +844,15 @@ is_number:
 
     .ltorg
 
+    defword "DECIMAL", 7, , DECIMAL
+    .word LIT, 10, BASE, STORE, EXIT
+
+    defword "HEX", 3, , HEX
+    .word LIT, 16, BASE, STORE, EXIT
+
+    defword "OCTAL", 5, , OCTAL
+    .word LIT, 8, BASE, STORE, EXIT
+
 @ ---------------------------------------------------------------------
 @ -- Control flow ----------------------------------------------------
 

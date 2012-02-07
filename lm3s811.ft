@@ -1,3 +1,5 @@
+HEX
+
 : REGISTER   CREATE , DOES> @ + ;
 : SET-BITS   DUP @ ROT OR SWAP ! ;
 

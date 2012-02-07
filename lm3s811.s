@@ -437,7 +437,6 @@ adcomp_handler:
     .word LIT, RETI, COMMA, REVEAL, LBRACKET, EXIT
 
     defword "COLD", 4, , COLD
-    .word LIT, 16, BASE, STORE
     .word LIT, words, EVALUATE
     .word QUIT
 
