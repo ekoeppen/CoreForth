@@ -893,7 +893,7 @@ is_number:
     .word SWAP, LIT, BRANCH, COMMA, COMMA
     .word ENDIF, EXIT
 
-    defcode "DO", 2, , DO
+    defcode "(DO)", 4, , XDO
     pop {r0, r1}
     ldr r2, [r6]
     str r1, [r6]
@@ -908,18 +908,28 @@ is_number:
     push {r0}
     NEXT
 
-    defcode "LOOP", 4, , LOOP
+    defcode "(LOOP)", 6, , XLOOP
     ldr r0, [r6, #4]
     ldr r1, [r6, #8]
     cmp r0, r1
-    beq 1f
+    bge 1f
     add r0, r0, #1
     str r0, [r6,#4]
+    mov r0, #0
+    push {r0}
     NEXT
 1:  ldr r0, [r6]
     add r6, r6, #8
     str r0, [r6]
+    mvn r0, #0
+    push {r0}
     NEXT
+
+    defword "DO", 2, F_IMMED, DO
+    .word HERE, LIT, XDO, COMMA, EXIT
+
+    defword "LOOP", 4, F_IMMED, LOOP
+    .word LIT, XLOOP, COMMA, LIT, ZBRANCH, COMMA, COMMA, EXIT
 
 @ ---------------------------------------------------------------------
 @ -- Compiler and interpreter ----------------------------------------
