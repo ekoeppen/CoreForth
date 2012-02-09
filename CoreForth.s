@@ -911,7 +911,7 @@ is_number:
     defword ",", 1, , COMMA
     .word HERE, STORE, CELL, ALLOT, EXIT
 
-    defword "CCOMMA", 6, , CCOMMA
+    defword "C,", 2, , CCOMMA
     .word HERE, STOREBYTE, LIT, 1, ALLOT, EXIT
 
     defword "\'", 1, , TICK
