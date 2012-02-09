@@ -935,6 +935,7 @@ is_number:
     .word LIT, DODOES + 1, COMMA, EXIT
 
     defword "CREATE", 6, , CREATE
+    .word HERE, ALIGNED, DP, STORE
     .word LATEST, FETCH
     .word HERE, LATEST, STORE       @ update latest
     .word COMMA                     @ set link
