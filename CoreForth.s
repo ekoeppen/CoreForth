@@ -791,7 +791,7 @@ dump_end:
 
     defword "SCAN", 4, , SCAN
     @ :SCAN ( c-addr -- c-addr' )
-    @ BEGIN DUP C@ 32 <> IF EXIT ENDIF LOOP ;
+    @ BEGIN DUP C@ 32 <> WHILE 1+ UNTIL ;
 scan_loop:
     .word DUP, FETCHBYTE, LIT, 32, NEQU, ZBRANCH, scan_cont
     .word EXIT
@@ -800,7 +800,7 @@ scan_cont:
 
     defword "-SCAN", 5, , NOTSCAN
     @ :-SCAN ( c-addr -- c-addr' )
-    @ DUP BEGIN DUP C@ 32 = IF - EXIT ENDIF LOOP ;
+    @ BEGIN DUP C@ 32 = WHILE 1+ UNTIL ;
 not_scan_loop:
     .word DUP, FETCHBYTE, LIT, 32, EQU, ZBRANCH, not_scan_cont
     .word EXIT
@@ -914,7 +914,7 @@ is_number:
     cmp r0, r1
     bge 1f
     add r0, r0, #1
-    str r0, [r6,#4]
+    str r0, [r6, #4]
     mov r0, #0
     push {r0}
     NEXT
@@ -926,7 +926,7 @@ is_number:
     NEXT
 
     defword "DO", 2, F_IMMED, DO
-    .word HERE, LIT, XDO, COMMA, EXIT
+    .word LIT, XDO, COMMA, HERE, EXIT
 
     defword "LOOP", 4, F_IMMED, LOOP
     .word LIT, XLOOP, COMMA, LIT, ZBRANCH, COMMA, COMMA, EXIT
