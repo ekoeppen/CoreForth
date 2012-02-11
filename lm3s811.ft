@@ -112,3 +112,37 @@ HEX
 : POT@
     8 ADCPSSI C!
     ADCSSFIFO3 @ ;
+
+CREATE DISP-INIT-SEQ
+    013 C,
+    002 C, 080 C, 0AE C,
+    002 C, 080 C, 004 C,
+    002 C, 080 C, 012 C,
+    004 C, 080 C, 081 C, 080 C, 02B C,
+    002 C, 080 C, 0A1 C,
+    002 C, 080 C, 040 C,
+    004 C, 080 C, 0D3 C, 080 C, 000 C,
+    004 C, 080 C, 0A8 C, 080 C, 00F C,
+    002 C, 080 C, 0A4 C,
+    002 C, 080 C, 0A6 C,
+    002 C, 080 C, 0B0 C,
+    002 C, 080 C, 0C8 C,
+    004 C, 080 C, 0D5 C, 080 C, 072 C,
+    004 C, 080 C, 0D8 C, 080 C, 000 C,
+    004 C, 080 C, 0D9 C, 080 C, 022 C,
+    004 C, 080 C, 0DA C, 080 C, 012 C,
+    004 C, 080 C, 0DB C, 080 C, 00F C,
+    004 C, 080 C, 0AD C, 080 C, 08B C,
+    002 C, 080 C, 0AF C,
+
+: I2C-SINGLE-SEQ-M!
+    DUP C@ 1 DO DUP I + C@ . LOOP CR DUP C@ + 1+ ;
+
+: I2C-SEQ-M!
+    DUP C@ SWAP 1+ SWAP 1 DO
+        I2C-SINGLE-SEQ-M!
+    LOOP ;
+
+: DISP-ENABLE
+    I2C-ENABLE
+    3D I2CSOAR C! ;
