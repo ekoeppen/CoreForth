@@ -621,6 +621,18 @@ cmove_loop:
     push {r0}
     NEXT
 
+    defcode "2*", 2, , TWOSTAR
+    ldr r0, [sp]
+    lsl r0, r0, #1
+    str r0, [sp]
+    NEXT
+
+    defcode "2/", 2, , TWOSLASH
+    ldr r0, [sp]
+    asr r0, r0, #1
+    str r0, [sp]
+    NEXT
+
 @ ---------------------------------------------------------------------
 @ -- Boolean operators -----------------------------------------------
 
