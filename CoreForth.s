@@ -922,10 +922,10 @@ is_number:
 
     defcode "(LOOP)", 6, , XLOOP
     ldr r0, [r6, #4]
+    add r0, r0, #1
     ldr r1, [r6, #8]
     cmp r0, r1
     bge 1f
-    add r0, r0, #1
     str r0, [r6, #4]
     mov r0, #0
     push {r0}
