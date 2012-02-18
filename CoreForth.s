@@ -544,7 +544,9 @@ cmove_loop:
     .word RFROM, COUNT, TWODUP, ADD, ALIGNED, TOR, EXIT
 
     defword "S\"", 2, F_IMMED, SQUOTE
-    .word LIT, XSQUOTE, COMMA, LIT, '"', WORD, FETCHBYTE, INCR, ALIGNED, ALLOT, EXIT 
+    .word LIT, XSQUOTE, COMMA, LIT, '"', WORD, FETCHBYTE, INCR, ALIGNED, ALLOT
+    .word LIT, 1, ININDEX, ADDSTORE
+    .word EXIT 
 
     defword "PAD", 3, , PAD
     .word HERE, LIT, 256, ADD, EXIT
