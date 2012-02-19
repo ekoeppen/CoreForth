@@ -535,11 +535,12 @@ DISP_FONT:
     .word LIT, RETI, COMMA, REVEAL, LBRACKET, EXIT
 
     defword "COLD", 4, , COLD
-    .word LIT, words, EVALUATE
+    .word LIT, words, LIT, words_end - words, EVALUATE
     .word QUIT
 
 words:
     .include "lm3s811.gen.s"
+words_end:
 
     defvar "SBUF", 4, , SBUF, 128
     defvar "SBUF-HEAD", 9, , SBUF_HEAD

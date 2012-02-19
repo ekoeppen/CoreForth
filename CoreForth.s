@@ -1164,7 +1164,7 @@ interpret_eol:
     .word LIT, -1, EXIT
 
     defword "INTERPRET", 9, , INTERPRET
-    .word TIB, XSOURCE, STORE
+    .word TIB, XSOURCE, STORE, TIBSIZE, SOURCECOUNT, STORE
     .word LIT, 0, ININDEX, STORE
     .word SOURCE, DROP, DUP, TIBSIZE, ACCEPT, ADD, LIT, 0, SWAP, STOREBYTE, SPACE
     .word XINTERPRET, ZBRANCH, interpret_error
@@ -1175,7 +1175,7 @@ prompt:
     .ascii " ok "
 
     defword "EVALUATE", 8, , EVALUATE
-    .word XSOURCE, STORE, LIT, 0, ININDEX, STORE, XINTERPRET, TWODROP, EXIT
+    .word SOURCECOUNT, STORE, XSOURCE, STORE, LIT, 0, ININDEX, STORE, XINTERPRET, TWODROP, EXIT
 
     .align 2, 0
 
@@ -1284,6 +1284,7 @@ see_done:
     defvar "TIB", 3, , TIB, 132
     defvar "(SOURCE)", 8, , XSOURCE
     defvar "SOURCE#", 7, , SOURCECOUNT
+    defvar ">SOURCE", 7, , SOURCEINDEX
 
     .ltorg
 
