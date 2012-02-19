@@ -1085,6 +1085,17 @@ is_number:
 
     .ltorg
 
+    defword "XWORD", 5, , XWORD
+    .word DUP, SOURCE, DROP, ININDEX, FETCH, TRIMSTRING
+    .word DUP, TOR, ROT, SKIP @           -- c adr' n'
+    .word OVER, RFROM, ROT, SCAN @          -- adr" n"
+    .word DUP, ZNEQU, ZBRANCH, noskip_delim, DECR   @     skip trailing delim.
+noskip_delim:
+    .word RFROM, RFROM, ROT, SUB, ININDEX, ADDSTORE @        update >IN offset
+    .word TUCK, SUB @                      -- adr' N
+    .word HERE, INCR, SWAP, CMOVE
+    .word HERE, EXIT
+
     defword "WORD", 4, , WORD
     .word SOURCE, DROP, ININDEX, FETCH, ADD
 word_find_start:
