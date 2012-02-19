@@ -807,23 +807,21 @@ dump_line:
 dump_end:
     .word DROP, EXIT
 
-    defword "SCAN", 4, , SCAN
-    @ :SCAN ( c-addr -- c-addr' )
-    @ BEGIN DUP C@ 32 <> WHILE 1+ UNTIL ;
-scan_loop:
-    .word DUP, FETCHBYTE, LIT, 32, NEQU, ZBRANCH, scan_cont
-    .word EXIT
-scan_cont:
-    .word INCR, BRANCH, scan_loop
+    defword "SKIP", 4, , SKIP
+    .word TOR
+1:
+    .word OVER, FETCHBYTE, RFETCH, EQU, OVER, ZGT, AND, ZBRANCH, 2f
+    .word LIT, 1, TRIMSTRING, BRANCH, 1b
+2:
+    .word RDROP, EXIT
 
-    defword "-SCAN", 5, , NOTSCAN
-    @ :-SCAN ( c-addr -- c-addr' )
-    @ BEGIN DUP C@ 32 = WHILE 1+ UNTIL ;
-not_scan_loop:
-    .word DUP, FETCHBYTE, LIT, 32, EQU, ZBRANCH, not_scan_cont
-    .word EXIT
-not_scan_cont:
-    .word INCR, BRANCH, not_scan_loop
+    defword "SCAN", 4, , SCAN
+    .word TOR
+1:
+    .word OVER, FETCHBYTE, RFETCH, NEQU, OVER, ZGT, AND, ZBRANCH, 2f
+    .word LIT, 1, TRIMSTRING, BRANCH, 1b
+2:
+    .word RDROP, EXIT
 
     defword "DIGIT?", 6, , ISDIGIT
     .word DUP, LIT, '9', GT, LIT, 0x100, AND, ADD
