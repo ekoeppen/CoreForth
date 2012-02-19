@@ -1083,36 +1083,6 @@ is_number:
 
     .ltorg
 
-    defword "SKIP", 4, , SKIP
-/*  SKIP ( c-addr n c -- c-addr' n' ) \ TODO: check result if not found
-    : skip >r begin over c@ r@ = over 0>= and while 1 /string repeat r> drop ;
-*/
-    NEXT    
-
-    defword "+SKIP", 5, , PSKIP
-/*
-    +SKIP ( c -- )
-    ( fetch source address, get byte, compare fetched byte to delimiter, increment address and loop if not equal )
-    BEGIN
-      DUP SOURCE >IN @ +      ( delimiter delimiter address )
-      C@                      ( delimiter delimiter content )
-      (compare)               ( delimiter check)
-    WHILE
-      CHAR >IN +! 
-    REPEAT
-    DROP
-*/
-
-skip_loop:
-    .word DUP, SOURCE, ININDEX, FETCH, ADD
-    .word FETCHBYTE
-    .word EQU
-    .word ZBRANCH, skip_loop_done
-    .word CHAR, ININDEX, ADDSTORE
-    .word BRANCH, skip_loop
-skip_loop_done:
-    .word DROP, EXIT
-
     defword "WORD", 4, , WORD
     .word SOURCE, DROP, ININDEX, FETCH, ADD
 word_find_start:
