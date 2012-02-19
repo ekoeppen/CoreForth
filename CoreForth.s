@@ -403,6 +403,10 @@ calc_wide_branch:
     push {r0}
     NEXT
 
+    defcode "RDROP", 5, , RDROP
+    add r6, r6, #4
+    NEXT
+
     defcode "SP@", 3, , SPAT
     mov r0, sp
     push {r0}
