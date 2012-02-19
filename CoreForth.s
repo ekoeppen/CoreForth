@@ -737,7 +737,7 @@ cmove_loop:
     defconst "#TIB", 4, , TIBSIZE, 128
 
     defword "SOURCE", 6, , SOURCE
-    .word XSOURCE, FETCH, EXIT
+    .word XSOURCE, FETCH, SOURCECOUNT, FETCH, EXIT
 
     .ltorg
 
@@ -1114,7 +1114,7 @@ skip_loop_done:
     .word DROP, EXIT
 
     defword "WORD", 4, , WORD
-    .word SOURCE, ININDEX, FETCH, ADD
+    .word SOURCE, DROP, ININDEX, FETCH, ADD
 word_find_start:
     .word DUP, FETCHBYTE, ROT, SWAP, OVER, EQU, ROT, DUP, FETCHBYTE, DUP, BL, LE, AND, ROT, OR, SWAP, ROT, ROT, ZBRANCH, word_start_found
     .word SWAP, INCR
@@ -1194,7 +1194,7 @@ interpret_eol:
     defword "INTERPRET", 9, , INTERPRET
     .word TIB, XSOURCE, STORE
     .word LIT, 0, ININDEX, STORE
-    .word SOURCE, DUP, TIBSIZE, ACCEPT, ADD, LIT, 0, SWAP, STOREBYTE, SPACE
+    .word SOURCE, DROP, DUP, TIBSIZE, ACCEPT, ADD, LIT, 0, SWAP, STOREBYTE, SPACE
     .word XINTERPRET, ZBRANCH, interpret_error
     .word DROP, LIT, prompt, LIT, 4, TYPE, CR, EXIT
 interpret_error:
@@ -1310,7 +1310,8 @@ see_done:
     defvar "BASE", 4, , BASE
     defvar ">IN", 3, , ININDEX
     defvar "TIB", 3, , TIB, 132
-    defvar "(SOURCE)", 7, , XSOURCE
+    defvar "(SOURCE)", 8, , XSOURCE
+    defvar "SOURCE#", 7, , SOURCECOUNT
 
     .ltorg
 
