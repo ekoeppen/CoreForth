@@ -1135,9 +1135,8 @@ noskip_delim:
     mov pc, r1
 
     defword "(INTERPRET)", 11, , XINTERPRET @ TODO restructure this
-    .word LIT, 0, STATE, STORE
 interpret_loop:
-    .word BL, WORD, DUMP, SPACE, DUP, FETCHBYTE, ZBRANCH, interpret_eol
+    .word BL, WORD, DUP, FETCHBYTE, ZBRANCH, interpret_eol
     .word FIND, QDUP, ZBRANCH, interpret_check_number
     .word STATE, FETCH, ZBRANCH, interpret_execute
     .word INCR, ZBRANCH, interpret_compile_word
@@ -1156,6 +1155,7 @@ interpret_eol:
     .word LIT, -1, EXIT
 
     defword "INTERPRET", 9, , INTERPRET
+    .word LIT, 0, STATE, STORE
     .word TIB, XSOURCE, STORE
     .word LIT, 0, ININDEX, STORE
     .word XSOURCE, FETCH, TIBSIZE, ACCEPT, SOURCECOUNT, STORE, SPACE
@@ -1167,14 +1167,16 @@ prompt:
     .ascii " ok "
 
     defword "EVALUATE", 8, , EVALUATE
+    .word XSOURCE, STORE
+    .word LIT, 0, STATE, STORE
 1:
-    .word DUP, FETCHBYTE, DUP, LIT, 255, NEQU, ZBRANCH, 2f
-    .word SOURCECOUNT, STORE, DUP, INCR, XSOURCE, STORE, LIT, 0, ININDEX, STORE, XINTERPRET, ZBRANCH, 3f, DROP
-    .word DUP, FETCHBYTE, ADD, INCR,BRANCH, 1b
+    .word XSOURCE, FETCH, DUP, FETCHBYTE, DUP, LIT, 255, NEQU, ZBRANCH, 2f
+    .word SOURCECOUNT, STORE, INCR, XSOURCE, STORE, LIT, 0, ININDEX, STORE, XINTERPRET, ZBRANCH, 3f, DROP
+    .word SOURCECOUNT, FETCH, XSOURCE, ADDSTORE, BRANCH, 1b
 2:
     .word TWODROP, EXIT
 3:
-    .word DROP, EXIT
+    .word DROP, BRANCH, interpret_error
 
     defword "FORGET", 6, , FORGET
     /* BL WORD DROP FIND DROP >LINK @ LATEST ! */
