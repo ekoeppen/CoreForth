@@ -4,7 +4,7 @@ all: lm3s811.bin qemu.bin
 	arm-none-eabi-objcopy -Obinary $< $@
 
 %.gen.s: %.ft
-	awk '{print ".ascii \"" $$0 "\\n\""} END{print ".byte 0\n.align 2, 0"}' < $< > $@
+	awk '{print ".byte ", length($$0); print ".ascii \"" $$0 "\""} END{print ".byte 255\n.align 2, 0"}' < $< > $@
 
 .s.o:
 	arm-none-eabi-as -mcpu=cortex-m3 -o $@ $< 

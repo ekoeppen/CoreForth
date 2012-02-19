@@ -1085,34 +1085,15 @@ is_number:
 
     .ltorg
 
-    defword "XWORD", 5, , XWORD
-    .word DUP, SOURCE, DROP, ININDEX, FETCH, TRIMSTRING
-    .word DUP, TOR, ROT, SKIP @           -- c adr' n'
-    .word OVER, RFROM, ROT, SCAN @          -- adr" n"
-    .word DUP, ZNEQU, ZBRANCH, noskip_delim, DECR   @     skip trailing delim.
-noskip_delim:
-    .word RFROM, RFROM, ROT, SUB, ININDEX, ADDSTORE @        update >IN offset
-    .word TUCK, SUB @                      -- adr' N
-    .word HERE, INCR, SWAP, CMOVE
-    .word HERE, EXIT
-
     defword "WORD", 4, , WORD
-    .word SOURCE, DROP, ININDEX, FETCH, ADD
-word_find_start:
-    .word DUP, FETCHBYTE, ROT, SWAP, OVER, EQU, ROT, DUP, FETCHBYTE, DUP, BL, LE, AND, ROT, OR, SWAP, ROT, ROT, ZBRANCH, word_start_found
-    .word SWAP, INCR
-    .word LIT, 1, ININDEX, ADDSTORE
-    .word BRANCH, word_find_start
-word_start_found:
-    .word OVER
-word_find_end:
-    .word DUP, FETCHBYTE, ROT, SWAP, OVER, NEQU, ROT, DUP, FETCHBYTE, DUP, BL, GE, AND, ROT, AND, SWAP, ROT, ROT, ZBRANCH, word_end_found
-    .word SWAP, INCR
-    .word LIT, 1, ININDEX, ADDSTORE
-    .word BRANCH, word_find_end
-word_end_found:
-    .word DROP, OVER, SUB
-    .word DUP, HERE, STORE
+    .word DUP, SOURCE, ININDEX, FETCH, TRIMSTRING
+    .word DUP, TOR, ROT, SKIP
+    .word OVER, TOR, ROT, SCAN
+    .word DUP, ZNEQU, ZBRANCH, noskip_delim, DECR
+noskip_delim:
+    .word RFROM, RFROM, ROT, SUB, ININDEX, ADDSTORE
+    .word TUCK, SUB
+    .word DUP, HERE, STOREBYTE
     .word HERE, INCR, SWAP, CMOVE
     .word HERE, EXIT
 
@@ -1156,7 +1137,7 @@ word_end_found:
     defword "(INTERPRET)", 11, , XINTERPRET @ TODO restructure this
     .word LIT, 0, STATE, STORE
 interpret_loop:
-    .word BL, WORD, DUP, FETCHBYTE, ZBRANCH, interpret_eol
+    .word BL, WORD, DUMP, SPACE, DUP, FETCHBYTE, ZBRANCH, interpret_eol
     .word FIND, QDUP, ZBRANCH, interpret_check_number
     .word STATE, FETCH, ZBRANCH, interpret_execute
     .word INCR, ZBRANCH, interpret_compile_word
@@ -1175,9 +1156,9 @@ interpret_eol:
     .word LIT, -1, EXIT
 
     defword "INTERPRET", 9, , INTERPRET
-    .word TIB, XSOURCE, STORE, TIBSIZE, SOURCECOUNT, STORE
+    .word TIB, XSOURCE, STORE
     .word LIT, 0, ININDEX, STORE
-    .word SOURCE, DROP, DUP, TIBSIZE, ACCEPT, ADD, LIT, 0, SWAP, STOREBYTE, SPACE
+    .word XSOURCE, FETCH, TIBSIZE, ACCEPT, SOURCECOUNT, STORE, SPACE
     .word XINTERPRET, ZBRANCH, interpret_error
     .word DROP, LIT, prompt, LIT, 4, TYPE, CR, EXIT
 interpret_error:
@@ -1186,9 +1167,14 @@ prompt:
     .ascii " ok "
 
     defword "EVALUATE", 8, , EVALUATE
-    .word SOURCECOUNT, STORE, XSOURCE, STORE, LIT, 0, ININDEX, STORE, XINTERPRET, TWODROP, EXIT
-
-    .align 2, 0
+1:
+    .word DUP, FETCHBYTE, DUP, LIT, 255, NEQU, ZBRANCH, 2f
+    .word SOURCECOUNT, STORE, DUP, INCR, XSOURCE, STORE, LIT, 0, ININDEX, STORE, XINTERPRET, ZBRANCH, 3f, DROP
+    .word DUP, FETCHBYTE, ADD, INCR,BRANCH, 1b
+2:
+    .word TWODROP, EXIT
+3:
+    .word DROP, EXIT
 
     defword "FORGET", 6, , FORGET
     /* BL WORD DROP FIND DROP >LINK @ LATEST ! */
@@ -1220,9 +1206,6 @@ prompt:
 quit_loop:
     .word INTERPRET
     .word BRANCH, quit_loop
-
-    defword "TEST", 4, , TEST
-    .word QUIT
 
     defword "WORDS", 5, , WORDS
     .word LATEST, FETCH
