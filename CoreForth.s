@@ -549,7 +549,7 @@ cmove_loop:
 
     defword "S\"", 2, F_IMMED, SQUOTE
     .word LIT, XSQUOTE, COMMA, LIT, '"', WORD, FETCHBYTE, INCR, ALIGNED, ALLOT
-    .word LIT, 1, ININDEX, ADDSTORE
+    .word LIT, 1, SOURCEINDEX, ADDSTORE
     .word EXIT 
 
     defword "PAD", 3, , PAD
@@ -1085,18 +1085,18 @@ is_number:
     .ltorg
 
     defword "\\", 1, F_IMMED, BACKSLASH
-    .word SOURCECOUNT, FETCH, ININDEX, STORE, EXIT
+    .word SOURCECOUNT, FETCH, SOURCEINDEX, STORE, EXIT
 
     defword "(", 1, F_IMMED, LPAREN
     .word LIT, ')', WORD, DROP, EXIT
 
     defword "WORD", 4, , WORD
-    .word DUP, SOURCE, ININDEX, FETCH, TRIMSTRING
+    .word DUP, SOURCE, SOURCEINDEX, FETCH, TRIMSTRING
     .word DUP, TOR, ROT, SKIP
     .word OVER, TOR, ROT, SCAN
     .word DUP, ZNEQU, ZBRANCH, noskip_delim, DECR
 noskip_delim:
-    .word RFROM, RFROM, ROT, SUB, ININDEX, ADDSTORE
+    .word RFROM, RFROM, ROT, SUB, SOURCEINDEX, ADDSTORE
     .word TUCK, SUB
     .word DUP, HERE, STOREBYTE
     .word HERE, INCR, SWAP, CMOVE
@@ -1162,7 +1162,7 @@ interpret_eol:
     defword "INTERPRET", 9, , INTERPRET
     .word LIT, 0, STATE, STORE
     .word TIB, XSOURCE, STORE
-    .word LIT, 0, ININDEX, STORE
+    .word LIT, 0, SOURCEINDEX, STORE
     .word XSOURCE, FETCH, TIBSIZE, ACCEPT, SOURCECOUNT, STORE, SPACE
     .word XINTERPRET, ZBRANCH, interpret_error
     .word DROP, LIT, prompt, LIT, 4, TYPE, CR, EXIT
@@ -1176,7 +1176,7 @@ prompt:
     .word LIT, 0, STATE, STORE
 1:
     .word XSOURCE, FETCH, DUP, FETCHBYTE, DUP, LIT, 255, NEQU, ZBRANCH, 2f
-    .word SOURCECOUNT, STORE, INCR, XSOURCE, STORE, LIT, 0, ININDEX, STORE, XINTERPRET, ZBRANCH, 3f, DROP
+    .word SOURCECOUNT, STORE, INCR, XSOURCE, STORE, LIT, 0, SOURCEINDEX, STORE, XINTERPRET, ZBRANCH, 3f, DROP
     .word SOURCECOUNT, FETCH, XSOURCE, ADDSTORE, BRANCH, 1b
 2:
     .word TWODROP, EXIT
@@ -1281,7 +1281,6 @@ see_done:
     defvar "LATEST", 6, , LATEST
     defvar "S0", 2, , SZ
     defvar "BASE", 4, , BASE
-    defvar ">IN", 3, , ININDEX
     defvar "TIB", 3, , TIB, 132
     defvar "(SOURCE)", 8, , XSOURCE
     defvar "SOURCE#", 7, , SOURCECOUNT
