@@ -1082,8 +1082,13 @@ is_number:
     push {r1}
     NEXT
 
-
     .ltorg
+
+    defword "\\", 1, F_IMMED, BACKSLASH
+    .word SOURCECOUNT, FETCH, ININDEX, STORE, EXIT
+
+    defword "(", 1, F_IMMED, LPAREN
+    .word LIT, ')', WORD, DROP, EXIT
 
     defword "WORD", 4, , WORD
     .word DUP, SOURCE, ININDEX, FETCH, TRIMSTRING
