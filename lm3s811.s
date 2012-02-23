@@ -220,12 +220,6 @@ init_board:
     .align 2, 0
     .ltorg
 
-delay:
-    push {lr}
-    subs r0, r0, #1
-    bgt delay
-    pop {pc}
-
 read_key_interrupt:
 2:  ldr r1, =addr_SBUF_TAIL
     ldrb r3, [r1]
@@ -548,6 +542,8 @@ DISP_FONT:
 
     defword "COLD", 4, , COLD
     .word LIT, lm3s811_words, EVALUATE
+
+    .ltorg
 
 lm3s811_words:
     .include "lm3s811.gen.s"

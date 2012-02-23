@@ -309,6 +309,12 @@ calc_wide_branch:
     subs r0, r0, #1
     bx lr
 
+    @ Busy delay with three ticks per count
+delay:
+    subs r0, #1
+    bne delay
+    bx lr
+
 @ ---------------------------------------------------------------------
 @ -- Stack manipulation -----------------------------------------------
 
@@ -955,6 +961,11 @@ is_number:
 
     defword "LOOP", 4, F_IMMED, LOOP
     .word LIT, XLOOP, COMMA, LIT, ZBRANCH, COMMA, COMMA, EXIT
+
+    defcode "DELAY", 5, , DELAY
+    pop {r0}
+    bl delay
+    NEXT
 
 @ ---------------------------------------------------------------------
 @ -- Compiler and interpreter ----------------------------------------
