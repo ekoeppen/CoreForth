@@ -52,6 +52,10 @@
     .set GPIO_PDR,         0x514
     .set GPIO_DEN,         0x51c
 
+    .set STCTRL,      0xe000e010
+    .set STRELOAD,    0xe000e014
+    .set STCURRENT,   0xe000e018
+
 @ ---------------------------------------------------------------------
 @ -- Interrupt vectors ------------------------------------------------
 
@@ -202,6 +206,14 @@ init_board:
     @ enable the UART
     ldr r0, =(UART0 + UART_CR)
     ldr r1, =0x0301
+    str r1, [r0]
+
+    @ enable SYSTICK (without interrupts)
+    ldr r0, =STRELOAD
+    ldr r1, =0x00ffffff
+    str r1, [r0]
+    ldr r0, =STCTRL
+    mov r1, #5
     str r1, [r0]
 
     pop {pc}
