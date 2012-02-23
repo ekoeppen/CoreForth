@@ -407,13 +407,22 @@ calc_wide_branch:
     add r6, r6, #4
     NEXT
 
-    defcode "SP@", 3, , SPAT
+    defcode "SP@", 3, , SPFETCH
     mov r0, sp
     push {r0}
     NEXT
 
-    defcode "RP@", 3, , RPAT
+    defcode "RP@", 3, , RPFETCH
     push {r6}
+    NEXT
+
+    defcode "SP!", 3, , SPSTORE
+    pop {r0}
+    mov sp, r0
+    NEXT
+
+    defcode "RP!", 3, , RPSTORE
+    pop {r6}
     NEXT
 
 @ ---------------------------------------------------------------------
