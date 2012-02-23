@@ -1219,6 +1219,8 @@ prompt:
     .word LIT, EXIT, COMMA, REVEAL, LBRACKET, EXIT
 
     defword "QUIT", 4, , QUIT
+    .word LIT, addr_RTOS, RPSTORE
+    .word LIT, addr_TOS, SPSTORE
 quit_loop:
     .word INTERPRET
     .word BRANCH, quit_loop
