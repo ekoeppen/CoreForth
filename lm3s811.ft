@@ -130,6 +130,11 @@ VARIABLE (I2C-DELAY)
 : I2CS@
     I2CSDR C@ ;
 
+( Busy delay loop. Some example delay values at 6MHz:
+  4: 0x0210 ticks = 0.00009s
+ 16: 0x06d8 ticks = 0.0003s
+100: 0x2850 ticks = 0.0017s
+)
 : I2C-DELAY
     (I2C-DELAY) @ BEGIN 1- DUP 0= UNTIL DROP ;
 
