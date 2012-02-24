@@ -8,7 +8,7 @@
     .set F_LENMASK,         0x1f
 
     .set link,                 0
-    .set compiled_here, ram_start      
+    .set compiled_here, ram_start     
 
 @ ---------------------------------------------------------------------
 @ -- Macros -----------------------------------------------------------
@@ -131,7 +131,7 @@ DOVAR:
 DOCON:
     ldr r1, [r0, #4]
     push {r1}
-    NEXT   
+    NEXT  
 
 DODOES:
     sub r6, r6, #4
@@ -147,7 +147,7 @@ DOOFFSET:
     pop {r2}
     add r1, r2, r1
     push {r1}
-    NEXT   
+    NEXT  
 
     defcode "EXIT", 4, , EXIT
     ldr r7, [r6]
@@ -541,7 +541,7 @@ fill_done:
 
     defcode "BLANK", 5, , BLANK
     mov r2, #32
-    b fill_code   
+    b fill_code  
 
 	defcode "CMOVE",5 , , CMOVE
 	pop {r0}
@@ -590,7 +590,7 @@ cmove_loop:
     defword "S\"", 2, F_IMMED, SQUOTE
     .word LIT, XSQUOTE, COMMA, LIT, '"', WORD, FETCHBYTE, INCR, ALIGNED, ALLOT
     .word LIT, 1, SOURCEINDEX, ADDSTORE
-    .word EXIT 
+    .word EXIT
 
     defword "PAD", 3, , PAD
     .word HERE, LIT, 256, ADD, EXIT
@@ -818,16 +818,18 @@ cmove_loop:
     defcode ".", 1, , DOT
     pop {r0}
     bl putsignedhexnumber
-putspace:
     mov r0, #32
     bl putchar
     NEXT
 
-    defcode ".D", 2, , DOTD
+    defcode "(.D)", 4, , XDOTD
     pop {r0}
     bl putnumber
-    b putspace
-    
+    NEXT
+
+    defword ".D", 2, , DOTD
+    .word XDOTD, SPACE, EXIT
+
     defcode "KEY", 3, , KEY
     bl read_key
     push {r0}
@@ -916,7 +918,25 @@ is_number:
     .word LIT, 8, BASE, STORE, EXIT
 
 @ ---------------------------------------------------------------------
-@ -- Control flow ----------------------------------------------------
+@ -- ANSI terminal I/O ------------------------------------------------
+
+    defword "ANSI-ESC-START", 14, , ANSI_ESC_START
+    .word LIT, 27, EMIT, LIT, '[', EMIT, EXIT
+
+    defword "AT-XY", 5, , AT_XY
+    .word ANSI_ESC_START, XDOTD, LIT, ';', EMIT, XDOTD, LIT, 'H', EMIT, EXIT
+
+    defword "!CURSOR", 7, , SAVECURSOR
+    .word LIT, 27, EMIT, LIT, '7', EMIT, EXIT
+
+    defword "@CURSOR", 7, , RESTORECURSOR
+    .word LIT, 27, EMIT, LIT, '8', EMIT, EXIT
+
+    defword "CLS", 3, , CLS
+    .word ANSI_ESC_START, LIT, '2', EMIT, LIT, 'J', EMIT, LIT, 0, LIT, 0, AT_XY, EXIT
+
+@ ---------------------------------------------------------------------
+@ -- Control flow -----------------------------------------------------
 
     defcode "BRANCH", 7, , BRANCH
     ldr r7, [r7]
@@ -929,7 +949,7 @@ is_number:
     add r7, r7, #4
     NEXT
 
-    defword "BEGIN", 5, F_IMMED, BEGIN 
+    defword "BEGIN", 5, F_IMMED, BEGIN
     .word HERE, EXIT
 
     defword "AGAIN", 5, F_IMMED, AGAIN
@@ -943,10 +963,10 @@ is_number:
 
     defword "ELSE", 4, F_IMMED, ELSE
     .word LIT, BRANCH, COMMA, HERE, DUP, COMMA
-    .word SWAP, ENDIF, EXIT 
+    .word SWAP, ENDIF, EXIT
 
     defword "ENDIF", 5, F_IMMED, ENDIF
-    .word HERE, SWAP, STORE, EXIT 
+    .word HERE, SWAP, STORE, EXIT
 
     defword "WHILE", 5, F_IMMED, WHILE
     .word IF, EXIT
@@ -1023,10 +1043,10 @@ is_number:
     .word BL, WORD, FIND, DROP, EXIT  @ TODO abort if not found
 
     defword "[\']", 3, F_IMMED, BRACKETTICK
-    .word TICK, LIT, LIT, COMMA, COMMA, EXIT  
+    .word TICK, LIT, LIT, COMMA, COMMA, EXIT 
 
     defword "(DOES>)", 7, , XDOES
-    .word RFROM, LATEST, FETCH, FROMLINK, STORE, EXIT 
+    .word RFROM, LATEST, FETCH, FROMLINK, STORE, EXIT
 
     defword "DOES>", 5, F_IMMED, DOES
     .word LIT, XDOES, COMMA
@@ -1239,13 +1259,13 @@ prompt:
     .word BL, WORD, FIND, DROP, TOLINK, FETCH, LATEST, STORE, EXIT
 
     defword "HIDE", 4, , HIDE
-    .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_HIDDEN, OR, SWAP, STOREBYTE, EXIT  
+    .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_HIDDEN, OR, SWAP, STOREBYTE, EXIT 
 
     defword "REVEAL", 6, , REVEAL
-    .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_HIDDEN, INVERT, AND, SWAP, STOREBYTE, EXIT  
+    .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_HIDDEN, INVERT, AND, SWAP, STOREBYTE, EXIT 
 
     defword "IMMEDIATE", 9, , IMMEDIATE
-    .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_IMMED, OR, SWAP, STOREBYTE, EXIT  
+    .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_IMMED, OR, SWAP, STOREBYTE, EXIT 
 
     defword "[", 1, F_IMMED, LBRACKET
     .word LIT, 0, STATE, STORE, EXIT
