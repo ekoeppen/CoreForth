@@ -8,7 +8,7 @@
     .set F_LENMASK,         0x1f
 
     .set link,                 0
-    .set compiled_here, ram_start     
+    .set compiled_here, ram_start
 
 @ ---------------------------------------------------------------------
 @ -- Macros -----------------------------------------------------------
@@ -131,7 +131,7 @@ DOVAR:
 DOCON:
     ldr r1, [r0, #4]
     push {r1}
-    NEXT  
+    NEXT
 
 DODOES:
     sub r6, r6, #4
@@ -147,7 +147,7 @@ DOOFFSET:
     pop {r2}
     add r1, r2, r1
     push {r1}
-    NEXT  
+    NEXT
 
     defcode "EXIT", 4, , EXIT
     ldr r7, [r6]
@@ -541,7 +541,7 @@ fill_done:
 
     defcode "BLANK", 5, , BLANK
     mov r2, #32
-    b fill_code  
+    b fill_code
 
 	defcode "CMOVE",5 , , CMOVE
 	pop {r0}
@@ -1043,7 +1043,7 @@ is_number:
     .word BL, WORD, FIND, DROP, EXIT  @ TODO abort if not found
 
     defword "[\']", 3, F_IMMED, BRACKETTICK
-    .word TICK, LIT, LIT, COMMA, COMMA, EXIT 
+    .word TICK, LIT, LIT, COMMA, COMMA, EXIT
 
     defword "(DOES>)", 7, , XDOES
     .word RFROM, LATEST, FETCH, FROMLINK, STORE, EXIT
@@ -1259,13 +1259,13 @@ prompt:
     .word BL, WORD, FIND, DROP, TOLINK, FETCH, LATEST, STORE, EXIT
 
     defword "HIDE", 4, , HIDE
-    .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_HIDDEN, OR, SWAP, STOREBYTE, EXIT 
+    .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_HIDDEN, OR, SWAP, STOREBYTE, EXIT
 
     defword "REVEAL", 6, , REVEAL
-    .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_HIDDEN, INVERT, AND, SWAP, STOREBYTE, EXIT 
+    .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_HIDDEN, INVERT, AND, SWAP, STOREBYTE, EXIT
 
     defword "IMMEDIATE", 9, , IMMEDIATE
-    .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_IMMED, OR, SWAP, STOREBYTE, EXIT 
+    .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_IMMED, OR, SWAP, STOREBYTE, EXIT
 
     defword "[", 1, F_IMMED, LBRACKET
     .word LIT, 0, STATE, STORE, EXIT
