@@ -935,6 +935,18 @@ is_number:
     defword "CLS", 3, , CLS
     .word ANSI_ESC_START, LIT, '2', EMIT, LIT, 'J', EMIT, LIT, 0, LIT, 0, AT_XY, EXIT
 
+    defword "CURSOR-UP", 9, , CURSOR_UP
+    .word ANSI_ESC_START, LIT, 'A', EMIT, EXIT
+
+    defword "CURSOR-DOWN", 11, , CURSOR_DOWN
+    .word ANSI_ESC_START, LIT, 'B', EMIT, EXIT
+
+    defword "CURSOR-RIGHT", 12, , CURSOR_RIGHT
+    .word ANSI_ESC_START, LIT, 'C', EMIT, EXIT
+
+    defword "CURSOR-LEFT", 11, , CURSOR_LEFT
+    .word ANSI_ESC_START, LIT, 'D', EMIT, EXIT
+
 @ ---------------------------------------------------------------------
 @ -- Control flow -----------------------------------------------------
 
