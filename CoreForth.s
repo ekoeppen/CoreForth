@@ -172,6 +172,31 @@ putstring_loop:
     bgt putstring_loop
     pop {r5, r6, pc}
 
+putnumber:
+    push {lr}
+    cmp r0, #0
+    bne 1f
+    mov r0, #48
+    bl putchar
+    pop {pc}
+1:  push {r4}
+    mov r4, #0
+    mov r3, #10
+    mov r1, #48
+2:  sdiv r2, r0, r3
+    mls r0, r3, r2, r0
+    add r0, r1
+    push {r0}
+    add r4, #1
+    mov r0, r2
+    cmp r0, #0
+    bgt 2b
+3:  pop {r0}
+    bl putchar
+    subs r4, #1
+    bne 3b
+    pop {r4, pc}
+
 puthexnumber:
     push {r4, r5, lr}
     mov r4, r0
@@ -793,10 +818,16 @@ cmove_loop:
     defcode ".", 1, , DOT
     pop {r0}
     bl putsignedhexnumber
+putspace:
     mov r0, #32
     bl putchar
     NEXT
 
+    defcode ".D", 2, , DOTD
+    pop {r0}
+    bl putnumber
+    b putspace
+    
     defcode "KEY", 3, , KEY
     bl read_key
     push {r0}
