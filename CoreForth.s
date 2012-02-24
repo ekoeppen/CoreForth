@@ -280,6 +280,38 @@ readline_end:
     sub r0, r5, r4
     pop {r4, r5, r6, pc}
 
+read_widekey:
+    push {r4, r5, lr}
+    bl read_key
+    cmp r0, #27
+    bne 1f
+    bl read_key
+    cmp r0, '['
+    bne 1f
+    bl read_key
+    cmp r0, 'A'
+    blt 3f
+    cmp r0, 'Z'
+    bgt 3f
+    sub r4, r0, '@'
+    b 4f
+3:  mov r4, #10
+    mov r5, #10
+2:  cmp r0, '~'
+    beq 4f
+    cmp r0, '0'
+    blt 1f
+    cmp r0, '9'
+    bgt 1f
+    sub r0, '0'
+    mul r4, r4, r5
+    add r4, r0
+    bl read_key
+    b 2b
+4:  mov r0, #0
+    sub r0, r4
+1:  pop {r4, r5, pc}
+
 printstack:
     ldr r0, =addr_TOS
     cmp sp, r0
@@ -832,6 +864,11 @@ cmove_loop:
 
     defcode "KEY", 3, , KEY
     bl read_key
+    push {r0}
+    NEXT
+
+    defcode "WIDEKEY", 7, , WIDEKEY
+    bl read_widekey
     push {r0}
     NEXT
 
