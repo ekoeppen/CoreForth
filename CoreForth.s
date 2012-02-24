@@ -280,6 +280,9 @@ readline_end:
     sub r0, r5, r4
     pop {r4, r5, r6, pc}
 
+/* read keys including escape sequences. Reading escape itself is
+ * not supported yet. Escape sequences return negative numbers
+ */
 read_widekey:
     push {r4, r5, lr}
     bl read_key
