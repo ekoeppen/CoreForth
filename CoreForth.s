@@ -1063,9 +1063,9 @@ is_positive:
 
     defword "ELSE", 4, F_IMMED, ELSE
     .word LIT, BRANCH, COMMA, HERE, DUP, COMMA
-    .word SWAP, ENDIF, EXIT
+    .word SWAP, THEN, EXIT
 
-    defword "ENDIF", 5, F_IMMED, ENDIF
+    defword "THEN", 4, F_IMMED, THEN
     .word HERE, SWAP, STORE, EXIT
 
     defword "WHILE", 5, F_IMMED, WHILE
@@ -1073,7 +1073,7 @@ is_positive:
 
     defword "REPEAT", 6, F_IMMED, REPEAT
     .word SWAP, LIT, BRANCH, COMMA, COMMA
-    .word ENDIF, EXIT
+    .word THEN, EXIT
 
     defcode "(DO)", 4, , XDO
     pop {r0, r1}
