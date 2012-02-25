@@ -744,6 +744,9 @@ cmove_loop:
     defword "NEGATE", 6, , NEGATE
     .word LIT, -1, MUL, EXIT
 
+    defword "WITHIN", 6, , WITHIN
+    .word OVER, SUB, TOR, SUB, RFROM, ULT, EXIT
+
 @ ---------------------------------------------------------------------
 @ -- Boolean operators -----------------------------------------------
 

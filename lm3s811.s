@@ -546,6 +546,7 @@ DISP_FONT:
     .ltorg
 
 lm3s811_words:
+    .include "CoreForth.gen.s"
     .include "lm3s811.gen.s"
 
     defvar "SBUF", 4, , SBUF, 128

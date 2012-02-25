@@ -1,0 +1,19 @@
+0 variable x
+0 variable y
+0 variable #tib
+
+decimal
+
+: readline
+    cls 0 x ! 0 y ! 0 #tib !
+    begin
+        x @ y @ at-xy
+        widekey
+        dup 13 = if drop exit then
+        dup 10 = if drop exit then
+\        dup -1 = if drop exit then
+\        dup -2 = if drop exit then
+\        dup -3 = if drop exit then
+\        dup -4 = if drop exit then
+    again
+;
