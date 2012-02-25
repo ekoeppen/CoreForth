@@ -941,6 +941,13 @@ dump_end:
 2:
     .word RDROP, EXIT
 
+    defword "?SIGN", 5, , ISSIGN
+    .word OVER, FETCHBYTE, LIT, 0x2c, SUB, DUP, ABS
+    .word LIT, 1, EQU, AND, DUP, ZBRANCH, 1f
+    .word INCR, TOR, LIT, 1, TRIMSTRING, RFROM
+1:
+    .word EXIT
+
     defword "DIGIT?", 6, , ISDIGIT
     .word DUP, LIT, '9', GT, LIT, 0x100, AND, ADD
     .word DUP, LIT, 0x140, GT, LIT, 0x107, AND, SUB, LIT, 0x30, SUB
@@ -971,10 +978,12 @@ tonumber_done:
 
     defword "?NUMBER", 7, , ISNUMBER /* ( c-addr -- n true | c-addr false ) */
     .word DUP, LIT, 0, DUP, ROT, COUNT
-    .word TONUMBER, ZBRANCH, is_number
-    .word TWODROP, DROP, LIT, 0, EXIT
+    .word ISSIGN, TOR, TONUMBER, ZBRANCH, is_number
+    .word RDROP, TWODROP, DROP, LIT, 0, EXIT
 is_number:
-    .word TWOSWAP, TWODROP, DROP, LIT, -1, EXIT
+    .word TWOSWAP, TWODROP, DROP, RFROM, ZNEQU, ZBRANCH, is_positive, NEGATE
+is_positive:
+    .word LIT, -1, EXIT
 
     .ltorg
 
