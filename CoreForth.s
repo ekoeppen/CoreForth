@@ -714,6 +714,36 @@ cmove_loop:
     str r0, [sp]
     NEXT
 
+    defcode "ABS", 3, , ABS
+    ldr r0, [sp]
+    cmp r0, #0
+    bge 1f
+    mvn r0, r0
+    add r0, #1
+    str r0, [sp]
+1:  NEXT
+
+    defcode "MAX", 3, , MAX
+    pop {r0}
+    pop {r1}
+    cmp r0, r1
+    bge 1f
+    mov r0, r1
+1:  push {r0}
+    NEXT
+
+    defcode "MIN", 3, , MIN
+    pop {r0}
+    pop {r1}
+    cmp r0, r1
+    ble 1f
+    mov r0, r1
+1:  push {r0}
+    NEXT
+
+    defword "NEGATE", 6, , NEGATE
+    .word LIT, -1, MUL, EXIT
+
 @ ---------------------------------------------------------------------
 @ -- Boolean operators -----------------------------------------------
 
