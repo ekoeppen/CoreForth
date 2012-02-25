@@ -1026,6 +1026,15 @@ is_positive:
     defword "CURSOR-LEFT", 11, , CURSOR_LEFT
     .word ANSI_ESC_START, LIT, 'D', EMIT, EXIT
 
+    defword "CLR-EOL", 7, , CLR_EOL
+    .word ANSI_ESC_START, LIT, '0', EMIT, LIT, 'K', EMIT, EXIT
+
+    defword "CLR-SOL", 7, , CLR_SOL
+    .word ANSI_ESC_START, LIT, '1', EMIT, LIT, 'K', EMIT, EXIT
+
+    defword "CLR-LINE", 8, , CLR_LINE
+    .word ANSI_ESC_START, LIT, '2', EMIT, LIT, 'K', EMIT, EXIT
+
 @ ---------------------------------------------------------------------
 @ -- Control flow -----------------------------------------------------
 
