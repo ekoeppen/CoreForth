@@ -2,19 +2,23 @@ decimal
 
 : tib-tail   >tib @ tib# @ over - swap tib + swap ;
 : .tib-tail   clr-eol !cursor tib-tail type @cursor ;
-: cursor>   >tib dup @ 1+ #tib @ min swap ! cursor-right ;
-: cursor<   >tib dup @ 1- 0 max swap ! cursor-left ;
+: cursor>   1 >tib +! cursor-right ;
+: cursor<   1 >tib -! cursor-left ;
 : insert   tib-tail over 1+ swap cmove> 1 tib# +! tib >tib @ + c! ;
 : delete   1 tib# -! tib-tail over 1+ -rot cmove ;
+: -start?   >tib @ 0> ; : -end?   >tib @ tib# @ < ;
+: -full?   tib# @ #tib < ;
 
 : readline
     0 tib# ! 0 >tib !
     begin
         widekey
-        dup 32 127 within if insert .tib-tail cursor> then
-        dup 127 = if drop cursor< delete .tib-tail then
-        dup 8 = over -103 = or if drop delete .tib-tail then
-        dup 13 = over 10 = or if drop cr tib tib# @ type cr exit then
-        dup -3 = if drop cursor> then
-        dup -4 = if drop cursor< then
+        case
+            dup 32 127 within -full? and if insert .tib-tail cursor> else
+            dup 127 = -start? and if drop cursor< delete .tib-tail else
+            dup 8 = over -103 = or -end? and if drop delete .tib-tail else
+            dup 13 = over 10 = or if drop cr tib tib# @ type cr exit else
+            dup -3 = -end? and if drop cursor> else
+            dup -4 = -start? and if drop cursor< else
+        endcase
     again ;
