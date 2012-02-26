@@ -1,19 +1,20 @@
-0 variable x
-0 variable y
-0 variable #tib
-
 decimal
 
+: tib-tail   >tib @ tib# @ over - swap tib + swap ;
+: .tib-tail   clr-eol !cursor tib-tail type @cursor ;
+: cursor>   >tib dup @ 1+ #tib @ min swap ! cursor-right ;
+: cursor<   >tib dup @ 1- 0 max swap ! cursor-left ;
+: insert   tib-tail over 1+ swap cmove> 1 tib# +! tib >tib @ + c! ;
+: delete   1 tib# -! tib-tail over 1+ -rot cmove ;
+
 : readline
-    cls 0 x ! 0 y ! 0 #tib !
+    0 tib# ! 0 >tib !
     begin
-        x @ y @ at-xy
         widekey
-        dup 13 = if drop exit then
-        dup 10 = if drop exit then
-\        dup -1 = if drop exit then
-\        dup -2 = if drop exit then
-\        dup -3 = if drop exit then
-\        dup -4 = if drop exit then
-    again
-;
+        dup 32 127 within if insert .tib-tail cursor> then
+        dup 127 = if drop cursor< delete .tib-tail then
+        dup 8 = over -103 = or if drop delete .tib-tail then
+        dup 13 = over 10 = or if drop cr tib tib# @ type cr exit then
+        dup -3 = if drop cursor> then
+        dup -4 = if drop cursor< then
+    again ;

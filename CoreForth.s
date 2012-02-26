@@ -1474,6 +1474,8 @@ see_done:
     defvar "S0", 2, , SZ
     defvar "BASE", 4, , BASE
     defvar "TIB", 3, , TIB, 132
+    defvar ">TIB", 4, , TIBINDEX
+    defvar "TIB#", 4, , TIBCOUNT
     defvar "(SOURCE)", 8, , XSOURCE
     defvar "SOURCE#", 7, , SOURCECOUNT
     defvar ">SOURCE", 7, , SOURCEINDEX
