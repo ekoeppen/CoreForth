@@ -491,6 +491,9 @@ delay:
     pop {r6}
     NEXT
 
+    defword "-ROT", 4, , ROTROT
+    .word ROT, ROT, EXIT
+
 @ ---------------------------------------------------------------------
 @ -- Memory operations -----------------------------------------------
 
@@ -578,17 +581,30 @@ fill_done:
     mov r2, #32
     b fill_code
 
-	defcode "CMOVE",5 , , CMOVE
+	defcode "CMOVE>", 6 , , CMOVEUP
 	pop {r0}
 	pop {r1}
 	pop {r2}
-cmove_loop:
-	sub r0, r0, #1
+2:  sub r0, r0, #1
     cmp	r0, #0
     blt 1f
 	ldrb r3, [r2, r0]
 	strb r3, [r1, r0]
-	b cmove_loop
+	b 2b
+1:  NEXT
+
+	defcode "CMOVE", 5 , , CMOVE
+	pop {r0}
+	pop {r1}
+	pop {r2}
+2:  sub r0, r0, #1
+    cmp	r0, #0
+    blt 1f
+	ldrb r3, [r2]
+	strb r3, [r1]
+    add r1, #1
+    add r2, #1
+	b 2b
 1:  NEXT
 
     defcode "S=", 2, , SEQU
