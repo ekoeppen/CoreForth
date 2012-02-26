@@ -1094,6 +1094,18 @@ is_positive:
     .word SWAP, LIT, BRANCH, COMMA, COMMA
     .word THEN, EXIT
 
+    defword "CASE", 4 , F_IMMED, CASE
+    .word LIT, 0, EXIT
+
+    defword "OF", 2, F_IMMED, OF
+    .word LIT, OVER, COMMA, LIT, EQU, COMMA, IF, LIT, DROP, COMMA, EXIT
+
+    defword "ENDCASE", 7, F_IMMED, ENDCASE
+    .word LIT, DROP, COMMA
+1:  .word DUP, ZBRANCH, 2f
+    .word THEN, BRANCH, 1b
+2:  .word DROP, EXIT
+
     defcode "(DO)", 4, , XDO
     pop {r0, r1}
     ldr r2, [r6]
