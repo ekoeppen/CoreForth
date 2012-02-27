@@ -1152,6 +1152,10 @@ is_positive:
 @ ---------------------------------------------------------------------
 @ -- Compiler and interpreter ----------------------------------------
 
+    defcode "BYE", 3, , BYE
+    ldr r0, =0xfffffff8
+    ldr r0, [r0]
+
     defcode "(ABRANCH)", 9, , ASMBRANCH
     pop {r0}
     bl calc_wide_branch
