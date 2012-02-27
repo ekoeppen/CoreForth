@@ -364,55 +364,55 @@ adcomp_handler:
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
 
-    defconst "GPIOA", 5, , GPIO_A, GPIOA
-    defconst "GPIOB", 5, , GPIO_B, GPIOB
-    defconst "GPIOC", 5, , GPIO_C, GPIOC
-    defconst "GPIOD", 5, , GPIO_D, GPIOD
-    defconst "GPIOE", 5, , GPIO_E, GPIOE
+    defconst "GPIOA", 5, GPIO_A, GPIOA
+    defconst "GPIOB", 5, GPIO_B, GPIOB
+    defconst "GPIOC", 5, GPIO_C, GPIOC
+    defconst "GPIOD", 5, GPIO_D, GPIOD
+    defconst "GPIOE", 5, GPIO_E, GPIOE
 
-    defword "GPIO-DIR", 8, , _GPIO_DIR, DOOFFSET
+    defword "GPIO-DIR", 8, _GPIO_DIR, DOOFFSET
     .word GPIO_DIR
 
-    defword "GPIO-AFSEL", 10, , _GPIO_AFSEL, DOOFFSET
+    defword "GPIO-AFSEL", 10, _GPIO_AFSEL, DOOFFSET
     .word GPIO_AFSEL
 
-    defword "GPIO-IS", 7, , _GPIO_IS, DOOFFSET
+    defword "GPIO-IS", 7, _GPIO_IS, DOOFFSET
     .word GPIO_IS
 
-    defword "GPIO-IBE", 8, , _GPIO_IBE, DOOFFSET
+    defword "GPIO-IBE", 8, _GPIO_IBE, DOOFFSET
     .word GPIO_IBE
 
-    defword "GPIO-IEV", 8, , _GPIO_IEV, DOOFFSET
+    defword "GPIO-IEV", 8, _GPIO_IEV, DOOFFSET
     .word GPIO_IEV
 
-    defword "GPIO-IM", 7, , _GPIO_IM, DOOFFSET
+    defword "GPIO-IM", 7, _GPIO_IM, DOOFFSET
     .word GPIO_IM
 
-    defword "GPIO-RIS", 8, , _GPIO_RIS, DOOFFSET
+    defword "GPIO-RIS", 8, _GPIO_RIS, DOOFFSET
     .word GPIO_RIS
 
-    defword "GPIO-MIS", 8, , _GPIO_MIS, DOOFFSET
+    defword "GPIO-MIS", 8, _GPIO_MIS, DOOFFSET
     .word GPIO_MIS
 
-    defword "GPIO-ICR", 8, , _GPIO_ICR, DOOFFSET
+    defword "GPIO-ICR", 8, _GPIO_ICR, DOOFFSET
     .word GPIO_ICR
 
-    defword "GPIO-DR2R", 9, , _GPIO_DR2R, DOOFFSET
+    defword "GPIO-DR2R", 9, _GPIO_DR2R, DOOFFSET
     .word GPIO_DR2R
 
-    defword "GPIO-ODR", 8, , _GPIO_ODR, DOOFFSET
+    defword "GPIO-ODR", 8, _GPIO_ODR, DOOFFSET
     .word GPIO_ODR
 
-    defword "GPIO-PUR", 8, , _GPIO_PUR, DOOFFSET
+    defword "GPIO-PUR", 8, _GPIO_PUR, DOOFFSET
     .word GPIO_PUR
 
-    defword "GPIO-PDR", 8, , _GPIO_PDR, DOOFFSET
+    defword "GPIO-PDR", 8, _GPIO_PDR, DOOFFSET
     .word GPIO_PDR
 
-    defword "GPIO-DEN", 8, , _GPIO_DEN, DOOFFSET
+    defword "GPIO-DEN", 8, _GPIO_DEN, DOOFFSET
     .word GPIO_DEN
 
-    defcode "GPIO-DATA!", 10, , _GPIO_DATA_STORE @ ( value mask gpio -- )
+    defcode "GPIO-DATA!", 10, _GPIO_DATA_STORE @ ( value mask gpio -- )
     pop {r1}
     pop {r0}
     lsl r0, r0, #2
@@ -421,16 +421,16 @@ adcomp_handler:
     strb r1, [r0]
     NEXT
 
-    defconst "NVIC", 4, , _NVIC, NVIC
+    defconst "NVIC", 4, _NVIC, NVIC
 
-    defcode "NVIC-SETENA", 11, , NVIC_SETENA
+    defcode "NVIC-SETENA", 11, NVIC_SETENA
     ldr r0, =NVIC
     ldr r1, =NVIC_SETENA_BASE
     add r0, r1, r0
     push {r0}
     NEXT
 
-    defconst "DISP-FONT", 9, , _DISP_FONT, DISP_FONT
+    defconst "DISP-FONT", 9, _DISP_FONT, DISP_FONT
 DISP_FONT:
     .byte 0x00, 0x00, 0x00, 0x00, 0x00   @ " "
     .byte 0x00, 0x00, 0x4f, 0x00, 0x00   @ !
@@ -530,17 +530,17 @@ DISP_FONT:
 
     .ltorg
 
-    defcode "WFI", 3, , WFI
+    defcode "WFI", 3, WFI
     wfi
     NEXT
 
-    defcode "RETI", 4, , RETI
+    defcode "RETI", 4, RETI
     pop {r4 - r12, pc}
 
-    defword ";I", 2, F_IMMED, SEMICOLONI
+    defword ";I", 2 + F_IMMED, SEMICOLONI
     .word LIT, RETI, COMMA, REVEAL, LBRACKET, EXIT
 
-    defword "COLD", 4, , COLD
+    defword "COLD", 4, COLD
     .word LIT, lm3s811_words, EVALUATE
 
     .ltorg
@@ -549,10 +549,10 @@ lm3s811_words:
     .include "CoreForth.gen.s"
     .include "lm3s811.gen.s"
 
-    defvar "SBUF", 4, , SBUF, 128
-    defvar "SBUF-HEAD", 9, , SBUF_HEAD
-    defvar "SBUF-TAIL", 9, , SBUF_TAIL
-    defvar "IVT", 3, , IVT, 48 * 4
+    defvar "SBUF", 4, SBUF, 128
+    defvar "SBUF-HEAD", 9, SBUF_HEAD
+    defvar "SBUF-TAIL", 9, SBUF_TAIL
+    defvar "IVT", 3, IVT, 48 * 4
 
     .set last_word, link
     .set data_start, compiled_here 
