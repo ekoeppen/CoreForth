@@ -639,7 +639,7 @@ fill_done:
     .word RFROM, COUNT, TWODUP, ADD, ALIGNED, TOR, EXIT
 
     defword "S\"", 2, F_IMMED, SQUOTE
-    .word LIT, XSQUOTE, COMMA, LIT, '"', WORD, FETCHBYTE, INCR, ALIGNED, ALLOT
+    .word LIT, XSQUOTE, COMMAXT, LIT, '"', WORD, FETCHBYTE, INCR, ALIGNED, ALLOT
     .word LIT, 1, SOURCEINDEX, ADDSTORE
     .word EXIT
 
@@ -1072,16 +1072,16 @@ is_positive:
     .word HERE, EXIT
 
     defword "AGAIN", 5, F_IMMED, AGAIN
-    .word LIT, BRANCH, COMMA, COMMA, EXIT
+    .word LIT, BRANCH, COMMAXT, COMMADEST, EXIT
 
     defword "UNTIL", 5, F_IMMED, UNTIL
-    .word LIT, ZBRANCH, COMMA, COMMA, EXIT
+    .word LIT, ZBRANCH, COMMAXT, COMMADEST, EXIT
 
     defword "IF", 2, F_IMMED, IF
-    .word LIT, ZBRANCH, COMMA, HERE, DUP, COMMA, EXIT
+    .word LIT, ZBRANCH, COMMAXT, HERE, DUP, COMMADEST, EXIT
 
     defword "ELSE", 4, F_IMMED, ELSE
-    .word LIT, BRANCH, COMMA, HERE, DUP, COMMA
+    .word LIT, BRANCH, COMMAXT, HERE, DUP, COMMADEST
     .word SWAP, THEN, EXIT
 
     defword "THEN", 4, F_IMMED, THEN
@@ -1091,7 +1091,7 @@ is_positive:
     .word IF, EXIT
 
     defword "REPEAT", 6, F_IMMED, REPEAT
-    .word SWAP, LIT, BRANCH, COMMA, COMMA
+    .word SWAP, LIT, BRANCH, COMMAXT, COMMADEST
     .word THEN, EXIT
 
     defword "CASE", 4 , F_IMMED, CASE
@@ -1139,10 +1139,10 @@ is_positive:
     NEXT
 
     defword "DO", 2, F_IMMED, DO
-    .word LIT, XDO, COMMA, HERE, EXIT
+    .word LIT, XDO, COMMAXT, HERE, EXIT
 
     defword "LOOP", 4, F_IMMED, LOOP
-    .word LIT, XLOOP, COMMA, LIT, ZBRANCH, COMMA, COMMA, EXIT
+    .word LIT, XLOOP, COMMAXT, LIT, ZBRANCH, COMMAXT, COMMADEST, EXIT
 
     defcode "DELAY", 5, , DELAY
     pop {r0}
@@ -1167,6 +1167,15 @@ is_positive:
     defword ",", 1, , COMMA
     .word HERE, STORE, CELL, ALLOT, EXIT
 
+    defword ",DEST", 5, , COMMADEST
+    .word HERE, STORE, CELL, ALLOT, EXIT
+
+    defword ",XT", 3, , COMMAXT
+    .word HERE, STORE, CELL, ALLOT, EXIT
+
+    defword ",LINK", 5, , COMMALINK
+    .word HERE, STORE, CELL, ALLOT, EXIT
+
     defword "C,", 2, , CCOMMA
     .word HERE, STOREBYTE, LIT, 1, ALLOT, EXIT
 
@@ -1174,13 +1183,13 @@ is_positive:
     .word BL, WORD, FIND, DROP, EXIT  @ TODO abort if not found
 
     defword "[\']", 3, F_IMMED, BRACKETTICK
-    .word TICK, LIT, LIT, COMMA, COMMA, EXIT
+    .word TICK, LIT, LIT, COMMAXT, COMMAXT, EXIT
 
     defword "(DOES>)", 7, , XDOES
     .word RFROM, LATEST, FETCH, FROMLINK, STORE, EXIT
 
     defword "DOES>", 5, F_IMMED, DOES
-    .word LIT, XDOES, COMMA
+    .word LIT, XDOES, COMMAXT
     .word LIT
     ldr.w r1, [pc, #4]
     .word COMMA
@@ -1194,9 +1203,9 @@ is_positive:
     .word HERE, ALIGNED, DP, STORE
     .word LATEST, FETCH
     .word HERE, LATEST, STORE       @ update latest
-    .word COMMA                     @ set link
+    .word COMMALINK                 @ set link
     .word BL, WORD, FETCHBYTE, INCR, ALIGNED, ALLOT  @ set name field
-    .word LIT, DOVAR, COMMA         @ set code field
+    .word LIT, DOVAR, COMMAXT       @ set code field
     .word EXIT
 
     defword "VARIABLE", 8, , VARIABLE
@@ -1349,13 +1358,13 @@ interpret_loop:
     .word INCR, ZBRANCH, interpret_compile_word
     .word EXECUTE, BRANCH, interpret_loop
 interpret_compile_word:
-    .word COMMA, BRANCH, interpret_loop
+    .word COMMAXT, BRANCH, interpret_loop
 interpret_execute:
     .word DROP, EXECUTE, BRANCH, interpret_loop
 interpret_check_number:
     .word ISNUMBER, ZBRANCH, interpret_not_found
     .word STATE, FETCH, ZBRANCH, interpret_loop
-    .word LIT, LIT, COMMA, COMMA, BRANCH, interpret_loop
+    .word LIT, LIT, COMMAXT, COMMA, BRANCH, interpret_loop
 interpret_not_found:
     .word LIT, 0, EXIT
 interpret_eol:
@@ -1409,7 +1418,7 @@ prompt:
     .word CREATE, HIDE, RBRACKET, LIT, DOCOL, HERE, CELL, SUB, STORE, EXIT
 
     defword ";", 1, F_IMMED, SEMICOLON
-    .word LIT, EXIT, COMMA, REVEAL, LBRACKET, EXIT
+    .word LIT, EXIT, COMMAXT, REVEAL, LBRACKET, EXIT
 
     defword "QUIT", 4, , QUIT
     .word RTOS, RPSTORE
