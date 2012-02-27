@@ -914,12 +914,12 @@ fill_done:
     defword ".D", 2, , DOTD
     .word XDOTD, SPACE, EXIT
 
-    defcode "KEY", 3, , KEY
+    defcode "(KEY)", 5, , XKEY
     bl read_key
     push {r0}
     NEXT
 
-    defcode "WIDEKEY", 7, , WIDEKEY
+    defcode "KEY", 3, , KEY
     bl read_widekey
     push {r0}
     NEXT
@@ -1412,8 +1412,8 @@ prompt:
     .word LIT, EXIT, COMMA, REVEAL, LBRACKET, EXIT
 
     defword "QUIT", 4, , QUIT
-    .word LIT, addr_RTOS, RPSTORE
-    .word LIT, addr_TOS, SPSTORE
+    .word RTOS, RPSTORE
+    .word TOS, SPSTORE
 quit_loop:
     .word INTERPRET
     .word BRANCH, quit_loop
@@ -1477,13 +1477,12 @@ see_done:
 @ -- User variables ---------------------------------------------------
 
     defvar "STACK", 5, , STACK, 1024
-    defvar "TOS", 3, , TOS, 0
+    defvar "S0", 2, , TOS, 0
     defvar "RSTACK", 6, , RSTACK, 256
-    defvar "RTOS", 3, , RTOS, 0
+    defvar "R0", 2, , RTOS, 0
     defvar "STATE", 5, , STATE
     defvar "DP", 2, , DP
     defvar "LATEST", 6, , LATEST
-    defvar "S0", 2, , SZ
     defvar "BASE", 4, , BASE
     defvar "TIB", 3, , TIB, 132
     defvar ">TIB", 4, , TIBINDEX

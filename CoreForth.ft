@@ -1,24 +1,33 @@
-decimal
+DECIMAL
 
-: tib-tail   >tib @ tib# @ over - swap tib + swap ;
-: .tib-tail   clr-eol !cursor tib-tail type @cursor ;
-: cursor>   1 >tib +! cursor-right ;
-: cursor<   1 >tib -! cursor-left ;
-: insert   tib-tail over 1+ swap cmove> 1 tib# +! tib >tib @ + c! ;
-: delete   1 tib# -! tib-tail over 1+ -rot cmove ;
-: -start?   >tib @ 0> ; : -end?   >tib @ tib# @ < ;
-: -full?   tib# @ #tib < ;
+: TIB-TAIL   >TIB @ TIB# @ OVER - SWAP TIB + SWAP ;
+: .TIB-TAIL   CLR-EOL !CURSOR TIB-TAIL TYPE @CURSOR ;
+: CURSOR>   1 >TIB +! CURSOR-RIGHT ;
+: CURSOR<   1 >TIB -! CURSOR-LEFT ;
+: INSERT   TIB-TAIL OVER 1+ SWAP CMOVE>   1 TIB# +!   TIB >TIB @ + C! ;
+: DELETE   1 TIB# -! TIB-TAIL OVER 1+ -ROT CMOVE ;
+: -START?   >TIB @ 0> ;   : -END?   >TIB @ TIB# @ < ;
+: -FULL?   TIB# @ #TIB < ;
 
-: readline
-    0 tib# ! 0 >tib !
-    begin
-        widekey
-        case
-            dup 32 127 within -full? and if insert .tib-tail cursor> else
-            dup 127 = -start? and if drop cursor< delete .tib-tail else
-            dup 8 = over -103 = or -end? and if drop delete .tib-tail else
-            dup 13 = over 10 = or if drop cr tib tib# @ type cr exit else
-            dup -3 = -end? and if drop cursor> else
-            dup -4 = -start? and if drop cursor< else
-        endcase
-    again ;
+: ACCEPT
+    0 TIB# !   0 >TIB !
+    BEGIN
+        KEY
+        CASE
+            DUP 32 127 WITHIN -FULL? AND IF INSERT .TIB-TAIL CURSOR> ELSE
+            DUP 127 = -START? AND IF DROP CURSOR< DELETE .TIB-TAIL ELSE
+            DUP 8 = OVER -103 = OR -END? AND IF DROP DELETE .TIB-TAIL ELSE
+            DUP 13 = OVER 10 = OR IF DROP TIB# @ EXIT ELSE
+            DUP -3 = -END? AND IF DROP CURSOR> ELSE
+            DUP -4 = -START? AND IF DROP CURSOR< ELSE
+        ENDCASE
+    AGAIN ;
+
+: INTERPRET
+    0 STATE !   TIB (SOURCE) !   0 >SOURCE !
+    ACCEPT   SOURCE# !   SPACE
+    (INTERPRET) IF DROP S"  ok " TYPE ELSE COUNT TYPE 63 EMIT THEN CR ;
+
+: QUIT
+    S0 SP!   R0 RP!
+    BEGIN INTERPRET AGAIN ; 
