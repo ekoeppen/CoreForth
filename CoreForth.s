@@ -88,6 +88,7 @@ name_\label :
     .global \label
 \label :
     .int DOCON
+addr_\label :
     .word \value
     .endm
 
