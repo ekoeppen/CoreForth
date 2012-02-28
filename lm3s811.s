@@ -550,8 +550,9 @@ DISP_FONT:
 
     .ltorg
 
-    .set last_rom_word, .
+@    .include "precomp.s"
 
+    .set last_rom_word, .
 eval_words:
     .include "CoreForth.gen.s"
     .include "lm3s811.gen.s"
