@@ -1528,5 +1528,7 @@ see_done:
 
 @ ---------------------------------------------------------------------
 
+    .include "CoreForth.precomp.s"
+
     .set last_core_word, link
     .set end_of_core, .
