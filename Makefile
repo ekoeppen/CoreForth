@@ -26,4 +26,4 @@ clean:
 	rm -f *.elf *.bin *.o *.gen.s
 
 run: qemu.elf
-	qemu-system-arm -M lm3s811evb -serial stdio -kernel qemu.elf
+	qemu-system-arm -M lm3s811evb -serial stdio -kernel qemu.elf; stty sane
