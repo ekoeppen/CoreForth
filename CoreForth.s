@@ -97,16 +97,9 @@ addr_\label :
 
 reset_handler:
     bl init_board
-    ldr r0, =start_prompt
-    mov r1, #(start_prompt_end - start_prompt)
-    bl putstring
     ldr r6, =addr_RTOS
     ldr r7, =cold_start
     NEXT
-start_prompt:
-    .ascii "CoreForth ready.\n"
-start_prompt_end:
-    .align 2, 0
 cold_start:
     .word LIT, 10, BASE, STORE
     .word LIT, data_start, DP, STORE
@@ -1444,9 +1437,14 @@ prompt:
     defword "QUIT", 4, , QUIT
     .word RTOS, RPSTORE
     .word TOS, SPSTORE
+    .word LIT, ready_prompt, LIT, 2f - ready_prompt, TYPE
 quit_loop:
     .word INTERPRET
     .word BRANCH, quit_loop
+ready_prompt:
+    .ascii "CoreForth ready.\n"
+2:
+    .align 2, 0
 
     defword "WORDS", 5, , WORDS
     .word LATEST, FETCH
