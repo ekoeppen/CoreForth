@@ -554,7 +554,7 @@ DISP_FONT:
     .set end_of_rom, .
 
 eval_words:
-    @.include "CoreForth.gen.s"
+    @ .include "CoreForth.gen.s"
     .include "lm3s811.gen.s"
 
     .set last_word, link
