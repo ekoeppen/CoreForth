@@ -538,7 +538,7 @@ DISP_FONT:
     pop {r4 - r12, pc}
 
     defword ";I", 2, F_IMMED, SEMICOLONI
-    .word LIT, RETI, COMMA, REVEAL, LBRACKET, EXIT
+    .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
     defword "COLD", 4, , COLD
     .word LIT, eval_words, EVALUATE
