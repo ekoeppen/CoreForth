@@ -1504,8 +1504,10 @@ see_done:
 @ ---------------------------------------------------------------------
 @ -- User variables ---------------------------------------------------
 
-    defconst "ROMTOP", 6, , ROMTOP, last_rom_word
+    defconst "ROMTOP", 6, , ROMTOP, end_of_rom
     defconst "CORETOP", 7, , CORETOP, end_of_core
+    defconst "LATESTROM", 9, , LATESTROM, last_rom_word
+    defconst "LATESTCORE", 10, , LATESTCORE, last_core_word
     defvar "STACK", 5, , STACK, 1024
     defvar "S0", 2, , TOS, 0
     defvar "RSTACK", 6, , RSTACK, 256
@@ -1526,4 +1528,5 @@ see_done:
 
 @ ---------------------------------------------------------------------
 
+    .set last_core_word, link
     .set end_of_core, .
