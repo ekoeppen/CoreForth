@@ -104,7 +104,7 @@ reset_handler:
     ldr r7, =cold_start
     NEXT
 start_prompt:
-    .ascii "CoreForth ready.\r\n"
+    .ascii "CoreForth ready.\n"
 start_prompt_end:
     .align 2, 0
 cold_start:
@@ -880,8 +880,6 @@ fill_done:
     NEXT
 
     defcode "CR", 2, , CR
-    mov r0, #13
-    bl putchar
     mov r0, #10
     bl putchar
     NEXT
@@ -903,6 +901,13 @@ fill_done:
     defcode ".", 1, , DOT
     pop {r0}
     bl putsignedhexnumber
+    mov r0, #32
+    bl putchar
+    NEXT
+
+    defcode ".U", 2, , UDOT
+    pop {r0}
+    bl puthexnumber
     mov r0, #32
     bl putchar
     NEXT
