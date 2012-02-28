@@ -541,18 +541,20 @@ DISP_FONT:
     .word LIT, RETI, COMMA, REVEAL, LBRACKET, EXIT
 
     defword "COLD", 4, , COLD
-    .word LIT, lm3s811_words, EVALUATE
-
-    .ltorg
-
-lm3s811_words:
-    .include "CoreForth.gen.s"
-    .include "lm3s811.gen.s"
+    .word LIT, eval_words, EVALUATE
 
     defvar "SBUF", 4, , SBUF, 128
     defvar "SBUF-HEAD", 9, , SBUF_HEAD
     defvar "SBUF-TAIL", 9, , SBUF_TAIL
     defvar "IVT", 3, , IVT, 48 * 4
+
+    .ltorg
+
+    .set last_rom_word, .
+
+eval_words:
+    .include "CoreForth.gen.s"
+    .include "lm3s811.gen.s"
 
     .set last_word, link
     .set data_start, compiled_here 

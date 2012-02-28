@@ -1490,6 +1490,7 @@ see_done:
 @ ---------------------------------------------------------------------
 @ -- User variables ---------------------------------------------------
 
+    defconst "ROMTOP", 6, , ROMTOP, last_rom_word
     defvar "STACK", 5, , STACK, 1024
     defvar "S0", 2, , TOS, 0
     defvar "RSTACK", 6, , RSTACK, 256
