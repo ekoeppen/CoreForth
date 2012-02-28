@@ -645,7 +645,7 @@ fill_done:
     .word EXIT
 
     defword "PAD", 3, , PAD
-    .word HERE, LIT, 256, ADD, EXIT
+    .word HERE, LIT, 128, ADD, EXIT
 
 @ ---------------------------------------------------------------------
 @ -- Arithmetic ------------------------------------------------------
