@@ -1,3 +1,19 @@
+HEX
+
+: RELOCATE
+    CORETOP - >R   DUP HERE SWAP -   
+    FIXUPS @ DUP CELL + SWAP @ 0 DO
+        DUP I CELLS + @ DUP @ R@ - SWAP !
+    LOOP DROP RDROP
+    0 DO
+        DUP I + DUP LATEST @ = IF CR S"    .set link, ." TYPE CR S"    .byte " TYPE 
+        ELSE I 16 MOD 0= IF CR S"    .byte " TYPE ELSE S" , " TYPE THEN THEN
+        C@ .U
+    LOOP
+    BYE ;
+
+\ 20001B00 FIXUPS !   0 FIXUPS @ !   HERE LATEST @ 
+
 DECIMAL
 
 : TIB-TAIL   >TIB @ TIB# @ OVER - SWAP TIB + SWAP ;
@@ -30,4 +46,6 @@ DECIMAL
 
 : QUIT
     S0 SP!   R0 RP!
-    BEGIN INTERPRET AGAIN ; 
+    BEGIN INTERPRET AGAIN ;
+
+\ RELOCATE

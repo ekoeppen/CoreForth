@@ -1177,14 +1177,25 @@ is_positive:
     defword ",", 1, , COMMA
     .word HERE, STORE, CELL, ALLOT, EXIT
 
+    defword "+FIXUP", 6, , ADDFIXUP
+    .word ROMTOP, GT, ZBRANCH, 1f
+    .word FIXUPS, FETCH, QDUP, ZBRANCH, 1f
+    .word DUP, FETCH, INCR, CELLS, OVER, ADD, HERE, SWAP, STORE
+    .word LIT, 1, SWAP, ADDSTORE
+1:
+    .word EXIT
+
+    defword ",FIXED", 6, , COMMAFIXED
+    .word DUP, ADDFIXUP, HERE, STORE, CELL, ALLOT, EXIT
+
     defword ",DEST", 5, , COMMADEST
-    .word HERE, STORE, CELL, ALLOT, EXIT
+    .word COMMAFIXED, EXIT
 
     defword ",XT", 3, , COMMAXT
-    .word HERE, STORE, CELL, ALLOT, EXIT
+    .word COMMAFIXED, EXIT
 
     defword ",LINK", 5, , COMMALINK
-    .word HERE, STORE, CELL, ALLOT, EXIT
+    .word COMMAFIXED, EXIT
 
     defword "C,", 2, , CCOMMA
     .word HERE, STOREBYTE, LIT, 1, ALLOT, EXIT
@@ -1496,6 +1507,7 @@ see_done:
 @ -- User variables ---------------------------------------------------
 
     defconst "ROMTOP", 6, , ROMTOP, last_rom_word
+    defconst "CORETOP", 7, , CORETOP, end_of_core
     defvar "STACK", 5, , STACK, 1024
     defvar "S0", 2, , TOS, 0
     defvar "RSTACK", 6, , RSTACK, 256
@@ -1510,8 +1522,10 @@ see_done:
     defvar "(SOURCE)", 8, , XSOURCE
     defvar "SOURCE#", 7, , SOURCECOUNT
     defvar ">SOURCE", 7, , SOURCEINDEX
+    defvar "FIXUPS", 6, , FIXUPS
 
     .ltorg
 
 @ ---------------------------------------------------------------------
 
+    .set end_of_core, .
