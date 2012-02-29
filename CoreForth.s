@@ -104,6 +104,7 @@ cold_start:
     .word LIT, 10, BASE, STORE
     .word LIT, data_start, DP, STORE
     .word LIT, last_word, LATEST, STORE
+    .word LIT, 0, FIXUPS, STORE
     .word COLD
 
     .ltorg
@@ -1502,7 +1503,7 @@ see_done:
 3:  .word    LIT, interbyte, LIT, 5f - interbyte, TYPE
 6:  .word    FETCHBYTE, UDOT
     .word XLOOP, ZBRANCH, 2b
-    .word CR, RDROP, BYE, EXIT
+    .word LIT, 10, EMIT, RDROP, BYE, EXIT
 set_link:
     .ascii "\n.set link, .\n    .byte "
 line_prefix:
