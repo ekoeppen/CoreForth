@@ -1526,7 +1526,7 @@ see_done:
 3:  .word    LIT, interbyte, LIT, 5f - interbyte, TYPE
 6:  .word    FETCHBYTE, UDOT
     .word XLOOP, ZBRANCH, 2b
-    .word RDROP, BYE, EXIT
+    .word CR, RDROP, BYE, EXIT
 set_link:
     .ascii "\n.set link, .\n    .byte "
 line_prefix:
@@ -1563,7 +1563,9 @@ interbyte:
 @ ---------------------------------------------------------------------
 @ -- Precompiled words ------------------------------------------------
 
+.ifndef PRECOMPILE
     .include "CoreForth.precomp.s"
+.endif
 
 @ ---------------------------------------------------------------------
 

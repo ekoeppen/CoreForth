@@ -131,7 +131,7 @@ init_board:
     msr basepri, r0
     ldr r0, =(NVIC + NVIC_SETENA_BASE)
     mov r1, #0
-.if UART_USE_INTERRUPTS == 1
+.ifdef UART_USE_INTERRUPTS
     orr r1, #0x20
 .endif
     str r1, [r0]
@@ -189,7 +189,7 @@ init_board:
     mov r1, #0x70
     str r1, [r0]
 
-.if UART_USE_INTERRUPTS == 1
+.ifdef UART_USE_INTERRUPTS
     @ enable UART interrupts
     ldr r0, =(UART0 + UART_IFLS)
     mov r1, #0x1    @ trigger after one byte
@@ -245,7 +245,7 @@ read_key_polled:
     ldrb r0, [r1, #UART_DR]
     pop {r1, r2, r3, pc}
 
-.if UART_USE_INTERRUPTS == 1
+.ifdef UART_USE_INTERRUPTS
     .set read_key, read_key_interrupt
 .else
     .set read_key, read_key_polled
@@ -314,7 +314,7 @@ pendsv_handler:
 systick_handler:
     b .
 
-.if UART_USE_INTERRUPTS == 1
+.ifdef UART_USE_INTERRUPTS
 uart0_handler:
 2:  ldr r0, =(UART0 + UART_FR)
     ldr r1, [r0]
@@ -554,7 +554,9 @@ DISP_FONT:
     .set end_of_rom, .
 
 eval_words:
-    @ .include "CoreForth.gen.s"
+.ifdef PRECOMPILE
+    .include "CoreForth.gen.s"
+.endif
     .include "lm3s811.gen.s"
 
     .set last_word, link
