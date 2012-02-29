@@ -1502,7 +1502,8 @@ see_done:
     .word EXIT
 
     defword "RELOCATE", 8, , RELOCATE
-/*
+/*: RELOCATE   ( start end --  )
+    
     SWAP DUP CORETOP - >R   SWAP OVER -
     FIXUPS @ DUP CELL + SWAP @ 0 DO
         DUP I CELLS + @ DUP @ R@ - SWAP !
@@ -1517,18 +1518,13 @@ see_done:
  */
     .word SWAP, DUP, CORETOP, SUB, TOR, SWAP, OVER, SUB
     .word FIXUPS, FETCH, DUP, CELL, ADD, SWAP, FETCH, LIT, 0x0, XDO
-1:
-    .word    DUP, INDEX, CELLS, ADD, FETCH, DUP, FETCH, RFETCH, SUB, SWAP, STORE
+1:  .word    DUP, INDEX, CELLS, ADD, FETCH, DUP, FETCH, RFETCH, SUB, SWAP, STORE
     .word XLOOP, ZBRANCH, 1b, DROP, RDROP
     .word ROT, TOR, LIT, 0x0, XDO
-2:
-    .word    DUP, INDEX, ADD, DUP, RFETCH, EQU, ZBRANCH, 4f, LIT, set_link, LIT, line_prefix - set_link, TYPE, BRANCH, 6f
-4:
-    .word    INDEX, LIT, 0x10, MOD, ZEQU, ZBRANCH, 3f, LIT, line_prefix, LIT, interbyte - line_prefix, TYPE, BRANCH, 6f
-3:
-    .word    LIT, interbyte, LIT, 5f - interbyte, TYPE
-6:
-    .word    FETCHBYTE, UDOT
+2:  .word    DUP, INDEX, ADD, DUP, RFETCH, EQU, ZBRANCH, 4f, LIT, set_link, LIT, line_prefix - set_link, TYPE, BRANCH, 6f
+4:  .word    INDEX, LIT, 0x10, MOD, ZEQU, ZBRANCH, 3f, LIT, line_prefix, LIT, interbyte - line_prefix, TYPE, BRANCH, 6f
+3:  .word    LIT, interbyte, LIT, 5f - interbyte, TYPE
+6:  .word    FETCHBYTE, UDOT
     .word XLOOP, ZBRANCH, 2b
     .word RDROP, BYE, EXIT
 set_link:
@@ -1537,8 +1533,7 @@ line_prefix:
     .ascii "\n    .byte "
 interbyte:
     .ascii ", "
-5:
-    .align 2, 0
+5:  .align 2, 0
 
 @ ---------------------------------------------------------------------
 @ -- User variables ---------------------------------------------------
