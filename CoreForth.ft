@@ -4,19 +4,6 @@ LATESTCORE LATEST !  20001B00 FIXUPS !   0 FIXUPS @ !   HERE
 
 DECIMAL
 
-: RELOCATE
-    SWAP DUP CORETOP - >R   SWAP OVER -
-    FIXUPS @ DUP CELL + SWAP @ 0 DO
-        DUP I CELLS + @ DUP @ R@ - SWAP !
-    LOOP DROP RDROP
-    ROT >R 
-    0 DO
-        DUP I + DUP R@ = IF CR S"    .set link, ." TYPE CR S"    .byte " TYPE 
-        ELSE I 16 MOD 0= IF CR S"    .byte " TYPE ELSE S" , " TYPE THEN THEN
-        C@ .U
-    LOOP RDROP
-    BYE ;
-
 : TIB-TAIL   >TIB @ TIB# @ OVER - SWAP TIB + SWAP ;
 : .TIB-TAIL   CLR-EOL !CURSOR TIB-TAIL TYPE @CURSOR ;
 : CURSOR>   1 >TIB +! CURSOR-RIGHT ;
@@ -52,21 +39,4 @@ DECIMAL
 
 HERE  LATEST @ -ROT
 
-FIXUPS @ -ROT   0 FIXUPS !
-
-: XLOCATE
-    SWAP DUP CORETOP - >R   SWAP OVER -
-    FIXUPS @ DUP CELL + SWAP @ 0 DO
-        DUP I CELLS + @ DUP @ R@ - SWAP !
-    LOOP DROP RDROP
-    ROT >R 
-    0 DO
-        DUP I + DUP R@ = IF CR S"    .set link, ." TYPE CR S"    .byte " TYPE 
-        ELSE I 16 MOD 0= IF CR S"    .byte " TYPE ELSE S" , " TYPE THEN THEN
-        C@ .U
-    LOOP RDROP
-    BYE ;
-
-ROT FIXUPS !
-
-XLOCATE
+RELOCATE
