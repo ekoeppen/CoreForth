@@ -1384,18 +1384,6 @@ interpret_not_found:
 interpret_eol:
     .word LIT, -1, EXIT
 
-    defword "INTERPRET", 9, , INTERPRET
-    .word LIT, 0, STATE, STORE
-    .word TIB, XSOURCE, STORE
-    .word LIT, 0, SOURCEINDEX, STORE
-    .word XSOURCE, FETCH, TIBSIZE, ACCEPT, SOURCECOUNT, STORE, SPACE
-    .word XINTERPRET, ZBRANCH, interpret_error
-    .word DROP, LIT, prompt, LIT, 4, TYPE, CR, EXIT
-interpret_error:
-    .word COUNT, TYPE, LIT, '?', EMIT, CR, EXIT
-prompt:
-    .ascii " ok "
-
     defword "EVALUATE", 8, , EVALUATE
     .word XSOURCE, STORE
     .word LIT, 0, STATE, STORE
@@ -1406,7 +1394,7 @@ prompt:
 2:
     .word TWODROP, EXIT
 3:
-    .word DROP, BRANCH, interpret_error
+    .word DROP, DUP, DOT, SPACE, COUNT, TYPE, LIT, '?', EMIT, CR, EXIT
 
     defword "FORGET", 6, , FORGET
     /* BL WORD DROP FIND DROP >LINK @ LATEST ! */
@@ -1433,18 +1421,6 @@ prompt:
 
     defword ";", 1, F_IMMED, SEMICOLON
     .word LIT, EXIT, COMMAXT, REVEAL, LBRACKET, EXIT
-
-    defword "QUIT", 4, , QUIT
-    .word RTOS, RPSTORE
-    .word TOS, SPSTORE
-    .word LIT, ready_prompt, LIT, 2f - ready_prompt, TYPE
-quit_loop:
-    .word INTERPRET
-    .word BRANCH, quit_loop
-ready_prompt:
-    .ascii "CoreForth ready.\n"
-2:
-    .align 2, 0
 
     defword "WORDS", 5, , WORDS
     .word LATEST, FETCH
