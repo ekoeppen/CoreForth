@@ -874,6 +874,8 @@ fill_done:
     NEXT
 
     defcode "CR", 2, , CR
+    mov r0, #13
+    bl putchar
     mov r0, #10
     bl putchar
     NEXT
