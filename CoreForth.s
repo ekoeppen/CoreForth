@@ -1,5 +1,7 @@
 @ -- vim:syntax=asm:foldmethod=marker:foldmarker=@\ --\ ,@\ ---:
 
+    .org 0x400
+
 @ ---------------------------------------------------------------------
 @ -- Variable definitions ---------------------------------------------
 
@@ -1155,8 +1157,8 @@ is_positive:
 @ -- Compiler and interpreter ----------------------------------------
 
     defcode "BYE", 3, , BYE
-    ldr r0, =0xfffffff8
-    ldr r0, [r0]
+    ldr r0, =0xfffffff
+    bx r0
 
     defcode "(ABRANCH)", 9, , ASMBRANCH
     pop {r0}
@@ -1505,7 +1507,7 @@ see_done:
 3:  .word    LIT, interbyte, LIT, 5f - interbyte, TYPE
 6:  .word    FETCHBYTE, UDOT
     .word XLOOP, ZBRANCH, 2b
-    .word LIT, 10, EMIT, RDROP, BYE, EXIT
+    .word LIT, 10, EMIT, RDROP, BYE
 set_link:
     .ascii "\n.set link, .\n    .byte "
 line_prefix:
@@ -1513,6 +1515,14 @@ line_prefix:
 interbyte:
     .ascii ", "
 5:  .align 2, 0
+
+    defword "PRECOMP-BEGIN", 13, , PRECOMP_BEGIN
+    .word LATESTCORE, LATEST, STORE, LIT, 0x20001B00, FIXUPS, STORE, LIT, 0, FIXUPS, FETCH, STORE, HERE
+    .word EXIT
+
+    defword "PRECOMP-END", 11, , PRECOMP_END
+    .word HERE, LATEST, FETCH, ROTROT, RELOCATE
+    .word EXIT
 
 @ ---------------------------------------------------------------------
 @ -- User variables ---------------------------------------------------

@@ -4,7 +4,7 @@ all: lm3s811.bin qemu.bin
 	arm-none-eabi-objcopy -Obinary $< $@
 
 %.gen.s: %.ft
-	awk '{ print ".byte ", length($$0); gsub(/\\/, "\\\\"); gsub(/"/, "\\\""); print ".ascii \"" $$0 "\""} END{ print ".align 2, 0"}' < $< > $@
+	awk '{ print ".byte ", length($$0); gsub(/\\/, "\\\\"); gsub(/"/, "\\\""); print ".ascii \"" $$0 "\""} END{print ".byte 255,\n.align 2, 0"}' < $< > $@
 
 .s.o:
 	arm-none-eabi-as -mcpu=cortex-m3 -o $@ $< 
@@ -35,4 +35,4 @@ run: qemu.elf
 	qemu-system-arm -M lm3s811evb -serial stdio -kernel qemu.elf; stty sane
 
 precomp: precomp.bin
-	qemu-system-arm -M lm3s811evb -nographic -kernel precomp.elf > CoreForth.precomp.s; stty sane
+	qemu-system-arm -M lm3s811evb -serial stdio -kernel precomp.elf > CoreForth.precomp.s; stty sane

@@ -86,7 +86,11 @@ _start:
     .long gpioc_handler + 1           /* GPIO C */
     .long gpiod_handler + 1           /* GPIO D */
     .long gpioe_handler + 1           /* GPIO E */
+.ifdef UART_USE_INTERRUPTS
+    .long uart0_key_handler + 1       /* UART 0 */
+.else
     .long uart0_handler + 1           /* UART 0 */
+.endif
     .long uart1_handler + 1           /* UART 1 */
     .long ssi_handler + 1             /* SSI */
     .long i2c_handler + 1             /* I2C */
@@ -261,11 +265,6 @@ putchar:
     strb r0, [r1, #UART_DR]
     pop {r1, r2, r3, pc}
 
-
-    .org 0x400
-
-.include "CoreForth.s"
-
 @ ---------------------------------------------------------------------
 @ -- IRQ handlers -----------------------------------------------------
 
@@ -286,7 +285,11 @@ generic_forth_handler:
     push {r4 - r12, lr}
     ldr r6, =irq_stack_top
     mov r7, r0
-    NEXT 
+    ldr r0, [r7]
+    add r7, r7, #4
+    ldr r1, [r0]
+    add r1, r1, #1
+    bx r1
 1:  bx lr
 
 nmi_handler:
@@ -317,33 +320,12 @@ pendsv_handler:
 systick_handler:
     b .
 
-.ifdef UART_USE_INTERRUPTS
-uart0_handler:
-2:  ldr r0, =(UART0 + UART_FR)
-    ldr r1, [r0]
-    ldr r2, =UART_RXFE
-    ands r1, r1, r2
-    bne 1f
-    ldr r0, =(UART0 + UART_DR)
-    ldrb r1, [r0]
-    ldr r0, =addr_SBUF
-    ldr r2, =addr_SBUF_HEAD
-    ldrb r3, [r2]
-    strb r1, [r0, r3]
-    add r3, r3, #1
-    strb r3, [r2]
-    b 2b
-1:  bx lr
-.else
-uart0_handler:
-    b generic_forth_handler
-.endif
-
 gpioa_handler:
 gpiob_handler:
 gpioc_handler:
 gpiod_handler:
 gpioe_handler:
+uart0_handler:
 uart1_handler:
 ssi_handler:
 i2c_handler:
@@ -363,6 +345,28 @@ timer2a_handler:
 timer2b_handler:
 adcomp_handler:
     b generic_forth_handler
+
+uart0_key_handler:
+2:  ldr r0, =(UART0 + UART_FR)
+    ldr r1, [r0]
+    ldr r2, =UART_RXFE
+    ands r1, r1, r2
+    bne 1f
+    ldr r0, =(UART0 + UART_DR)
+    ldrb r1, [r0]
+    ldr r0, =addr_SBUF
+    ldr r2, =addr_SBUF_HEAD
+    ldrb r3, [r2]
+    strb r1, [r0, r3]
+    add r3, r3, #1
+    strb r3, [r2]
+    b 2b
+1:  bx lr
+
+@ ---------------------------------------------------------------------
+@ -- CoreForth starts here --------------------------------------------
+
+.include "CoreForth.s"
 
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
@@ -544,7 +548,12 @@ DISP_FONT:
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
     defword "COLD", 4, , COLD
+.ifdef PRECOMPILE
+    .word PRECOMP_BEGIN, LIT, 1f, EVALUATE, PRECOMP_END
+1:  .include "CoreForth.gen.s"
+.else
     .word LIT, eval_words, EVALUATE
+.endif
 
     defvar "SBUF", 4, , SBUF, 128
     defvar "SBUF-HEAD", 9, , SBUF_HEAD
@@ -557,9 +566,6 @@ DISP_FONT:
     .set end_of_rom, .
 
 eval_words:
-.ifdef PRECOMPILE
-    .include "CoreForth.gen.s"
-.endif
     .include "lm3s811.gen.s"
 
     .set last_word, link
