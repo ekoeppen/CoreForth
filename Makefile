@@ -35,4 +35,4 @@ run: qemu.elf
 	qemu-system-arm -M lm3s811evb -serial stdio -kernel qemu.elf; stty sane
 
 precomp: precomp.bin
-	qemu-system-arm -M lm3s811evb -serial stdio -kernel precomp.elf > CoreForth.precomp.s; stty sane
+	qemu-system-arm -M lm3s811evb -serial stdio -kernel precomp.elf > precomp.s; stty sane

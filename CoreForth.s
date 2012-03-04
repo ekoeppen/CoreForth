@@ -1497,7 +1497,7 @@ see_done:
     LOOP RDROP
     BYE ;
  */
-    .word SWAP, DUP, CORETOP, SUB, TOR, SWAP, OVER, SUB
+    .word SWAP, DUP, ROMTOP, SUB, TOR, SWAP, OVER, SUB
     .word FIXUPS, FETCH, DUP, CELL, ADD, SWAP, FETCH, LIT, 0x0, XDO
 1:  .word    DUP, INDEX, CELLS, ADD, FETCH, DUP, FETCH, RFETCH, SUB, SWAP, STORE
     .word XLOOP, ZBRANCH, 1b, DROP, RDROP
@@ -1517,7 +1517,9 @@ interbyte:
 5:  .align 2, 0
 
     defword "PRECOMP-BEGIN", 13, , PRECOMP_BEGIN
-    .word LATESTCORE, LATEST, STORE, LIT, 0x20001B00, FIXUPS, STORE, LIT, 0, FIXUPS, FETCH, STORE, HERE
+    .word LATESTCORE, PAD, STORE
+    @ .word LATESTCORE, LATEST, STORE
+    .word LIT, 0x20001B00, FIXUPS, STORE, LIT, 0, FIXUPS, FETCH, STORE, HERE
     .word EXIT
 
     defword "PRECOMP-END", 11, , PRECOMP_END
@@ -1552,9 +1554,7 @@ interbyte:
 @ ---------------------------------------------------------------------
 @ -- Precompiled words ------------------------------------------------
 
-.ifndef PRECOMPILE
     .include "CoreForth.precomp.s"
-.endif
 
 @ ---------------------------------------------------------------------
 
