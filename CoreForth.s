@@ -1497,7 +1497,9 @@ see_done:
     LOOP RDROP
     BYE ;
  */
-    .word SWAP, DUP, ROMTOP, SUB, TOR, SWAP, OVER, SUB
+    .word SWAP, DUP
+    .word ROMTOP @ use CORETOP for recompiling core words
+    .word SUB, TOR, SWAP, OVER, SUB
     .word FIXUPS, FETCH, DUP, CELL, ADD, SWAP, FETCH, LIT, 0x0, XDO
 1:  .word    DUP, INDEX, CELLS, ADD, FETCH, DUP, FETCH, RFETCH, SUB, SWAP, STORE
     .word XLOOP, ZBRANCH, 1b, DROP, RDROP
