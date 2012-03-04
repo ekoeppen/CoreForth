@@ -550,10 +550,14 @@ DISP_FONT:
     .ltorg
 
     defword "(COLD)", 6, , XCOLD
-    .word LIT, eval_words, EVALUATE, QUIT
+    .word LIT, eval_words, EVALUATE
 
     defword "(COLD-PRECOMPILE)", 17, , XCOLD_PRECOMPILE
+.ifdef PRECOMP_CORE
+    .word PRECOMP_CORE_BEGIN
+.else
     .word PRECOMP_BEGIN
+.endif
     .word LIT, eval_words, EVALUATE
     .word PRECOMP_END
 
@@ -569,16 +573,22 @@ DISP_FONT:
     .set end_of_rom, .
 
 eval_words:
-    .include "lm3s811.gen.s"
+    .ifdef PRECOMP_CORE
+        .include "CoreForth.gen.s"
+    .else
+        .include "lm3s811.gen.s"
+    .endif
+
 .else
-    .include "lm3s811.precomp.s"
+
+    .ifndef PRECOMP_CORE
+        .include "lm3s811.precomp.s"
+    .endif
     .set last_rom_word, link
     .set end_of_rom, .
 
 eval_words:
-@    .include "lm3s811.gen.s"
-    .byte 255
-    .align 2, 0
+    .include "lm3s811ram.gen.s"
 .endif
 
     .set last_word, link

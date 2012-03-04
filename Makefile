@@ -9,15 +9,18 @@ all: lm3s811.bin qemu.bin
 .s.o:
 	arm-none-eabi-as -mcpu=cortex-m3 -o $@ $< 
 
-lm3s811.o: CoreForth.s CoreForth.gen.s lm3s811.gen.s
+lm3s811.o: CoreForth.s CoreForth.gen.s lm3s811ram.gen.s lm3s811.gen.s
 
-qemu.o: CoreForth.s CoreForth.gen.s lm3s811.gen.s
+qemu.o: CoreForth.s CoreForth.gen.s lm3s811ram.gen.s lm3s811.gen.s
 
 qemu.o: lm3s811.s
 	arm-none-eabi-as -mcpu=cortex-m3 -defsym UART_USE_INTERRUPTS=1 -o $@ $< 
 
 precomp.o: lm3s811.s CoreForth.gen.s lm3s811.gen.s
 	arm-none-eabi-as -mcpu=cortex-m3 -defsym UART_USE_INTERRUPTS=1 -defsym PRECOMPILE=1 -o $@ $< 
+
+precomp_core.o: lm3s811.s CoreForth.gen.s lm3s811.gen.s
+	arm-none-eabi-as -mcpu=cortex-m3 -defsym UART_USE_INTERRUPTS=1 -defsym PRECOMPILE=1 -defsym PRECOMP_CORE=1 -o $@ $< 
 
 lm3s811.elf: lm3s811.o
 	arm-none-eabi-ld $< -o $@ -Tlm3s811.ld
@@ -28,6 +31,9 @@ qemu.elf: qemu.o
 precomp.elf: precomp.o
 	arm-none-eabi-ld $< -o $@ -Tlm3s811.ld
 
+precomp_core.elf: precomp_core.o
+	arm-none-eabi-ld $< -o $@ -Tlm3s811.ld
+
 clean:
 	rm -f *.elf *.bin *.o *.gen.s
 
@@ -36,3 +42,6 @@ run: qemu.elf
 
 precomp: precomp.bin
 	qemu-system-arm -M lm3s811evb -serial stdio -kernel precomp.elf > precomp.s; stty sane
+
+precomp_core: precomp_core.bin
+	qemu-system-arm -M lm3s811evb -serial stdio -kernel precomp_core.elf > precomp.s; stty sane

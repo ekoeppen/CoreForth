@@ -1507,7 +1507,11 @@ see_done:
     BYE ;
  */
     .word SWAP, DUP
-    .word ROMTOP @ use CORETOP for recompiling core words
+.ifdef PRECOMP_CORE
+    .word CORETOP
+.else
+    .word ROMTOP
+.endif
     .word SUB, TOR, SWAP, OVER, SUB
     .word FIXUPS, FETCH, DUP, CELL, ADD, SWAP, FETCH, LIT, 0x0, XDO
 1:  .word    DUP, INDEX, CELLS, ADD, FETCH, DUP, FETCH, RFETCH, SUB, SWAP, STORE
@@ -1527,9 +1531,15 @@ interbyte:
     .ascii ", "
 5:  .align 2, 0
 
-    defword "PRECOMP-BEGIN", 13, , PRECOMP_BEGIN
+    defword "(PRECOMP-BEGIN)", 15, , XPRECOMP_BEGIN
     .word LIT, 0x20001B00, FIXUPS, STORE, LIT, 0, FIXUPS, FETCH, STORE, HERE
     .word EXIT
+
+    defword "PRECOMP-BEGIN", 13, , PRECOMP_BEGIN
+    .word XPRECOMP_BEGIN, EXIT
+
+    defword "PRECOMP-CORE-BEGIN", 18, , PRECOMP_CORE_BEGIN
+    .word LATESTCORE, LATEST, STORE, XPRECOMP_BEGIN, EXIT
 
     defword "PRECOMP-END", 11, , PRECOMP_END
     .word HERE, LATEST, FETCH, ROTROT, RELOCATE
@@ -1563,7 +1573,9 @@ interbyte:
 @ ---------------------------------------------------------------------
 @ -- Precompiled words ------------------------------------------------
 
+.ifndef PRECOMP_CORE
     .include "CoreForth.precomp.s"
+.endif
 
 @ ---------------------------------------------------------------------
 
