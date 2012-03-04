@@ -1160,6 +1160,15 @@ is_positive:
     ldr r0, =0xfffffff
     bx r0
 
+    defcode "WFI", 3, , WFI
+    wfi
+    NEXT
+
+    defcode "RESET", 5, , RESET
+    ldr r0, =0xe000ed0c
+    ldr r1, =0x05fa0004
+    str r1, [r0]
+
     defcode "(ABRANCH)", 9, , ASMBRANCH
     pop {r0}
     bl calc_wide_branch

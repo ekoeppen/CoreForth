@@ -535,15 +535,6 @@ DISP_FONT:
     .byte 0x00, 0x41, 0x36, 0x08, 0x00   @ }
     .byte 0x02, 0x01, 0x02, 0x04, 0x02   @ ~
 
-    defcode "WFI", 3, , WFI
-    wfi
-    NEXT
-
-    defcode "RESET", 5, , RESET
-    ldr r0, =0xe000ed0c
-    ldr r1, =0x05fa0004
-    str r1, [r0]
-
     defcode "RETI", 4, , RETI
     pop {r4 - r12, pc}
 
