@@ -559,6 +559,7 @@ DISP_FONT:
     defvar "SBUF-HEAD", 9, , SBUF_HEAD
     defvar "SBUF-TAIL", 9, , SBUF_TAIL
     defvar "IVT", 3, , IVT, 48 * 4
+    defvar "(I2C-DELAY)", 11, , XI2C_DELAY, 16
 
     .ltorg
 
