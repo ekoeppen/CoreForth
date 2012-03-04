@@ -1485,7 +1485,7 @@ see_done:
     defword "RELOCATE", 8, , RELOCATE
 /*: RELOCATE   ( start end --  )
     
-    SWAP DUP CORETOP - >R   SWAP OVER -
+    SWAP DUP ROMTOP - >R   SWAP OVER -
     FIXUPS @ DUP CELL + SWAP @ 0 DO
         DUP I CELLS + @ DUP @ R@ - SWAP !
     LOOP DROP RDROP
@@ -1517,8 +1517,6 @@ interbyte:
 5:  .align 2, 0
 
     defword "PRECOMP-BEGIN", 13, , PRECOMP_BEGIN
-    .word LATESTCORE, PAD, STORE
-    @ .word LATESTCORE, LATEST, STORE
     .word LIT, 0x20001B00, FIXUPS, STORE, LIT, 0, FIXUPS, FETCH, STORE, HERE
     .word EXIT
 
