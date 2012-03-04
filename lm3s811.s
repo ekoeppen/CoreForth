@@ -366,7 +366,7 @@ uart0_key_handler:
 @ ---------------------------------------------------------------------
 @ -- CoreForth starts here --------------------------------------------
 
-.include "CoreForth.s"
+    .include "CoreForth.s"
 
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
@@ -550,14 +550,6 @@ DISP_FONT:
     defword ";I", 2, F_IMMED, SEMICOLONI
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    defword "COLD", 4, , COLD
-.ifdef PRECOMPILE
-    .word PRECOMP_BEGIN, LIT, 1f, EVALUATE, PRECOMP_END
-1:  .include "CoreForth.gen.s"
-.else
-    .word LIT, eval_words, EVALUATE
-.endif
-
     defvar "SBUF", 4, , SBUF, 128
     defvar "SBUF-HEAD", 9, , SBUF_HEAD
     defvar "SBUF-TAIL", 9, , SBUF_TAIL
@@ -566,11 +558,37 @@ DISP_FONT:
 
     .ltorg
 
+    defword "(COLD)", 6, , XCOLD
+    .word LIT, eval_words, EVALUATE, QUIT
+
+    defword "(COLD-PRECOMPILE)", 17, , XCOLD_PRECOMPILE
+    .word PRECOMP_BEGIN
+    .word LIT, eval_words, EVALUATE
+    .word PRECOMP_END
+
+    defword "COLD", 4, , COLD
+.ifdef PRECOMPILE
+    .word XCOLD_PRECOMPILE
+.else
+    .word XCOLD
+.endif
+
+.ifdef PRECOMPILE
     .set last_rom_word, link
     .set end_of_rom, .
 
 eval_words:
     .include "lm3s811.gen.s"
+.else
+    .include "lm3s811.precomp.s"
+    .set last_rom_word, link
+    .set end_of_rom, .
+
+eval_words:
+@    .include "lm3s811.gen.s"
+    .byte 255
+    .align 2, 0
+.endif
 
     .set last_word, link
     .set data_start, compiled_here 
