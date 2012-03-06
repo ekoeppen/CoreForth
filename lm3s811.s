@@ -120,6 +120,11 @@ _start:
 
 init_board:
     push {lr}
+
+    @ safety delay of 3x8000000 ticks (~ 3 seconds)
+    ldr r0, =8000000
+    bl delay
+
     @ reset the interrupt vector table
     ldr r0, =addr_IVT
     mov r1, #0
