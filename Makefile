@@ -9,7 +9,7 @@ all: stm32p103.bin lm3s811.bin qemu.bin
 .s.o:
 	arm-none-eabi-as -mcpu=cortex-m3 -o $@ $< 
 
-stm32p103.o: CoreForth.s CoreForth.gen.s
+stm32p103.o: CoreForth.s CoreForth.gen.s stm32p103ram.gen.s
 
 lm3s811.o: CoreForth.s CoreForth.gen.s lm3s811ram.gen.s lm3s811.gen.s
 

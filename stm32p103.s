@@ -270,6 +270,46 @@ adcomp_handler:
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
 
+    defconst "RCC-CR", 6, , RCCCR, RCC_CR
+    defconst "RCC-CFGR", 8, , RCCCFGR, RCC_CFGR
+    defconst "RCC-CIR", 7, , RCCCIR, RCC_CIR
+    defconst "RCC-APB2RSTR", 12, , RCCAPB2RSTR, RCC_APB2RSTR
+    defconst "RCC-APB1RSTR", 12, , RCCAPB1RSTR, RCC_APB1RSTR
+    defconst "RCC-AHBENR", 10, , RCCAHBENR, RCC_AHBENR
+    defconst "RCC-APB2ENR", 11, , RCCAPB2ENR, RCC_APB2ENR
+    defconst "RCC-APB1ENR", 11, , RCCAPB1ENR, RCC_APB1ENR
+    defconst "RCC-BDCR", 8, , RCCBDCR, RCC_BDCR
+    defconst "RCC-CSR", 7, , RCCCSR, RCC_CSR
+    defconst "RCC-AHBRSTR", 11, , RCCAHBRSTR, RCC_AHBRSTR
+    defconst "RCC-CFGR2", 9, , RCCCFGR2, RCC_CFGR2
+
+    defconst "GPIOA", 5, , GPIO_A, GPIOA
+    defconst "GPIOB", 5, , GPIO_B, GPIOB
+    defconst "GPIOC", 5, , GPIO_C, GPIOC
+    defconst "GPIOD", 5, , GPIO_D, GPIOD
+    defconst "GPIOE", 5, , GPIO_E, GPIOE
+
+    defword "GPIO-CRL", 8, , _GPIO_CRL, DOOFFSET
+    .word GPIO_CRL
+
+    defword "GPIO-CRH", 8, , _GPIO_CRH, DOOFFSET
+    .word GPIO_CRH
+
+    defword "GPIO-IDR", 8, , _GPIO_IDR, DOOFFSET
+    .word GPIO_IDR
+
+    defword "GPIO-ODR", 8, , _GPIO_ODR, DOOFFSET
+    .word GPIO_ODR
+
+    defword "GPIO-BSRR", 9, , _GPIO_BSRR, DOOFFSET
+    .word GPIO_BSRR
+
+    defword "GPIO-BRR", 8, , _GPIO_BRR, DOOFFSET
+    .word GPIO_BRR
+
+    defword "GPIO-LCKR", 9, , _GPIO_LCKR, DOOFFSET
+    .word GPIO_LCKR
+
     defconst "NVIC", 4, , _NVIC, NVIC
 
     defcode "NVIC-SETENA", 11, , NVIC_SETENA
@@ -385,26 +425,19 @@ DISP_FONT:
     defword ";I", 2, F_IMMED, SEMICOLONI
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    defword "COLD", 4, , COLD
-.ifdef PRECOMPILE
-    .word PRECOMP_BEGIN, LIT, 1f, EVALUATE, PRECOMP_END
-1:  .include "CoreForth.gen.s"
-.else
-    .word QUIT
-.endif
-
     defvar "SBUF", 4, , SBUF, 128
     defvar "SBUF-HEAD", 9, , SBUF_HEAD
     defvar "SBUF-TAIL", 9, , SBUF_TAIL
-    defvar "IVT", 3, , IVT, 48 * 4
+    defvar "IVT", 3, , IVT, 75 * 4
 
-    .ltorg
+    defword "COLD", 4, , COLD
+    .word LIT, eval_words, EVALUATE
 
     .set last_rom_word, link
     .set end_of_rom, .
 
-@ eval_words:
-@    .include "stm32p103.gen.s"
+eval_words:
+    .include "stm32p103ram.gen.s"
 
     .set last_word, link
     .set data_start, compiled_here 
