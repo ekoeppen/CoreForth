@@ -1169,6 +1169,9 @@ is_positive:
     ldr r1, =0x05fa0004
     str r1, [r0]
 
+    defcode "HALT", 3, , HALT
+    b .
+
     defcode "(ABRANCH)", 9, , ASMBRANCH
     pop {r0}
     bl calc_wide_branch

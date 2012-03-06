@@ -3,54 +3,49 @@
 @ ---------------------------------------------------------------------
 @ -- Definitions ------------------------------------------------------
 
-    .set UART0,       0x4000c000
-    .set UART_DR,           0x00
-    .set UART_RSR_ECR,      0x04
-    .set UART_FR,           0x18
-    .set UART_LPR,          0x20
-    .set UART_IBRD,         0x24
-    .set UART_FBRD,         0x28
-    .set UART_LCRH,         0x2c
-    .set UART_CR,           0x30
-    .set UART_IFLS,         0x34
-    .set UART_IMSC,         0x38
-    .set UART_RIS,          0x3c
-    .set UART_MIS,          0x40
-    .set UART_ICR,          0x44
-    .set UART_DMACR,        0x48
+    .set UART1,       0x40013800
+    .set UART2,       0x40004400
+    .set UART3,       0x40004800
+    .set UART_SR,           0x00
+    .set UART_DR,           0x04
+    .set UART_BRR,          0x08
+    .set UART_CR1,          0x0c
+    .set UART_CR2,          0x10
+    .set UART_CR3,          0x14
+    .set UART_GPTR,         0x18
 
-    .set UART_RXFE,         0x10
-    .set UART_TXFF,         0x20
-
-    .set SYSCTL,      0x400fe000
-    .set SYSCTL_RCC,      0x0060
-    .set SYSCTL_RCGC0,    0x0100
-    .set SYSCTL_RCGC1,    0x0104
-    .set SYSCTL_RCGC2,    0x0108
+    .set RCC,         0x40021000
+    .set RCC_CR,      0x40021000
+    .set RCC_CFGR,    0x40021004
+    .set RCC_CIR,     0x40021008
+    .set RCC_APB2RSTR,0x4002100c
+    .set RCC_APB1RSTR,0x40021010
+    .set RCC_AHBENR,  0x40021014
+    .set RCC_APB2ENR, 0x40021018
+    .set RCC_APB1ENR, 0x4002101c
+    .set RCC_BDCR,    0x40021020
+    .set RCC_CSR,     0x40021024
+    .set RCC_AHBRSTR, 0x40021028
+    .set RCC_CFGR2,   0x4002102c
 
     .set NVIC,        0xe000e000
     .set NVIC_SETENA_BASE, 0x100
     .set NVIC_ACTIVE_BASE, 0x300
 
-    .set GPIOA,       0x40004000
-    .set GPIOB,       0x40005000
-    .set GPIOC,       0x40006000
-    .set GPIOD,       0x40007000
-    .set GPIOE,       0x40024000
-    .set GPIO_DIR,         0x400
-    .set GPIO_AFSEL,       0x420
-    .set GPIO_IS,          0x404 
-    .set GPIO_IBE,         0x408 
-    .set GPIO_IEV,         0x40c 
-    .set GPIO_IM,          0x410 
-    .set GPIO_RIS,         0x414 
-    .set GPIO_MIS,         0x418 
-    .set GPIO_ICR,         0x41c 
-    .set GPIO_DR2R,        0x500
-    .set GPIO_ODR,         0x50c
-    .set GPIO_PUR,         0x510
-    .set GPIO_PDR,         0x514
-    .set GPIO_DEN,         0x51c
+    .set GPIOA,       0x40010800
+    .set GPIOB,       0x40010c00
+    .set GPIOC,       0x40011000
+    .set GPIOD,       0x40011400
+    .set GPIOE,       0x40011800
+    .set GPIOF,       0x40011c00
+    .set GPIOG,       0x40012000
+    .set GPIO_CRL,         0x000
+    .set GPIO_CRH,         0x004
+    .set GPIO_IDR,         0x008
+    .set GPIO_ODR,         0x00c
+    .set GPIO_BSRR,        0x010
+    .set GPIO_BRR,         0x014
+    .set GPIO_LCKR,        0x018
 
     .set STCTRL,      0xe000e010
     .set STRELOAD,    0xe000e014
@@ -76,50 +71,15 @@ _start:
     .long 0                           /* Reserved                     */
     .long 0                           /* Reserved                     */
     .long 0                           /* Reserved                     */
-    .long svc_handler + 1             /* SVCall Handler               */
-    .long debugmon_handler + 1        /* Debug Monitor Handler        */
-    .long 0                           /* Reserved                     */
-    .long pendsv_handler + 1          /* PendSV Handler               */
-    .long systick_handler + 1         /* SysTick Handler              */
-    .long gpioa_handler + 1           /* GPIO A */
-    .long gpiob_handler + 1           /* GPIO B */
-    .long gpioc_handler + 1           /* GPIO C */
-    .long gpiod_handler + 1           /* GPIO D */
-    .long gpioe_handler + 1           /* GPIO E */
-.ifdef UART_USE_INTERRUPTS
-    .long uart0_key_handler + 1       /* UART 0 */
-.else
-    .long uart0_handler + 1           /* UART 0 */
-.endif
-    .long uart1_handler + 1           /* UART 1 */
-    .long ssi_handler + 1             /* SSI */
-    .long i2c_handler + 1             /* I2C */
-    .long 0                           /* Reserved */
-    .long pwm0_handler + 1            /* PWM Generator 0 */
-    .long pwm1_handler + 1            /* PWM Generator 1 */
-    .long pwm2_handler + 1            /* PWM Generator 2 */
-    .long 0                           /* Reserved */
-    .long adcseq0_handler + 1         /* ADC0 Sequence 0 */
-    .long adcseq1_handler + 1         /* ADC0 Sequence 1 */
-    .long adcseq2_handler + 1         /* ADC0 Sequence 2 */
-    .long adcseq3_handler + 1         /* ADC0 Sequence 3 */
-    .long watchdog_handler + 1        /* Watchdog Timer 0 */
-    .long timer0a_handler + 1         /* Timer 0A */
-    .long timer0b_handler + 1         /* Timer 0B */
-    .long timer1a_handler + 1         /* Timer 1A */
-    .long timer1b_handler + 1         /* Timer 1B */
-    .long timer2a_handler + 1         /* Timer 2A */
-    .long timer2b_handler + 1         /* Timer 2B */
-    .long adcomp_handler + 1          /* Analog Comparator 0 */
-    .long 0                           /* Reserved */
-    .long 0                           /* System Control */
-    .long 0                           /* Flash Memory Control */
+
+    .org 0x150
 
 @ ---------------------------------------------------------------------
 @ -- Board specific code and initialization ---------------------------
 
 init_board:
     push {lr}
+
     @ reset the interrupt vector table
     ldr r0, =addr_IVT
     mov r1, #0
@@ -141,78 +101,35 @@ init_board:
     str r1, [r0]
 
     @ enable clocks on all timers, UARTS, ADC, PWM, SSI and I2C and GPIO ports
-    ldr r0, =(SYSCTL + SYSCTL_RCC)
-    ldr r1, =0x078e3ac0
+    ldr r0, =RCC_APB2ENR
+    ldr r1, =0x4
     str r1, [r0]
-    ldr r0, =(SYSCTL + SYSCTL_RCGC0)
-    ldr r1, =0x00110000
-    str r1, [r0]
-    ldr r0, =(SYSCTL + SYSCTL_RCGC1)
-    ldr r1, =0x00071013
-    str r1, [r0]
-    ldr r0, =(SYSCTL + SYSCTL_RCGC2)
-    mov r1, #0x1f
+    ldr r0, =RCC_APB1ENR
+    ldr r1, =0x20000
     str r1, [r0]
 
     mov r0, #32
     bl delay
 
     @ enable pins on GPIOA
-    ldr r0, =(GPIOA + GPIO_AFSEL)
-    mov r1, #3
-    str r1, [r0]
-    ldr r0, =(GPIOA + GPIO_ODR)
-    mov r1, #0x0
-    str r1, [r0]
-    ldr r0, =(GPIOA + GPIO_PDR)
-    mov r1, #0x0
-    str r1, [r0]
-    ldr r0, =(GPIOA + GPIO_DEN)
-    mov r1, #0xff
-    str r1, [r0]
-    ldr r0, =(GPIOA + GPIO_DIR)
-    mov r1, #0x00
-    str r1, [r0]
-    ldr r0, =(GPIOA + GPIO_DR2R)
-    mov r1, #0xff
+    ldr r0, =(GPIOA + GPIO_CRL)
+    ldr r1, =0x44444b44
     str r1, [r0]
 
     mov r0, #32
     bl delay
 
+    @ enable UART
+    ldr r0, =(UART2 + UART_CR1)
+    ldr r1, =0x200c
+    str r1, [r0]
+
     @ set UART baud rate
-    ldr r0, =(UART0 + UART_IBRD)
-    mov r1, #3
-    str r1, [r0]
-    ldr r0, =(UART0 + UART_FBRD)
-    mov r1, #16
+    ldr r0, =(UART2 + UART_BRR)
+    ldr r1, =(8000000 / 115200)
     str r1, [r0]
 
-    @ set 8N1
-    ldr r0, =(UART0 + UART_LCRH)
-    mov r1, #0x70
-    str r1, [r0]
-
-.ifdef UART_USE_INTERRUPTS
-    @ enable UART interrupts
-    ldr r0, =(UART0 + UART_IFLS)
-    mov r1, #0x1    @ trigger after one byte
-    str r1, [r0]
-    ldr r0, =(UART0 + UART_IMSC)
-    mov r1, #0x10   @ trigger only receive interrupts
-    str r1, [r0]
-    mov r1, #0
-    ldr r0, =addr_SBUF_HEAD
-    str r1, [r0]
-    ldr r0, =addr_SBUF_TAIL
-.endif
-
-    @ enable the UART
-    ldr r0, =(UART0 + UART_CR)
-    ldr r1, =0x0301
-    str r1, [r0]
-
-    @ enable SYSTICK (without interrupts)
+    @ enable SYSTICK
     ldr r0, =STRELOAD
     ldr r1, =0x00ffffff
     str r1, [r0]
@@ -220,31 +137,23 @@ init_board:
     mov r1, #5
     str r1, [r0]
 
+    mov r0, #32
+    bl delay
+
     pop {pc}
     .align 2, 0
     .ltorg
 
 read_key_interrupt:
-2:  ldr r1, =addr_SBUF_TAIL
-    ldrb r3, [r1]
-    ldr r2, =addr_SBUF_HEAD
-    ldrb r2, [r2]
-    cmp r2, r3
-    bne 1f
-    wfi
-    b 2b
-1:  ldr r0, =addr_SBUF
-    ldrb r0, [r0, r3]
-    add r3, r3, #1
-    strb r3, [r1]
     mov pc, lr
 
 read_key_polled:
     push {r1, r2, r3, lr}
-    ldr r1, =UART0
-    mov r2, #UART_RXFE
-1:  ldr r3, [r1, #UART_FR]
-    ands r3, r3, r2
+    ldr r1, =UART2
+    mov r2, #32
+1:  ldr r3, [r1, #UART_SR]
+    and r3, r2
+    cmp r3, r2
     bne 1b
     ldrb r0, [r1, #UART_DR]
     pop {r1, r2, r3, pc}
@@ -257,12 +166,13 @@ read_key_polled:
 
 putchar:
     push {r1, r2, r3, lr}
-    ldr r1, =UART0
-    mov r2, #UART_TXFF
-1:  ldr r3, [r1, #UART_FR]
-    ands r3, r3, r2
+    mov r2, #0x80
+    ldr r3, =UART2
+1:  ldr r1, [r3, #UART_SR]
+    and r1, r2
+    cmp r1, r2
     bne 1b
-    strb r0, [r1, #UART_DR]
+    str r0, [r3, #UART_DR]
     pop {r1, r2, r3, pc}
 
 @ ---------------------------------------------------------------------
@@ -346,23 +256,6 @@ timer2b_handler:
 adcomp_handler:
     b generic_forth_handler
 
-uart0_key_handler:
-2:  ldr r0, =(UART0 + UART_FR)
-    ldr r1, [r0]
-    ldr r2, =UART_RXFE
-    ands r1, r1, r2
-    bne 1f
-    ldr r0, =(UART0 + UART_DR)
-    ldrb r1, [r0]
-    ldr r0, =addr_SBUF
-    ldr r2, =addr_SBUF_HEAD
-    ldrb r3, [r2]
-    strb r1, [r0, r3]
-    add r3, r3, #1
-    strb r3, [r2]
-    b 2b
-1:  bx lr
-
 @ ---------------------------------------------------------------------
 @ -- CoreForth starts here --------------------------------------------
 
@@ -372,63 +265,6 @@ uart0_key_handler:
 
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
-
-    defconst "GPIOA", 5, , GPIO_A, GPIOA
-    defconst "GPIOB", 5, , GPIO_B, GPIOB
-    defconst "GPIOC", 5, , GPIO_C, GPIOC
-    defconst "GPIOD", 5, , GPIO_D, GPIOD
-    defconst "GPIOE", 5, , GPIO_E, GPIOE
-
-    defword "GPIO-DIR", 8, , _GPIO_DIR, DOOFFSET
-    .word GPIO_DIR
-
-    defword "GPIO-AFSEL", 10, , _GPIO_AFSEL, DOOFFSET
-    .word GPIO_AFSEL
-
-    defword "GPIO-IS", 7, , _GPIO_IS, DOOFFSET
-    .word GPIO_IS
-
-    defword "GPIO-IBE", 8, , _GPIO_IBE, DOOFFSET
-    .word GPIO_IBE
-
-    defword "GPIO-IEV", 8, , _GPIO_IEV, DOOFFSET
-    .word GPIO_IEV
-
-    defword "GPIO-IM", 7, , _GPIO_IM, DOOFFSET
-    .word GPIO_IM
-
-    defword "GPIO-RIS", 8, , _GPIO_RIS, DOOFFSET
-    .word GPIO_RIS
-
-    defword "GPIO-MIS", 8, , _GPIO_MIS, DOOFFSET
-    .word GPIO_MIS
-
-    defword "GPIO-ICR", 8, , _GPIO_ICR, DOOFFSET
-    .word GPIO_ICR
-
-    defword "GPIO-DR2R", 9, , _GPIO_DR2R, DOOFFSET
-    .word GPIO_DR2R
-
-    defword "GPIO-ODR", 8, , _GPIO_ODR, DOOFFSET
-    .word GPIO_ODR
-
-    defword "GPIO-PUR", 8, , _GPIO_PUR, DOOFFSET
-    .word GPIO_PUR
-
-    defword "GPIO-PDR", 8, , _GPIO_PDR, DOOFFSET
-    .word GPIO_PDR
-
-    defword "GPIO-DEN", 8, , _GPIO_DEN, DOOFFSET
-    .word GPIO_DEN
-
-    defcode "GPIO-DATA!", 10, , _GPIO_DATA_STORE @ ( value mask gpio -- )
-    pop {r1}
-    pop {r0}
-    lsl r0, r0, #2
-    add r0, r0, r1
-    pop {r1}
-    strb r1, [r0]
-    NEXT
 
     defconst "NVIC", 4, , _NVIC, NVIC
 
@@ -537,61 +373,34 @@ DISP_FONT:
     .byte 0x00, 0x41, 0x36, 0x08, 0x00   @ }
     .byte 0x02, 0x01, 0x02, 0x04, 0x02   @ ~
 
+    .ltorg
+
     defcode "RETI", 4, , RETI
     pop {r4 - r12, pc}
 
     defword ";I", 2, F_IMMED, SEMICOLONI
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
+    defword "COLD", 4, , COLD
+.ifdef PRECOMPILE
+    .word PRECOMP_BEGIN, LIT, 1f, EVALUATE, PRECOMP_END
+1:  .include "CoreForth.gen.s"
+.else
+    .word QUIT
+.endif
+
     defvar "SBUF", 4, , SBUF, 128
     defvar "SBUF-HEAD", 9, , SBUF_HEAD
     defvar "SBUF-TAIL", 9, , SBUF_TAIL
     defvar "IVT", 3, , IVT, 48 * 4
-    defvar "(I2C-DELAY)", 11, , XI2C_DELAY, 16
 
     .ltorg
 
-    defword "(COLD)", 6, , XCOLD
-    .word LIT, eval_words, EVALUATE
-
-    defword "(COLD-PRECOMPILE)", 17, , XCOLD_PRECOMPILE
-.ifdef PRECOMP_CORE
-    .word PRECOMP_CORE_BEGIN
-.else
-    .word PRECOMP_BEGIN
-.endif
-    .word LIT, eval_words, EVALUATE
-    .word PRECOMP_END
-
-    defword "COLD", 4, , COLD
-.ifdef PRECOMPILE
-    .word XCOLD_PRECOMPILE
-.else
-    .word XCOLD
-.endif
-
-.ifdef PRECOMPILE
     .set last_rom_word, link
     .set end_of_rom, .
 
-eval_words:
-    .ifdef PRECOMP_CORE
-        .include "CoreForth.gen.s"
-    .else
-        .include "lm3s811.gen.s"
-    .endif
-
-.else
-
-    .ifndef PRECOMP_CORE
-        .include "lm3s811.precomp.s"
-    .endif
-    .set last_rom_word, link
-    .set end_of_rom, .
-
-eval_words:
-    .include "lm3s811ram.gen.s"
-.endif
+@ eval_words:
+@    .include "stm32p103.gen.s"
 
     .set last_word, link
     .set data_start, compiled_here 
