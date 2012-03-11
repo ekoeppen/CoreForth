@@ -129,8 +129,25 @@ init_board:
 
 .ifdef USE_50MHZ
     @ switch to 50Mhz SysClock
-    @ power up PLL and set XTAL and OSC source, set SYSDIV
     ldr r0, =SYSCTL_RCC
+
+    @ set bypass and clear SYSDIV
+    ldr r1, [r0]
+    ldr r2, =0x00008000
+    ldr r3, =0xf83fffff
+    and r1, r3
+    orr r1, r2
+    str r1, [r0]
+
+    @ clear OSC source and power down PLL
+    ldr r1, [r0]
+    ldr r2, =0x00000000
+    ldr r3, =0xffffcfcf
+    and r1, r3
+    orr r1, r2
+    str r1, [r0]
+
+    @ power up PLL and set XTAL and OSC source, set SYSDIV
     ldr r1, [r0]
     ldr r2, =0x01c002c0
     ldr r3, =0xf87ffc3f
@@ -142,7 +159,11 @@ init_board:
     ldr r2, =SYSCTL_RIS
 2:  ldr r1, [r2]
     ands r1, #0x40
+.ifndef PRECOMPILE @ qemu does not support PLL interrupts
     beq 2b
+.else
+    mov r0, r0
+.endif
 
     @ use the PLL for SysClock
     ldr r1, [r0]
@@ -463,6 +484,53 @@ uart0_key_handler:
     pop {r1}
     strb r1, [r0]
     NEXT
+
+    defconst "UART0", 5, , UART_0, UART0
+
+    defword "UART_DR", 7, , _UART_DR, DOOFFSET
+    .word UART_DR
+
+    defword "UART-RSR-ECR", 12, , _UART_RSR_ECR, DOOFFSET
+    .word UART_RSR_ECR
+
+    defword "UART-FR", 7, , _UART_FR, DOOFFSET
+    .word UART_FR
+
+    defword "UART-LPR", 8, , _UART_LPR, DOOFFSET
+    .word UART_LPR
+
+    defword "UART-IBRD", 9, , _UART_IBRD, DOOFFSET
+    .word UART_IBRD
+
+    defword "UART-FBRD", 9, , _UART_FBRD, DOOFFSET
+    .word UART_FBRD
+
+    defword "UART-LCRH", 9, , _UART_LCRH, DOOFFSET
+    .word UART_LCRH
+
+    defword "UART-CR", 7, , _UART_CR, DOOFFSET
+    .word UART_CR
+
+    defword "UART-IFLS", 9, , _UART_IFLS, DOOFFSET
+    .word UART_IFLS
+
+    defword "UART-IMSC", 9, , _UART_IMSC, DOOFFSET
+    .word UART_IMSC
+
+    defword "UART-RIS", 8, , _UART_RIS, DOOFFSET
+    .word UART_RIS
+
+    defword "UART-MIS", 8, , _UART_MIS, DOOFFSET
+    .word UART_MIS
+
+    defword "UART-ICR", 8, , _UART_ICR, DOOFFSET
+    .word UART_ICR
+
+    defword "UART-DMACR", 10, , _UART_DMACR, DOOFFSET
+    .word UART_DMACR
+
+    defconst "UART-RXFE", 9, ,  _UART_RXFE, UART_RXFE
+    defconst "UART-TXFF", 9, , _UART_TXFF, UART_TXFF
 
     defconst "NVIC", 4, , _NVIC, NVIC
 

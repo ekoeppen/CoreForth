@@ -13,16 +13,16 @@ stm32p103.o: CoreForth.s CoreForth.gen.s stm32p103ram.gen.s
 
 lm3s811.o: CoreForth.s CoreForth.gen.s lm3s811ram.gen.s lm3s811.gen.s
 
-#lm3s811.o: lm3s811.s
-#	arm-none-eabi-as -mcpu=cortex-m3 -defsym USE_50MHZ=1 -o $@ $<
+lm3s811.o: lm3s811.s
+	arm-none-eabi-as -mcpu=cortex-m3 -defsym USE_50MHZ=1 -o $@ $<
 
 qemu.o: CoreForth.s CoreForth.gen.s lm3s811ram.gen.s lm3s811.gen.s
 
 qemu.o: lm3s811.s
-	arm-none-eabi-as -mcpu=cortex-m3 -defsym UART_USE_INTERRUPTS=1 -o $@ $< 
+	arm-none-eabi-as -mcpu=cortex-m3 -defsym UART_USE_INTERRUPTS=1 -defsym USE_50MHZ=1 -o $@ $< 
 
 precomp.o: lm3s811.s CoreForth.gen.s lm3s811.gen.s
-	arm-none-eabi-as -mcpu=cortex-m3 -defsym UART_USE_INTERRUPTS=1 -defsym PRECOMPILE=1 -o $@ $< 
+	arm-none-eabi-as -mcpu=cortex-m3 -defsym UART_USE_INTERRUPTS=1 -defsym PRECOMPILE=1 -defsym USE_50MHZ=1 -o $@ $< 
 
 precomp_core.o: lm3s811.s CoreForth.gen.s lm3s811.gen.s
 	arm-none-eabi-as -mcpu=cortex-m3 -defsym UART_USE_INTERRUPTS=1 -defsym PRECOMPILE=1 -defsym PRECOMP_CORE=1 -o $@ $< 
