@@ -196,59 +196,55 @@ init_board:
     bl delay
 
     @ enable pins on GPIOA
-    ldr r0, =(GPIOA + GPIO_AFSEL)
+    ldr r0, =GPIOA
     mov r1, #3
-    str r1, [r0]
-    ldr r0, =(GPIOA + GPIO_ODR)
+    str r1, [r0, GPIO_AFSEL]
     mov r1, #0x0
-    str r1, [r0]
-    ldr r0, =(GPIOA + GPIO_PDR)
+    str r1, [r0, GPIO_ODR]
     mov r1, #0x0
-    str r1, [r0]
-    ldr r0, =(GPIOA + GPIO_DEN)
+    str r1, [r0, GPIO_PDR]
     mov r1, #0xff
-    str r1, [r0]
-    ldr r0, =(GPIOA + GPIO_DIR)
+    str r1, [r0, GPIO_DEN]
     mov r1, #0x00
-    str r1, [r0]
-    ldr r0, =(GPIOA + GPIO_DR2R)
+    str r1, [r0, GPIO_DIR]
     mov r1, #0xff
-    str r1, [r0]
+    str r1, [r0, GPIO_DR2R]
 
     mov r0, #32
     bl delay
 
     @ set UART baud rate
-    ldr r0, =(UART0 + UART_IBRD)
+    ldr r0, =UART0
+.ifdef USE_50MHZ
+    mov r1, #27
+    mov r2, #2
+.else
     mov r1, #3
-    str r1, [r0]
-    ldr r0, =(UART0 + UART_FBRD)
-    mov r1, #16
-    str r1, [r0]
+    mov r2, #16
+.endif
+    str r1, [r0, #UART_IBRD]
+    str r2, [r0, #UART_FBRD]
 
     @ set 8N1
-    ldr r0, =(UART0 + UART_LCRH)
     mov r1, #0x70
-    str r1, [r0]
+    str r1, [r0, UART_LCRH]
 
 .ifdef UART_USE_INTERRUPTS
     @ enable UART interrupts
-    ldr r0, =(UART0 + UART_IFLS)
     mov r1, #0x1    @ trigger after one byte
-    str r1, [r0]
-    ldr r0, =(UART0 + UART_IMSC)
+    str r1, [r0, UART_IFLS]
     mov r1, #0x10   @ trigger only receive interrupts
-    str r1, [r0]
+    str r1, [r0, UART_IMSC]
     mov r1, #0
-    ldr r0, =addr_SBUF_HEAD
-    str r1, [r0]
-    ldr r0, =addr_SBUF_TAIL
+    ldr r2, =addr_SBUF_HEAD
+    str r1, [r2]
+    ldr r2, =addr_SBUF_TAIL
+    str r1, [r2]
 .endif
 
     @ enable the UART
-    ldr r0, =(UART0 + UART_CR)
     ldr r1, =0x0301
-    str r1, [r0]
+    str r1, [r0, UART_CR]
 
     @ enable SYSTICK (without interrupts)
     ldr r0, =STRELOAD
