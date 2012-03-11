@@ -23,10 +23,12 @@
     .set UART_TXFF,         0x20
 
     .set SYSCTL,      0x400fe000
-    .set SYSCTL_RCC,      0x0060
-    .set SYSCTL_RCGC0,    0x0100
-    .set SYSCTL_RCGC1,    0x0104
-    .set SYSCTL_RCGC2,    0x0108
+    .set SYSCTL_RIS,  0x400fe050
+    .set SYSCTL_RCC,  0x400fe060
+    .set SYSCTL_PLLCFG,0x400fe064
+    .set SYSCTL_RCGC0,0x400fe100
+    .set SYSCTL_RCGC1,0x400fe104
+    .set SYSCTL_RCGC2,0x400fe108
 
     .set NVIC,        0xe000e000
     .set NVIC_SETENA_BASE, 0x100
@@ -125,6 +127,40 @@ init_board:
     ldr r0, =8000000
     bl delay
 
+.ifdef USE_50MHZ
+    @ switch to 50Mhz SysClock
+    @ power up PLL and set XTAL and OSC source, set SYSDIV
+    ldr r0, =SYSCTL_RCC
+    ldr r1, [r0]
+    ldr r2, =0x01c002c0
+    ldr r3, =0xf87ffc3f
+    and r1, r3
+    orr r1, r2
+    str r1, [r0]
+
+    @ wait for PLL to become ready
+    ldr r2, =SYSCTL_RIS
+2:  ldr r1, [r2]
+    ands r1, #0x40
+    beq 2b
+
+    @ use the PLL for SysClock
+    ldr r1, [r0]
+    ldr r2, =0x00000000
+    ldr r3, =0xfffff7ff
+    and r1, r3
+    orr r1, r2
+    str r1, [r0]
+.else
+    @ use 6MHz SysClock
+    ldr r0, =SYSCTL_RCC
+    ldr r1, =0x078e3ac0
+    str r1, [r0]
+.endif
+
+    mov r0, #32
+    bl delay
+
     @ reset the interrupt vector table
     ldr r0, =addr_IVT
     mov r1, #0
@@ -146,16 +182,13 @@ init_board:
     str r1, [r0]
 
     @ enable clocks on all timers, UARTS, ADC, PWM, SSI and I2C and GPIO ports
-    ldr r0, =(SYSCTL + SYSCTL_RCC)
-    ldr r1, =0x078e3ac0
-    str r1, [r0]
-    ldr r0, =(SYSCTL + SYSCTL_RCGC0)
+    ldr r0, =SYSCTL_RCGC0
     ldr r1, =0x00110000
     str r1, [r0]
-    ldr r0, =(SYSCTL + SYSCTL_RCGC1)
+    ldr r0, =SYSCTL_RCGC1
     ldr r1, =0x00071013
     str r1, [r0]
-    ldr r0, =(SYSCTL + SYSCTL_RCGC2)
+    ldr r0, =SYSCTL_RCGC2
     mov r1, #0x1f
     str r1, [r0]
 
