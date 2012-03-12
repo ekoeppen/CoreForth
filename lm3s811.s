@@ -88,11 +88,7 @@ _start:
     .long gpioc_handler + 1           /* GPIO C */
     .long gpiod_handler + 1           /* GPIO D */
     .long gpioe_handler + 1           /* GPIO E */
-.ifdef UART_USE_INTERRUPTS
     .long uart0_key_handler + 1       /* UART 0 */
-.else
-    .long uart0_handler + 1           /* UART 0 */
-.endif
     .long uart1_handler + 1           /* UART 1 */
     .long ssi_handler + 1             /* SSI */
     .long i2c_handler + 1             /* I2C */
@@ -196,10 +192,7 @@ init_board:
     mov r0, #0
     msr basepri, r0
     ldr r0, =(NVIC + NVIC_SETENA_BASE)
-    mov r1, #0
-.ifdef UART_USE_INTERRUPTS
-    orr r1, #0x20
-.endif
+    mov r1, #0x20
     str r1, [r0]
 
     @ enable clocks on all timers, UARTS, ADC, PWM, SSI and I2C and GPIO ports
@@ -247,12 +240,11 @@ init_board:
     str r2, [r0, #UART_FBRD]
 
     @ set 8N1
-    mov r1, #0x70
+    mov r1, #0x60
     str r1, [r0, UART_LCRH]
 
-.ifdef UART_USE_INTERRUPTS
     @ enable UART interrupts
-    mov r1, #0x1    @ trigger after one byte
+    mov r1, #0x0    @ trigger after one byte
     str r1, [r0, UART_IFLS]
     mov r1, #0x10   @ trigger only receive interrupts
     str r1, [r0, UART_IMSC]
@@ -261,7 +253,6 @@ init_board:
     str r1, [r2]
     ldr r2, =addr_SBUF_TAIL
     str r1, [r2]
-.endif
 
     @ enable the UART
     ldr r1, =0x0301
@@ -279,7 +270,7 @@ init_board:
     .align 2, 0
     .ltorg
 
-read_key_interrupt:
+read_key:
 2:  ldr r1, =addr_SBUF_TAIL
     ldrb r3, [r1]
     ldr r2, =addr_SBUF_HEAD
@@ -293,22 +284,6 @@ read_key_interrupt:
     add r3, r3, #1
     strb r3, [r1]
     mov pc, lr
-
-read_key_polled:
-    push {r1, r2, r3, lr}
-    ldr r1, =UART0
-    mov r2, #UART_RXFE
-1:  ldr r3, [r1, #UART_FR]
-    ands r3, r3, r2
-    bne 1b
-    ldrb r0, [r1, #UART_DR]
-    pop {r1, r2, r3, pc}
-
-.ifdef UART_USE_INTERRUPTS
-    .set read_key, read_key_interrupt
-.else
-    .set read_key, read_key_polled
-.endif
 
 putchar:
     push {r1, r2, r3, lr}
