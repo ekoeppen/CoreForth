@@ -754,11 +754,28 @@ fill_done:
 1:  push {r0}
     NEXT
 
+    defcode "ROR", 3, , ROR
+    pop {r0}
+    pop {r1}
+1:  ror r1, r0
+    push {r1}
+    NEXT
+
+    defword "ROTATE", 6, , ROTATE
+    .word DUP, ZGT, ZBRANCH, 1f, LIT, 32, SWAP, SUB, ROR, EXIT
+1:  .word NEGATE, ROR, EXIT
+
     defword "NEGATE", 6, , NEGATE
     .word LIT, -1, MUL, EXIT
 
     defword "WITHIN", 6, , WITHIN
     .word OVER, SUB, TOR, SUB, RFROM, ULT, EXIT
+
+    defword "BITE", 4, , BITE
+    .word DUP, LIT, 0xff, AND, SWAP, LIT, 8, ROR, EXIT
+
+    defword "CHEW", 4, , CHEW
+    .word BITE, BITE, BITE, BITE, DROP, EXIT
 
 @ ---------------------------------------------------------------------
 @ -- Boolean operators -----------------------------------------------
