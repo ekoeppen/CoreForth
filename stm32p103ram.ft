@@ -60,7 +60,7 @@ E000E018 CONSTANT STCURRENT
 : SPI-TXNE?   SPI2 SPI-SR @ 2 AND INVERT ;
 : SPI-WAIT-RXNE   SPI2 SPI-SR BEGIN DUP @ 1 AND UNTIL DROP ;
 : SPI-WAIT-TXE   SPI2 SPI-SR BEGIN DUP @ 2 AND UNTIL DROP ;
-: SPI-DR!@   SPI2 SPI-DR TUCK !   SPI-WAIT-RXNE   @ ;
+: SPI-DR!@   SPI-WAIT-TXE   SPI2 SPI-DR TUCK !   SPI-WAIT-RXNE   @ ;
 : SPI-DR!   SPI-DR!@ DROP ;
 : SPI-DR@   SPI-WAIT-RXNE   SPI2 SPI-DR @ ;
 
@@ -92,10 +92,11 @@ E000E018 CONSTANT STCURRENT
     200 ;
 
 : MMC-WRITE-BLK
-    200 * 18 SWAP MMC-CMD
-    0FE SPI-DR!
-    200 0 DO DUP C@ SPI-DR! 1+ LOOP DROP
-    0FF DUP SPI-DR! SPI-DR!   \ Dummy CRC
-    0FF SPI-DR!@ ;
+    200 * 18 SWAP MMC-CMD   MMC-RES-1 DROP  0FF SPI-DR!   \ Seek to sector
+    0FE SPI-DR!                                 \ Indicate data start
+    200 0 DO DUP C@ SPI-DR! 1+ LOOP DROP        \ Write data
+    0FF DUP SPI-DR! SPI-DR!                     \ Dummy CRC
+    0FF SPI-DR!@ 1F AND 5 =                     \ Get result
+    0FF BEGIN DUP DUP SPI-DR!@ = UNTIL DROP ;   \ Loop until idle
 
 QUIT
