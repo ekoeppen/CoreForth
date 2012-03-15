@@ -1043,7 +1043,7 @@ is_positive:
     .word LIT, 27, EMIT, LIT, '[', EMIT, EXIT
 
     defword "AT-XY", 5, , AT_XY
-    .word ANSI_ESC_START, XDOTD, LIT, ';', EMIT, XDOTD, LIT, 'H', EMIT, EXIT
+    .word ANSI_ESC_START, INCR, XDOTD, LIT, ';', EMIT, INCR, XDOTD, LIT, 'H', EMIT, EXIT
 
     defword "!CURSOR", 7, , SAVECURSOR
     .word LIT, 27, EMIT, LIT, '7', EMIT, EXIT
@@ -1074,6 +1074,18 @@ is_positive:
 
     defword "CLR-LINE", 8, , CLR_LINE
     .word ANSI_ESC_START, LIT, '2', EMIT, LIT, 'K', EMIT, EXIT
+
+    defconst "KEY-UP", 6, , KEY_UP, -1
+    defconst "KEY-DOWN", 8, , KEY_DOWN, -2
+    defconst "KEY-LEFT", 8, , KEY_LEFT, -4
+    defconst "KEY-RIGHT", 9, , KEY_RIGHT, -3
+    defconst "KEY-HOME", 8, , KEY_HOME, -101
+    defconst "KEY-END", 7, , KEY_END, -104
+    defconst "KEY-INSERT", 10, , KEY_INSERT, -102
+    defconst "KEY-DELETE", 10, , KEY_DELETE, -103
+    defconst "KEY-PGUP", 8, , KEY_PGUP, -105
+    defconst "KEY-PGDOWN", 10, , KEY_PGDOWN, -106
+    defconst "KEY-BACKSPACE", 13, , KEY_BACKSPACE, 127
 
 @ ---------------------------------------------------------------------
 @ -- Control flow -----------------------------------------------------
@@ -1257,7 +1269,7 @@ is_positive:
     .word EXIT
 
     defword "VARIABLE", 8, , VARIABLE
-    .word CREATE, CELL, ALLOT, EXIT
+    .word CREATE, COMMA, CELL, ALLOT, EXIT
 
     defword "CONSTANT", 8, , CONSTANT
     .word CREATE, COMMA, XDOES

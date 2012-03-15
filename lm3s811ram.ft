@@ -21,32 +21,34 @@ DECIMAL
 
 64 CONSTANT C/L
 0 VARIABLE SCR
+-1 VARIABLE BLOCK#
 
-: PAGE CLS ;
-: BLOCK DROP PAD ;
-: UPDATE ;
+: (BLOCK)   DROP 1024 BLANK ;
+: (UPDATE)   2DROP ;
+: BLOCK PAD SWAP DUP BLOCK# @ <> IF 2DUP (BLOCK) BLOCK# ! ELSE DROP THEN ;
+: UPDATE PAD BLOCK# @ (UPDATE) ;
 
-: LL   DUP C/L * SCR @ BLOCK + C/L TYPE .D ;
-: LIST ( n -- ) SCR ! 0 BEGIN DUP LL CR 1+ DUP 16 = UNTIL DROP ;
+: LL   C/L * SCR @ BLOCK + C/L TYPE ;
+: LIST ( n -- )  DUP SCR !  .D S" scr" TYPE CR 0 BEGIN DUP LL CR 1+ DUP 16 = UNTIL DROP ;
 : RE ( -- n ) SCR @ ;
 : L ( -- ) 0 DUP AT-XY RE LIST ;
 : B ( -- ) -1 SCR +! ;
 : N ( -- ) 1 SCR +! ;
-: mx1 ( c i -- c i ( miniEDIT extension 1 )
-    OVER 127 = IF 1- THEN ( left delete )
-    OVER 2 = IF B L THEN ( back ^b )
-    OVER 14 = IF N L THEN ( next ^n ) ;
 : !XY ( i -- i ) 1023 AND DUP C/L /MOD 1+ AT-XY ;
-: !CH ( c i -- c i ) 2DUP SCR @ BLOCK + C! UPDATE OVER EMIT ;
-: ?CH ( c i -- c i' ( VIM like controls )
-        OVER BL - 95 U< IF !CH 1+ EXIT THEN ( text )
-        OVER 8 = IF 1- THEN ( left ^h )
-        OVER 12 = IF 1+ THEN ( right ^l )
-        OVER 11 = IF C/L - THEN ( up ^k )
-        OVER 10 = IF C/L + THEN ( down ^j )
-        OVER 13 = IF C/L 2DUP MOD - + THEN ( crlf return )
-        mx1 ( mx2 ( mx3 ( mx4 ( mx5 ( mx6 ) ;
-: EDIT ( n -- ) PAGE 0 DUP AT-XY LIST 0 BEGIN !XY KEY SWAP ?CH SWAP 17 = UNTIL DROP L ;
+: !CH ( c i -- c i ) 2DUP SCR @ BLOCK + C! OVER EMIT ;
+: ?CH ( c i -- c i' )
+    OVER BL - 95 U< IF !CH 1+ EXIT THEN ( text )
+    OVER KEY-LEFT = IF 1- THEN
+    OVER KEY-RIGHT = IF 1+ THEN
+    OVER KEY-UP = IF C/L - THEN
+    OVER KEY-DOWN = IF C/L + THEN
+    OVER KEY-HOME = IF C/L 1- INVERT AND THEN
+    OVER KEY-DELETE = IF 1- THEN
+    OVER KEY-BACKSPACE = IF 1- THEN
+    OVER KEY-PGUP = IF UPDATE B L DROP 0 THEN
+    OVER KEY-PGDOWN = IF UPDATE N L DROP 0 THEN
+    OVER 13 = IF C/L 2DUP MOD - + THEN ( crlf return ) ;
+: EDIT ( n -- ) CLS 0 DUP AT-XY LIST 0 BEGIN !XY KEY SWAP ?CH SWAP 17 = UNTIL UPDATE DROP L ;
 
 HEX
 
