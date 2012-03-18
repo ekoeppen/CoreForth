@@ -282,6 +282,7 @@ read_key:
 1:  ldr r0, =addr_SBUF
     ldrb r0, [r0, r3]
     add r3, r3, #1
+    and r3, #0x0f
     strb r3, [r1]
     mov pc, lr
 
@@ -389,6 +390,7 @@ uart0_key_handler:
     ldrb r3, [r2]
     strb r1, [r0, r3]
     add r3, r3, #1
+    and r3, #0x0f
     strb r3, [r2]
     b 2b
 1:  bx lr
