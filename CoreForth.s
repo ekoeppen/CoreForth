@@ -1285,16 +1285,15 @@ QUOTE_CHARS:
     .ascii ")\006RPAREN"
     .ascii "+\004PLUS"
     .ascii "=\003EQU"
-    .ascii "[\004LBRAC"
-    .ascii "]\004RBRAC"
-    .ascii "\\011BACKSLASH"
-    .ascii "{\005LBRACE"
-    .ascii "}\005RBRACE"
+    .ascii "[\005LBRAC"
+    .ascii "]\005RBRAC"
+    .ascii "\\\011BACKSLASH"
+    .ascii "{\006LBRACE"
+    .ascii "}\006RBRACE"
     .ascii "|\003BAR"
-    .ascii ";\005SEMI"
+    .ascii ";\004SEMI"
     .ascii ":\005COLON"
     .ascii "'\004TICK"
-    .ascii "\"\004QUOT"
     .ascii ",\005COMMA"
     .ascii ".\003DOT"
     .ascii "/\005SLASH"
@@ -1304,12 +1303,10 @@ QUOTE_CHARS:
     .byte 0
 
     defword ".QUOTED", 7, , DOTQUOTED
-    .word OVER, ADD, TOR
-3:  .word DUP, FETCHBYTE, QUOTE_CHAR, ZBRANCH, 1f
-    .word EMIT, BRANCH, 2f
-1:  .word COUNT, TYPE
-2:  .word INCR, RFETCH, EQU, ZBRANCH, 3b
-    .word RDROP, DROP, EXIT
+1:  .word SWAP, DUP, FETCHBYTE, QUOTE_CHAR, ZBRANCH, 2f 
+    .word COUNT, TYPE, BRANCH, 3f
+2:  .word EMIT 
+3:  .word INCR, SWAP, DECR, QDUP, ZEQU, ZBRANCH, 1b, DROP, EXIT
 
     defword "CREATE", 6, , CREATE
     .word HERE, ALIGNED, DP, STORE
