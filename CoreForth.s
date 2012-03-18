@@ -1259,6 +1259,58 @@ is_positive:
     .word COMMA
     .word LIT, DODOES + 1, COMMA, EXIT
 
+    defword "QUOTE-CHAR", 10, , QUOTE_CHAR
+    .word LIT, QUOTE_CHARS
+2:  .word TWODUP, FETCHBYTE, DUP, ZNEQU, ZBRANCH, 3f, NEQU, ZBRANCH, 1f
+    .word CHAR, ADD, DUP, FETCHBYTE, ADD, CHAR, ADD, BRANCH, 2b
+1:  .word CHAR, ADD, NIP, LIT, -1, EXIT
+3:  .word TWODROP, DROP, LIT, 0, EXIT
+
+QUOTE_CHARS:
+    .ascii "-\001_"
+    .ascii "0\004ZERO"
+    .ascii "1\003ONE"
+    .ascii "2\003TWO"
+    .ascii "`\010BACKTICK"
+    .ascii "~\005TILDE"
+    .ascii "!\005STORE"
+    .ascii "@\005FETCH"
+    .ascii "#\003NUM"
+    .ascii "$\003VAL"
+    .ascii "%\007PERCENT"
+    .ascii "^\005CARET"
+    .ascii "&\003AND"
+    .ascii "*\003MUL"
+    .ascii "(\006LPAREN"
+    .ascii ")\006RPAREN"
+    .ascii "+\004PLUS"
+    .ascii "=\003EQU"
+    .ascii "[\004LBRAC"
+    .ascii "]\004RBRAC"
+    .ascii "\\011BACKSLASH"
+    .ascii "{\005LBRACE"
+    .ascii "}\005RBRACE"
+    .ascii "|\003BAR"
+    .ascii ";\005SEMI"
+    .ascii ":\005COLON"
+    .ascii "'\004TICK"
+    .ascii "\"\004QUOT"
+    .ascii ",\005COMMA"
+    .ascii ".\003DOT"
+    .ascii "/\005SLASH"
+    .ascii "<\002LT"
+    .ascii ">\002GT"
+    .ascii "?\001Q"
+    .byte 0
+
+    defword ".QUOTED", 7, , DOTQUOTED
+    .word OVER, ADD, TOR
+3:  .word DUP, FETCHBYTE, QUOTE_CHAR, ZBRANCH, 1f
+    .word EMIT, BRANCH, 2f
+1:  .word COUNT, TYPE
+2:  .word INCR, RFETCH, EQU, ZBRANCH, 3b
+    .word RDROP, DROP, EXIT
+
     defword "CREATE", 6, , CREATE
     .word HERE, ALIGNED, DP, STORE
     .word LATEST, FETCH
