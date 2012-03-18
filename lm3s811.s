@@ -620,7 +620,7 @@ DISP_FONT:
     defword ";I", 2, F_IMMED, SEMICOLONI
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    defvar "SBUF", 4, , SBUF, 128
+    defvar "SBUF", 4, , SBUF, 16
     defvar "SBUF-HEAD", 9, , SBUF_HEAD
     defvar "SBUF-TAIL", 9, , SBUF_TAIL
     defvar "IVT", 3, , IVT, 48 * 4
