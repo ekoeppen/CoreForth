@@ -4,7 +4,7 @@ all: stm32p103.bin lm3s811.bin
 	arm-none-eabi-objcopy -Obinary $< $@
 
 %.gen.s: %.ft
-	awk '{ print ".byte ", length($$0); gsub(/\\/, "\\\\"); gsub(/"/, "\\\""); print ".ascii \"" $$0 "\""} END{print ".byte 255,\n.align 2, 0"}' < $< > $@
+	awk '{ print ".byte ", length($$0); gsub(/\\/, "\\\\"); gsub(/"/, "\\\""); print ".ascii \"" $$0 "\""} END{print ".byte 255\n.align 2, 0"}' < $< > $@
 
 .s.o:
 	arm-none-eabi-as -mcpu=cortex-m3 -o $@ $< 

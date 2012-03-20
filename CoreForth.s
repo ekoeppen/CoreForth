@@ -52,6 +52,24 @@ name_\label :
     @ parameter field follows
     .endm
 
+    .macro xdefword name, label, alias="", flags=0, xt=DOCOL
+    .align 2, 0
+    .global name_\label
+name_\label :
+    .int link
+    .set link,name_\label
+    .byte \flags | (99f - 98f)
+98:
+    .ascii "\name"
+99:
+    .align  2, 0
+    .global \label
+\label :
+    .set \alias,\label
+    .int \xt
+    @ parameter field follows
+    .endm
+
     .macro defcode name, namelen, flags=0, label
     .align 2, 0
     .global name_\label
@@ -151,6 +169,9 @@ DOOFFSET:
     add r6, r6, #4
     NEXT
 
+    xdefword "XTEST", XTEST
+    .word EXIT
+    
 @ ---------------------------------------------------------------------
 @ -- Helper code ------------------------------------------------------
 
@@ -1259,55 +1280,6 @@ is_positive:
     .word COMMA
     .word LIT, DODOES + 1, COMMA, EXIT
 
-    defword "QUOTE-CHAR", 10, , QUOTE_CHAR
-    .word LIT, QUOTE_CHARS
-2:  .word TWODUP, FETCHBYTE, DUP, ZNEQU, ZBRANCH, 3f, NEQU, ZBRANCH, 1f
-    .word CHAR, ADD, DUP, FETCHBYTE, ADD, CHAR, ADD, BRANCH, 2b
-1:  .word CHAR, ADD, NIP, LIT, -1, EXIT
-3:  .word TWODROP, DROP, LIT, 0, EXIT
-
-QUOTE_CHARS:
-    .ascii "-\001_"
-    .ascii "0\004ZERO"
-    .ascii "1\003ONE"
-    .ascii "2\003TWO"
-    .ascii "`\010BACKTICK"
-    .ascii "~\005TILDE"
-    .ascii "!\005STORE"
-    .ascii "@\005FETCH"
-    .ascii "#\003NUM"
-    .ascii "$\003VAL"
-    .ascii "%\007PERCENT"
-    .ascii "^\005CARET"
-    .ascii "&\003AND"
-    .ascii "*\003MUL"
-    .ascii "(\006LPAREN"
-    .ascii ")\006RPAREN"
-    .ascii "+\004PLUS"
-    .ascii "=\003EQU"
-    .ascii "[\005LBRAC"
-    .ascii "]\005RBRAC"
-    .ascii "\\\011BACKSLASH"
-    .ascii "{\006LBRACE"
-    .ascii "}\006RBRACE"
-    .ascii "|\003BAR"
-    .ascii ";\004SEMI"
-    .ascii ":\005COLON"
-    .ascii "'\004TICK"
-    .ascii ",\005COMMA"
-    .ascii ".\003DOT"
-    .ascii "/\005SLASH"
-    .ascii "<\002LT"
-    .ascii ">\002GT"
-    .ascii "?\001Q"
-    .byte 0
-
-    defword ".QUOTED", 7, , DOTQUOTED
-1:  .word SWAP, DUP, FETCHBYTE, QUOTE_CHAR, ZBRANCH, 2f 
-    .word COUNT, TYPE, BRANCH, 3f
-2:  .word EMIT 
-3:  .word INCR, SWAP, DECR, QDUP, ZEQU, ZBRANCH, 1b, DROP, EXIT
-
     defword "CREATE", 6, , CREATE
     .word HERE, ALIGNED, DP, STORE
     .word LATEST, FETCH
@@ -1523,6 +1495,67 @@ words_loop:
     .word DUP, CELL, ADD, COUNT, LIT, 31, AND, TYPE, SPACE
     .word FETCH, QDUP, ZEQU, ZBRANCH, words_loop
     .word EXIT
+
+@ ---------------------------------------------------------------------
+@ -- Disassembler -----------------------------------------------------
+
+    defword "QUOTE-CHAR", 10, , QUOTE_CHAR
+    .word LIT, QUOTE_CHARS
+2:  .word TWODUP, FETCHBYTE, DUP, ZNEQU, ZBRANCH, 3f, NEQU, ZBRANCH, 1f
+    .word CHAR, ADD, DUP, FETCHBYTE, ADD, CHAR, ADD, BRANCH, 2b
+1:  .word CHAR, ADD, NIP, LIT, -1, EXIT
+3:  .word TWODROP, DROP, LIT, 0, EXIT
+
+QUOTE_MINUS:
+    .ascii "-\005MINUS"
+QUOTE_CHARS:
+    .ascii "-\001_"
+    .ascii "0\004ZERO"
+    .ascii "1\003ONE"
+    .ascii "2\003TWO"
+    .ascii "`\010BACKTICK"
+    .ascii "~\005TILDE"
+    .ascii "!\005STORE"
+    .ascii "@\005FETCH"
+    .ascii "#\003NUM"
+    .ascii "$\003VAL"
+    .ascii "%\007PERCENT"
+    .ascii "^\005CARET"
+    .ascii "&\003AND"
+    .ascii "*\003MUL"
+    .ascii "(\006LPAREN"
+    .ascii ")\006RPAREN"
+    .ascii "+\004PLUS"
+    .ascii "=\003EQU"
+    .ascii "[\005LBRAC"
+    .ascii "]\005RBRAC"
+    .ascii "\\\011BACKSLASH"
+    .ascii "{\006LBRACE"
+    .ascii "}\006RBRACE"
+    .ascii "|\003BAR"
+    .ascii ";\004SEMI"
+    .ascii ":\005COLON"
+    .ascii "'\004TICK"
+    .ascii ",\005COMMA"
+    .ascii ".\003DOT"
+    .ascii "/\005SLASH"
+    .ascii "<\002LT"
+    .ascii ">\002GT"
+    .ascii "?\001Q"
+    .byte 0
+
+    defword ".QUOTED", 7, , DOTQUOTED
+    .word OVER, FETCHBYTE, LIT, '-', EQU, ZBRANCH, 1f
+    .word SWAP, LIT, QUOTE_MINUS + 1, BRANCH, 5f
+1:  .word DUP, ZGT, ZBRANCH, 4f
+    .word DUP, LIT, 1, EQU, ZBRANCH, 6f
+    .word OVER, FETCHBYTE, LIT, '-', EQU, ZBRANCH, 6f
+    .word SWAP, LIT, QUOTE_MINUS + 1, BRANCH, 5f
+6:  .word SWAP, DUP, FETCHBYTE, QUOTE_CHAR, ZBRANCH, 2f 
+5:  .word COUNT, TYPE, BRANCH, 3f
+2:  .word EMIT 
+3:  .word INCR, SWAP, DECR, BRANCH, 1b
+4:  .word TWODROP, EXIT
 
     defword "get-next", 8, , get_next
     .word LATEST, FETCH
