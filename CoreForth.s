@@ -52,7 +52,7 @@ name_\label :
     @ parameter field follows
     .endm
 
-    .macro xdefword name, label, alias="", flags=0, xt=DOCOL
+    .macro shortdefword name, label, alias="", flags=0, xt=DOCOL
     .align 2, 0
     .global name_\label
 name_\label :
@@ -65,7 +65,6 @@ name_\label :
     .align  2, 0
     .global \label
 \label :
-    .set \alias,\label
     .int \xt
     @ parameter field follows
     .endm
@@ -169,9 +168,6 @@ DOOFFSET:
     add r6, r6, #4
     NEXT
 
-    xdefword "XTEST", XTEST
-    .word EXIT
-    
 @ ---------------------------------------------------------------------
 @ -- Helper code ------------------------------------------------------
 
