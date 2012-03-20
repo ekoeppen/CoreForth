@@ -1545,11 +1545,11 @@ QUOTE_CHARS:
 
     defword "get-next", get_next
     .word LATEST, FETCH
-get_next_loop:
-    .word TWODUP, FETCH, NEQU, ZBRANCH, get_next_done - .
-    .word FETCH, BRANCH, get_next_loop - .
-get_next_done:
-    .word SWAP, DROP, EXIT
+    .word TWODUP, EQU, ZBRANCH, 1f - .
+    .word TWODROP, HERE, EXIT
+1:  .word TWODUP, FETCH, NEQU, ZBRANCH, 2f - .
+    .word FETCH, BRANCH, 1b - .
+2:  .word SWAP, DROP, EXIT
 
     defword "print-word", print_word
     .word DUP, DUP, FETCH, CELL, SUB, OVER, NEQU, ZBRANCH, print_code - .
@@ -1580,16 +1580,14 @@ print_label_zbranch:
     .align 2
 
     defword "SEE", SEE
-    .word BL, WORD, FIND, ZBRANCH, see_not_found - .
+    .word BL, WORD, FIND, ZBRANCH, 3f - .
     .word DUP, TOLINK, get_next
-see_loop:
-    .word OVER, TWODUP, NEQU, ZBRANCH, see_done - .
-    .word print_word, DUP, ZBRANCH, see_done - .
+1:  .word OVER, TWODUP, NEQU, ZBRANCH, 2f - .
+    .word print_word, DUP, ZBRANCH, 2f - .
     .word ROT, ADD, SWAP
-    .word BRANCH, see_loop - .
-see_not_found:
-see_done:
-    .word EXIT
+    .word BRANCH, 1b - .
+2:  .word TWODROP
+3:  .word DROP, EXIT
 
     defword "RELOCATE", RELOCATE
 /*: RELOCATE   ( start end --  )
