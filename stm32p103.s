@@ -270,56 +270,56 @@ adcomp_handler:
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
 
-    defconst "RCC-CR", 6, , RCCCR, RCC_CR
-    defconst "RCC-CFGR", 8, , RCCCFGR, RCC_CFGR
-    defconst "RCC-CIR", 7, , RCCCIR, RCC_CIR
-    defconst "RCC-APB2RSTR", 12, , RCCAPB2RSTR, RCC_APB2RSTR
-    defconst "RCC-APB1RSTR", 12, , RCCAPB1RSTR, RCC_APB1RSTR
-    defconst "RCC-AHBENR", 10, , RCCAHBENR, RCC_AHBENR
-    defconst "RCC-APB2ENR", 11, , RCCAPB2ENR, RCC_APB2ENR
-    defconst "RCC-APB1ENR", 11, , RCCAPB1ENR, RCC_APB1ENR
-    defconst "RCC-BDCR", 8, , RCCBDCR, RCC_BDCR
-    defconst "RCC-CSR", 7, , RCCCSR, RCC_CSR
-    defconst "RCC-AHBRSTR", 11, , RCCAHBRSTR, RCC_AHBRSTR
-    defconst "RCC-CFGR2", 9, , RCCCFGR2, RCC_CFGR2
+    defconst "RCC-CR", RCCCR, RCC_CR
+    defconst "RCC-CFGR", RCCCFGR, RCC_CFGR
+    defconst "RCC-CIR", RCCCIR, RCC_CIR
+    defconst "RCC-APB2RSTR", RCCAPB2RSTR, RCC_APB2RSTR
+    defconst "RCC-APB1RSTR", RCCAPB1RSTR, RCC_APB1RSTR
+    defconst "RCC-AHBENR", RCCAHBENR, RCC_AHBENR
+    defconst "RCC-APB2ENR", RCCAPB2ENR, RCC_APB2ENR
+    defconst "RCC-APB1ENR", RCCAPB1ENR, RCC_APB1ENR
+    defconst "RCC-BDCR", RCCBDCR, RCC_BDCR
+    defconst "RCC-CSR", RCCCSR, RCC_CSR
+    defconst "RCC-AHBRSTR", RCCAHBRSTR, RCC_AHBRSTR
+    defconst "RCC-CFGR2", RCCCFGR2, RCC_CFGR2
 
-    defconst "GPIOA", 5, , GPIO_A, GPIOA
-    defconst "GPIOB", 5, , GPIO_B, GPIOB
-    defconst "GPIOC", 5, , GPIO_C, GPIOC
-    defconst "GPIOD", 5, , GPIO_D, GPIOD
-    defconst "GPIOE", 5, , GPIO_E, GPIOE
+    defconst "GPIOA", GPIO_A, GPIOA
+    defconst "GPIOB", GPIO_B, GPIOB
+    defconst "GPIOC", GPIO_C, GPIOC
+    defconst "GPIOD", GPIO_D, GPIOD
+    defconst "GPIOE", GPIO_E, GPIOE
 
-    defword "GPIO-CRL", 8, , _GPIO_CRL, DOOFFSET
+    defword "GPIO-CRL", _GPIO_CRL, , DOOFFSET
     .word GPIO_CRL
 
-    defword "GPIO-CRH", 8, , _GPIO_CRH, DOOFFSET
+    defword "GPIO-CRH", _GPIO_CRH, , DOOFFSET
     .word GPIO_CRH
 
-    defword "GPIO-IDR", 8, , _GPIO_IDR, DOOFFSET
+    defword "GPIO-IDR", _GPIO_IDR, , DOOFFSET
     .word GPIO_IDR
 
-    defword "GPIO-ODR", 8, , _GPIO_ODR, DOOFFSET
+    defword "GPIO-ODR", _GPIO_ODR, , DOOFFSET
     .word GPIO_ODR
 
-    defword "GPIO-BSRR", 9, , _GPIO_BSRR, DOOFFSET
+    defword "GPIO-BSRR", _GPIO_BSRR, , DOOFFSET
     .word GPIO_BSRR
 
-    defword "GPIO-BRR", 8, , _GPIO_BRR, DOOFFSET
+    defword "GPIO-BRR", _GPIO_BRR, , DOOFFSET
     .word GPIO_BRR
 
-    defword "GPIO-LCKR", 9, , _GPIO_LCKR, DOOFFSET
+    defword "GPIO-LCKR", _GPIO_LCKR, , DOOFFSET
     .word GPIO_LCKR
 
-    defconst "NVIC", 4, , _NVIC, NVIC
+    defconst "NVIC", _NVIC, NVIC
 
-    defcode "NVIC-SETENA", 11, , NVIC_SETENA
+    defcode "NVIC-SETENA", NVIC_SETENA
     ldr r0, =NVIC
     ldr r1, =NVIC_SETENA_BASE
     add r0, r1, r0
     push {r0}
     NEXT
 
-    defconst "DISP-FONT", 9, , _DISP_FONT, DISP_FONT
+    defconst "DISP-FONT", _DISP_FONT, DISP_FONT
 DISP_FONT:
     .byte 0x00, 0x00, 0x00, 0x00, 0x00   @ " "
     .byte 0x00, 0x00, 0x4f, 0x00, 0x00   @ !
@@ -419,18 +419,18 @@ DISP_FONT:
 
     .ltorg
 
-    defcode "RETI", 4, , RETI
+    defcode "RETI", RETI
     pop {r4 - r12, pc}
 
-    defword ";I", 2, F_IMMED, SEMICOLONI
+    defword ";I", SEMICOLONI, F_IMMED
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    defvar "SBUF", 4, , SBUF, 128
-    defvar "SBUF-HEAD", 9, , SBUF_HEAD
-    defvar "SBUF-TAIL", 9, , SBUF_TAIL
-    defvar "IVT", 3, , IVT, 75 * 4
+    defvar "SBUF", SBUF, , 128
+    defvar "SBUF-HEAD", SBUF_HEAD
+    defvar "SBUF-TAIL", SBUF_TAIL
+    defvar "IVT", IVT, , 75 * 4
 
-    defword "COLD", 4, , COLD
+    defword "COLD", COLD
     .word LIT, eval_words, EVALUATE
 
     .set last_rom_word, link

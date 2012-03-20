@@ -37,27 +37,12 @@
     bx r1
     .endm
 
-    .macro defword name, namelen, flags=0, label, xt=DOCOL
+    .macro defword name, label, flags=0, xt=DOCOL
     .align 2, 0
     .global name_\label
 name_\label :
     .int link
-    .set link,name_\label
-    .byte \flags+\namelen
-    .ascii "\name"
-    .align  2, 0
-    .global \label
-\label :
-    .int \xt
-    @ parameter field follows
-    .endm
-
-    .macro shortdefword name, label, alias="", flags=0, xt=DOCOL
-    .align 2, 0
-    .global name_\label
-name_\label :
-    .int link
-    .set link,name_\label
+    .set link, name_\label
     .byte \flags | (99f - 98f)
 98:
     .ascii "\name"
@@ -69,14 +54,16 @@ name_\label :
     @ parameter field follows
     .endm
 
-    .macro defcode name, namelen, flags=0, label
+    .macro defcode name, label, flags=0
     .align 2, 0
     .global name_\label
 name_\label :
     .int link
-    .set link,name_\label
-    .byte \flags+\namelen
+    .set link, name_\label
+    .byte \flags | (99f - 98f)
+98:
     .ascii "\name"
+99:
     .align 2, 0
     .global \label
 \label :
@@ -86,8 +73,8 @@ code_\label :
     @ parameter field follows
     .endm
 
-    .macro defvar name, namelen, flags=0, label, size=4
-    defcode \name,\namelen,\flags,\label
+    .macro defvar name, label, flags=0, size=4
+    defcode \name,\label,\flags
     .set addr_\label, compiled_here
     ldr r0, =addr_\label
     push {r0}
@@ -95,14 +82,16 @@ code_\label :
     .set compiled_here, compiled_here + \size
     .endm
 
-    .macro defconst name, namelen, flags=0, label, value
+    .macro defconst name, label, value, flags=0
     .align 2, 0
     .global name_\label
 name_\label :
     .int link
-    .set link,name_\label
-    .byte \flags+\namelen
+    .set link, name_\label
+    .byte \flags | (99f - 98f)
+98:
     .ascii "\name"
+99:
     .align 2, 0
     .global \label
 \label :
@@ -163,7 +152,7 @@ DOOFFSET:
     push {r1}
     NEXT
 
-    defcode "EXIT", 4, , EXIT
+    defcode "EXIT", EXIT
     ldr r7, [r6]
     add r6, r6, #4
     NEXT
@@ -392,48 +381,48 @@ delay:
 @ ---------------------------------------------------------------------
 @ -- Stack manipulation -----------------------------------------------
 
-    defcode "DROP", 4, , DROP
+    defcode "DROP", DROP
     add sp, sp, #4
     NEXT
 
-    defcode "SWAP", 4, , SWAP
+    defcode "SWAP", SWAP
     pop {r1}
     pop {r0}
     push {r1}
     push {r0}
     NEXT
 
-    defcode "OVER", 4, , OVER
+    defcode "OVER", OVER
     ldr r0, [sp, #4]
     push {r0}
     NEXT
 
-    defcode "ROT", 3, , ROT
+    defcode "ROT", ROT
     pop {r0, r1, r2}
     push {r1}
     push {r0}
     push {r2}
     NEXT
 
-    defcode "?DUP", 4, , QDUP
+    defcode "?DUP", QDUP
     ldr r0, [sp]
     cmp r0, #0
     beq 1f
     push {r0}
 1:  NEXT
 
-    defcode "DUP", 3, , DUP
+    defcode "DUP", DUP
     ldr r0, [sp]
     push {r0}
     NEXT
 
-    defcode "NIP", 3, , NIP
+    defcode "NIP", NIP
     pop {r0}
     pop {r1}
     push {r0}
     NEXT
 
-    defcode "TUCK", 4, , TUCK
+    defcode "TUCK", TUCK
     pop {r0}
     pop {r1}
     push {r0}
@@ -441,13 +430,13 @@ delay:
     push {r0}
     NEXT
 
-    defcode "2DUP", 4, , TWODUP
+    defcode "2DUP", TWODUP
     ldr r1, [sp, #4]
     ldr r0, [sp]
     push {r0, r1}
     NEXT
 
-    defcode "2SWAP", 5, , TWOSWAP
+    defcode "2SWAP", TWOSWAP
     pop {r0, r1, r2, r3}
     push {r1}
     push {r0}
@@ -455,80 +444,80 @@ delay:
     push {r2}
     NEXT
 
-    defcode "2DROP", 5, , TWODROP
+    defcode "2DROP", TWODROP
     add sp, sp, #8
     NEXT
 
-    defcode "2OVER", 5, , TWOOVER
+    defcode "2OVER", TWOOVER
     ldr r0, [sp, #8]
     ldr r1, [sp, #12]
     push {r1}
     push {r0}
     NEXT
 
-    defcode ">R", 2, , TOR
+    defcode ">R", TOR
     pop {r0}
     sub r6, r6, #4
     str r0, [r6]
     NEXT
 
-    defcode "R>", 2, , RFROM
+    defcode "R>", RFROM
     ldr r0, [r6]
     add r6, r6, #4
     push {r0}
     NEXT
 
-    defcode "R@", 2, , RFETCH
+    defcode "R@", RFETCH
     ldr r0, [r6]
     push {r0}
     NEXT
 
-    defcode "RDROP", 5, , RDROP
+    defcode "RDROP", RDROP
     add r6, r6, #4
     NEXT
 
-    defcode "SP@", 3, , SPFETCH
+    defcode "SP@", SPFETCH
     mov r0, sp
     push {r0}
     NEXT
 
-    defcode "RP@", 3, , RPFETCH
+    defcode "RP@", RPFETCH
     push {r6}
     NEXT
 
-    defcode "SP!", 3, , SPSTORE
+    defcode "SP!", SPSTORE
     pop {r0}
     mov sp, r0
     NEXT
 
-    defcode "RP!", 3, , RPSTORE
+    defcode "RP!", RPSTORE
     pop {r6}
     NEXT
 
-    defword "-ROT", 4, , ROTROT
+    defword "-ROT", ROTROT
     .word ROT, ROT, EXIT
 
 @ ---------------------------------------------------------------------
 @ -- Memory operations -----------------------------------------------
 
-    defcode "CHAR", 4, , CHAR
+    defcode "CHAR", CHAR
     mov r0, #1
     push {r0}
     NEXT
 
-    defcode "CELL", 4, , CELL
+    defcode "CELL", CELL
     mov r0, #4
     push {r0}
     NEXT
 
-    defcode "CELLS", 5, , CELLS
+    defcode "CELLS", CELLS
     pop {r0}
     mov r1, #4
     mul r0, r0, r1
     push {r0}
     NEXT
 
-    defcode "ALIGNED", 7, , ALIGNED
+    defcode "ALIGNED", ALIGNED
     pop {r0}
     add r0, r0, #3
     mvn r1, #3
@@ -536,31 +525,31 @@ delay:
     push {r0}
     NEXT
 
-    defcode "C@", 2, , FETCHBYTE
+    defcode "C@", FETCHBYTE
     pop {r0}
     ldrb r1, [r0]
     push {r1}
     NEXT
 
-    defcode "C!", 2, , STOREBYTE
+    defcode "C!", STOREBYTE
     pop {r1}
     pop {r0}
     strb r0, [r1]
     NEXT
 
-    defcode "@", 1, , FETCH
+    defcode "@", FETCH
     pop {r0}
     ldr r1, [r0]
     push {r1}
     NEXT
 
-    defcode "!", 1, , STORE
+    defcode "!", STORE
     pop {r1}
     pop {r0}
     str r0, [r1]
     NEXT
 
-    defcode "+!", 2, , ADDSTORE
+    defcode "+!", ADDSTORE
     pop {r1}
     pop {r0}
     ldr r2, [r1]
@@ -568,7 +557,7 @@ delay:
     str r2, [r1]
     NEXT
 
-    defcode "-!", 2, , SUBSTORE
+    defcode "-!", SUBSTORE
     pop {r1}
     pop {r0}
     ldr r2, [r1]
@@ -576,7 +565,7 @@ delay:
     str r2, [r1]
     NEXT
 
-    defcode "FILL", 4, , FILL
+    defcode "FILL", FILL
     pop {r2}
 fill_code:
     pop {r1}
@@ -591,11 +580,11 @@ fill_loop:
 fill_done:
     NEXT
 
-    defcode "BLANK", 5, , BLANK
+    defcode "BLANK", BLANK
     mov r2, #32
     b fill_code
 
-	defcode "CMOVE>", 6 , , CMOVEUP
+	defcode "CMOVE>", CMOVEUP
 	pop {r0}
 	pop {r1}
 	pop {r2}
@@ -607,7 +596,7 @@ fill_done:
 	b 2b
 1:  NEXT
 
-	defcode "CMOVE", 5 , , CMOVE
+	defcode "CMOVE", CMOVE
 	pop {r0}
 	pop {r1}
 	pop {r2}
@@ -621,7 +610,7 @@ fill_done:
 	b 2b
 1:  NEXT
 
-    defcode "S=", 2, , SEQU
+    defcode "S=", SEQU
     pop {r2}
     pop {r1}
     pop {r0}
@@ -643,72 +632,72 @@ fill_done:
 
     .ltorg
 
-    defword "/STRING", 7, , TRIMSTRING
+    defword "/STRING", TRIMSTRING
     .word ROT, OVER, ADD, ROT, ROT, SUB, EXIT
 
-    defword "COUNT", 5, , COUNT
+    defword "COUNT", COUNT
     .word DUP, INCR, SWAP, FETCHBYTE, EXIT
 
-    defword "(S\")", 4, , XSQUOTE
+    defword "(S\")", XSQUOTE
     .word RFROM, COUNT, TWODUP, ADD, ALIGNED, TOR, EXIT
 
-    defword "S\"", 2, F_IMMED, SQUOTE
+    defword "S\"", SQUOTE, F_IMMED
     .word LIT, XSQUOTE, COMMAXT, LIT, '"', WORD, FETCHBYTE, INCR, ALIGNED, ALLOT
     .word LIT, 1, SOURCEINDEX, ADDSTORE
     .word EXIT
 
-    defword "PAD", 3, , PAD
+    defword "PAD", PAD
     .word HERE, LIT, 128, ADD, EXIT
 
 @ ---------------------------------------------------------------------
 @ -- Arithmetic ------------------------------------------------------
 
-    defcode "1+", 2, , INCR
+    defcode "1+", INCR
     ldr r0, [sp]
     add r0, r0, #1
     str r0, [sp]
     NEXT
 
-    defcode "1-", 2, , DECR
+    defcode "1-", DECR
     ldr r0, [sp]
     sub r0, r0, #1
     str r0, [sp]
     NEXT
 
-    defcode "4+", 2, , INCR4
+    defcode "4+", INCR4
     ldr r0, [sp]
     add r0, r0, #4
     str r0, [sp]
     NEXT
 
-    defcode "4-", 2, , DECR4
+    defcode "4-", DECR4
     ldr r0, [sp]
     sub r0, r0, #4
     str r0, [sp]
     NEXT
 
-    defcode "+", 1, , ADD
+    defcode "+", ADD
     pop {r1}
     pop {r0}
     add r0, r1, r0
     push {r0}
     NEXT
 
-    defcode "-", 1, , SUB
+    defcode "-", SUB
     pop {r1}
     pop {r0}
     sub r0, r0, r1
     push {r0}
     NEXT
 
-    defcode "*", 1, , MUL
+    defcode "*", MUL
     pop {r0}
     pop {r1}
     mul r0, r1, r0
     push {r0}
     NEXT
 
-    defcode "/MOD", 4, , DIVMOD
+    defcode "/MOD", DIVMOD
     pop {r1}
     pop {r0}
     sdiv r2, r0, r1
@@ -717,14 +706,14 @@ fill_done:
     push {r2}
     NEXT
 
-    defcode "/", 1, , DIV
+    defcode "/", DIV
     pop {r1}
     pop {r0}
     sdiv r0, r0, r1
     push {r0}
     NEXT
 
-    defcode "MOD", 3, , MOD
+    defcode "MOD", MOD
     pop {r1}
     pop {r0}
     sdiv r2, r0, r1
@@ -732,19 +721,19 @@ fill_done:
     push {r0}
     NEXT
 
-    defcode "2*", 2, , TWOSTAR
+    defcode "2*", TWOSTAR
     ldr r0, [sp]
     lsl r0, r0, #1
     str r0, [sp]
     NEXT
 
-    defcode "2/", 2, , TWOSLASH
+    defcode "2/", TWOSLASH
     ldr r0, [sp]
     asr r0, r0, #1
     str r0, [sp]
     NEXT
 
-    defcode "ABS", 3, , ABS
+    defcode "ABS", ABS
     ldr r0, [sp]
     cmp r0, #0
     bge 1f
@@ -753,7 +742,7 @@ fill_done:
     str r0, [sp]
 1:  NEXT
 
-    defcode "MAX", 3, , MAX
+    defcode "MAX", MAX
     pop {r0}
     pop {r1}
     cmp r0, r1
@@ -762,7 +751,7 @@ fill_done:
 1:  push {r0}
     NEXT
 
-    defcode "MIN", 3, , MIN
+    defcode "MIN", MIN
     pop {r0}
     pop {r1}
     cmp r0, r1
@@ -771,54 +760,54 @@ fill_done:
 1:  push {r0}
     NEXT
 
-    defcode "ROR", 3, , ROR
+    defcode "ROR", ROR
     pop {r0}
     pop {r1}
 1:  ror r1, r0
     push {r1}
     NEXT
 
-    defword "ROTATE", 6, , ROTATE
-    .word DUP, ZGT, ZBRANCH, 1f, LIT, 32, SWAP, SUB, ROR, EXIT
+    defword "ROTATE", ROTATE
+    .word DUP, ZGT, ZBRANCH, 1f - ., LIT, 32, SWAP, SUB, ROR, EXIT
 1:  .word NEGATE, ROR, EXIT
 
-    defword "NEGATE", 6, , NEGATE
+    defword "NEGATE", NEGATE
     .word LIT, -1, MUL, EXIT
 
-    defword "WITHIN", 6, , WITHIN
+    defword "WITHIN", WITHIN
     .word OVER, SUB, TOR, SUB, RFROM, ULT, EXIT
 
-    defword "BITE", 4, , BITE
+    defword "BITE", BITE
     .word DUP, LIT, 0xff, AND, SWAP, LIT, 8, ROR, EXIT
 
-    defword "CHEW", 4, , CHEW
+    defword "CHEW", CHEW
     .word BITE, BITE, BITE, BITE, DROP, EXIT
 
 @ ---------------------------------------------------------------------
 @ -- Boolean operators -----------------------------------------------
 
-    defcode "AND", 3, , AND
+    defcode "AND", AND
     pop {r1}
     pop {r0}
     and r0, r1, r0
     push {r0}
     NEXT
 
-    defcode "OR", 2, , OR
+    defcode "OR", OR
     pop {r1}
     pop {r0}
     orr r0, r1, r0
     push {r0}
     NEXT
 
-    defcode "XOR", 3, , XOR
+    defcode "XOR", XOR
     pop {r1}
     pop {r0}
     eor r0, r1, r0
     push {r0}
     NEXT
 
-    defcode "INVERT", 6, , INVERT
+    defcode "INVERT", INVERT
     ldr r0, [sp]
     mvn r0, r0
     str r0, [sp]
@@ -827,7 +816,7 @@ fill_done:
 @ ---------------------------------------------------------------------
 @ -- Comparisons -----------------------------------------------------
 
-    defcode "=", 1, , EQU
+    defcode "=", EQU
     pop {r1}
     pop {r0}
     mov r2, #0
@@ -837,7 +826,7 @@ fill_done:
 1:  push {r2}
     NEXT
 
-    defcode "<", 1, , LT
+    defcode "<", LT
     pop {r1}
     pop {r0}
     mov r2, #0
@@ -847,7 +836,7 @@ fill_done:
 1:  push {r2}
     NEXT
 
-    defcode "U<", 2, , ULT
+    defcode "U<", ULT
     pop {r1}
     pop {r0}
     mov r2, #0
@@ -857,160 +846,160 @@ fill_done:
 1:  push {r2}
     NEXT
 
-    defword ">", 1, , GT
+    defword ">", GT
     .word SWAP, LT, EXIT
 
-    defword "U>", 2, , UGT
+    defword "U>", UGT
     .word SWAP, ULT, EXIT
 
-    defword "<>", 2, , NEQU
+    defword "<>", NEQU
     .word EQU, INVERT, EXIT
 
-    defword "<=", 2, , LE
+    defword "<=", LE
     .word GT, INVERT, EXIT
 
-    defword ">=", 2, , GE
+    defword ">=", GE
     .word LT, INVERT, EXIT
 
-    defword "0=", 2, , ZEQU
+    defword "0=", ZEQU
     .word LIT, 0, EQU, EXIT
 
-    defword "0<>", 3, , ZNEQU
+    defword "0<>", ZNEQU
     .word LIT, 0, NEQU, EXIT
 
-    defword "0<", 2, , ZLT
+    defword "0<", ZLT
     .word LIT, 0, LT, EXIT
 
-    defword "0>", 2, , ZGT
+    defword "0>", ZGT
     .word LIT, 0, GT, EXIT
 
-    defword "0<=", 3, , ZLE
+    defword "0<=", ZLE
     .word LIT, 0, LE, EXIT
 
-    defword "0>=", 3, , ZGE
+    defword "0>=", ZGE
     .word LIT, 0, GE, EXIT
 
 @ ---------------------------------------------------------------------
 @ -- Input/output ----------------------------------------------------
 
-    defconst "#TIB", 4, , TIBSIZE, 128
+    defconst "#TIB", TIBSIZE, 128
 
-    defword "SOURCE", 6, , SOURCE
+    defword "SOURCE", SOURCE
     .word XSOURCE, FETCH, SOURCECOUNT, FETCH, EXIT
 
     .ltorg
 
-    defcode ".S", 2, , PRINTSTACK
+    defcode ".S", PRINTSTACK
     bl printstack
     NEXT
 
-    defcode "EMIT", 4, , EMIT
+    defcode "EMIT", EMIT
     pop {r0}
     bl putchar
     NEXT
 
-    defcode "CR", 2, , CR
+    defcode "CR", CR
     mov r0, #13
     bl putchar
     mov r0, #10
     bl putchar
     NEXT
 
-    defcode "BL", 2, , BL
+    defcode "BL", BL
     mov r0, #32
     push {r0}
     NEXT
 
-    defword "SPACE", 5, , SPACE
+    defword "SPACE", SPACE
     .word LIT, 32, EMIT, EXIT
 
-    defcode "TYPE", 4, , TYPE
+    defcode "TYPE", TYPE
     pop {r1}
     pop {r0}
     bl putstring
     NEXT
 
-    defcode ".", 1, , DOT
+    defcode ".", DOT
     pop {r0}
     bl putsignedhexnumber
     mov r0, #32
     bl putchar
     NEXT
 
-    defcode ".U", 2, , UDOT
+    defcode ".U", UDOT
     pop {r0}
     bl puthexnumber
     mov r0, #32
     bl putchar
     NEXT
 
-    defcode "(.D)", 4, , XDOTD
+    defcode "(.D)", XDOTD
     pop {r0}
     bl putnumber
     NEXT
 
-    defword ".D", 2, , DOTD
+    defword ".D", DOTD
     .word XDOTD, SPACE, EXIT
 
-    defcode "(KEY)", 5, , XKEY
+    defcode "(KEY)", XKEY
     bl read_key
     push {r0}
     NEXT
 
-    defcode "KEY", 3, , KEY
+    defcode "KEY", KEY
     bl read_widekey
     push {r0}
     NEXT
 
-    defcode "ACCEPT", 6, , ACCEPT
+    defcode "ACCEPT", ACCEPT
     pop {r1}
     pop {r0}
     bl readline
     push {r0}
     NEXT
 
-    defword "DUMP", 4, , DUMP
-    .word QDUP, ZBRANCH, dump_end
+    defword "DUMP", DUMP
+    .word QDUP, ZBRANCH, dump_end - .
     .word SWAP
 dump_start_line:
     .word CR, DUP, DOT, LIT, 58, EMIT, BL, EMIT
 dump_line:
     .word DUP, FETCHBYTE, DOT, INCR
-    .word SWAP, DECR, QDUP, ZBRANCH, dump_end
-    .word SWAP, DUP, LIT, 7, AND, ZBRANCH, dump_start_line
-    .word BRANCH, dump_line
+    .word SWAP, DECR, QDUP, ZBRANCH, dump_end - .
+    .word SWAP, DUP, LIT, 7, AND, ZBRANCH, dump_start_line - .
+    .word BRANCH, dump_line - .
 dump_end:
     .word DROP, EXIT
 
-    defword "SKIP", 4, , SKIP
+    defword "SKIP", SKIP
     .word TOR
 1:
-    .word OVER, FETCHBYTE, RFETCH, EQU, OVER, ZGT, AND, ZBRANCH, 2f
-    .word LIT, 1, TRIMSTRING, BRANCH, 1b
+    .word OVER, FETCHBYTE, RFETCH, EQU, OVER, ZGT, AND, ZBRANCH, 2f - .
+    .word LIT, 1, TRIMSTRING, BRANCH, 1b - .
 2:
     .word RDROP, EXIT
 
-    defword "SCAN", 4, , SCAN
+    defword "SCAN", SCAN
     .word TOR
 1:
-    .word OVER, FETCHBYTE, RFETCH, NEQU, OVER, ZGT, AND, ZBRANCH, 2f
-    .word LIT, 1, TRIMSTRING, BRANCH, 1b
+    .word OVER, FETCHBYTE, RFETCH, NEQU, OVER, ZGT, AND, ZBRANCH, 2f - .
+    .word LIT, 1, TRIMSTRING, BRANCH, 1b - .
 2:
     .word RDROP, EXIT
 
-    defword "?SIGN", 5, , ISSIGN
+    defword "?SIGN", ISSIGN
     .word OVER, FETCHBYTE, LIT, 0x2c, SUB, DUP, ABS
-    .word LIT, 1, EQU, AND, DUP, ZBRANCH, 1f
+    .word LIT, 1, EQU, AND, DUP, ZBRANCH, 1f - .
     .word INCR, TOR, LIT, 1, TRIMSTRING, RFROM
 1:
     .word EXIT
 
-    defword "DIGIT?", 6, , ISDIGIT
+    defword "DIGIT?", ISDIGIT
     .word DUP, LIT, '9', GT, LIT, 0x100, AND, ADD
     .word DUP, LIT, 0x140, GT, LIT, 0x107, AND, SUB, LIT, 0x30, SUB
     .word DUP, BASE, FETCH, ULT, EXIT
 
-    defword ">NUMBER", 7, , TONUMBER
+    defword ">NUMBER", TONUMBER
 /*
     DUP WHILE
         OVER C@ DIGIT?
@@ -1021,142 +1010,143 @@ dump_end:
     REPEAT ;
 */
 tonumber_loop:
-    .word DUP, ZBRANCH, tonumber_done
+    .word DUP, ZBRANCH, tonumber_done - .
     .word OVER, FETCHBYTE, ISDIGIT
-    .word ZEQU, ZBRANCH, tonumber_cont
+    .word ZEQU, ZBRANCH, tonumber_cont - .
     .word DROP, EXIT
 tonumber_cont:
     .word TOR, ROT, BASE, FETCH, MUL
     .word RFROM, ADD, ROT, ROT
     .word LIT, 1, TRIMSTRING
-    .word BRANCH, tonumber_loop
+    .word BRANCH, tonumber_loop - .
 tonumber_done:
     .word EXIT
 
-    defword "?NUMBER", 7, , ISNUMBER /* ( c-addr -- n true | c-addr false ) */
+    defword "?NUMBER", ISNUMBER /* ( c-addr -- n true | c-addr false ) */
     .word DUP, LIT, 0, DUP, ROT, COUNT
-    .word ISSIGN, TOR, TONUMBER, ZBRANCH, is_number
+    .word ISSIGN, TOR, TONUMBER, ZBRANCH, is_number - .
     .word RDROP, TWODROP, DROP, LIT, 0, EXIT
 is_number:
-    .word TWOSWAP, TWODROP, DROP, RFROM, ZNEQU, ZBRANCH, is_positive, NEGATE
+    .word TWOSWAP, TWODROP, DROP, RFROM, ZNEQU, ZBRANCH, is_positive - ., NEGATE
 is_positive:
     .word LIT, -1, EXIT
 
     .ltorg
 
-    defword "DECIMAL", 7, , DECIMAL
+    defword "DECIMAL", DECIMAL
     .word LIT, 10, BASE, STORE, EXIT
 
-    defword "HEX", 3, , HEX
+    defword "HEX", HEX
     .word LIT, 16, BASE, STORE, EXIT
 
-    defword "OCTAL", 5, , OCTAL
+    defword "OCTAL", OCTAL
     .word LIT, 8, BASE, STORE, EXIT
 
 @ ---------------------------------------------------------------------
 @ -- ANSI terminal I/O ------------------------------------------------
 
-    defword "ANSI-ESC-START", 14, , ANSI_ESC_START
+    defword "ANSI-ESC-START", ANSI_ESC_START
     .word LIT, 27, EMIT, LIT, '[', EMIT, EXIT
 
-    defword "AT-XY", 5, , AT_XY
+    defword "AT-XY", AT_XY
     .word ANSI_ESC_START, INCR, XDOTD, LIT, ';', EMIT, INCR, XDOTD, LIT, 'H', EMIT, EXIT
 
-    defword "!CURSOR", 7, , SAVECURSOR
+    defword "!CURSOR", SAVECURSOR
     .word LIT, 27, EMIT, LIT, '7', EMIT, EXIT
 
-    defword "@CURSOR", 7, , RESTORECURSOR
+    defword "@CURSOR", RESTORECURSOR
     .word LIT, 27, EMIT, LIT, '8', EMIT, EXIT
 
-    defword "CLS", 3, , CLS
+    defword "CLS", CLS
     .word ANSI_ESC_START, LIT, '2', EMIT, LIT, 'J', EMIT, LIT, 0, LIT, 0, AT_XY, EXIT
 
-    defword "CURSOR-UP", 9, , CURSOR_UP
+    defword "CURSOR-UP", CURSOR_UP
     .word ANSI_ESC_START, LIT, 'A', EMIT, EXIT
 
-    defword "CURSOR-DOWN", 11, , CURSOR_DOWN
+    defword "CURSOR-DOWN", CURSOR_DOWN
     .word ANSI_ESC_START, LIT, 'B', EMIT, EXIT
 
-    defword "CURSOR-RIGHT", 12, , CURSOR_RIGHT
+    defword "CURSOR-RIGHT", CURSOR_RIGHT
     .word ANSI_ESC_START, LIT, 'C', EMIT, EXIT
 
-    defword "CURSOR-LEFT", 11, , CURSOR_LEFT
+    defword "CURSOR-LEFT", CURSOR_LEFT
     .word ANSI_ESC_START, LIT, 'D', EMIT, EXIT
 
-    defword "CLR-EOL", 7, , CLR_EOL
+    defword "CLR-EOL", CLR_EOL
     .word ANSI_ESC_START, LIT, '0', EMIT, LIT, 'K', EMIT, EXIT
 
-    defword "CLR-SOL", 7, , CLR_SOL
+    defword "CLR-SOL", CLR_SOL
     .word ANSI_ESC_START, LIT, '1', EMIT, LIT, 'K', EMIT, EXIT
 
-    defword "CLR-LINE", 8, , CLR_LINE
+    defword "CLR-LINE", CLR_LINE
     .word ANSI_ESC_START, LIT, '2', EMIT, LIT, 'K', EMIT, EXIT
 
-    defconst "KEY-UP", 6, , KEY_UP, -1
-    defconst "KEY-DOWN", 8, , KEY_DOWN, -2
-    defconst "KEY-LEFT", 8, , KEY_LEFT, -4
-    defconst "KEY-RIGHT", 9, , KEY_RIGHT, -3
-    defconst "KEY-HOME", 8, , KEY_HOME, -101
-    defconst "KEY-END", 7, , KEY_END, -104
-    defconst "KEY-INSERT", 10, , KEY_INSERT, -102
-    defconst "KEY-DELETE", 10, , KEY_DELETE, -103
-    defconst "KEY-PGUP", 8, , KEY_PGUP, -105
-    defconst "KEY-PGDOWN", 10, , KEY_PGDOWN, -106
-    defconst "KEY-BACKSPACE", 13, , KEY_BACKSPACE, 127
+    defconst "KEY-UP", KEY_UP, -1
+    defconst "KEY-DOWN", KEY_DOWN, -2
+    defconst "KEY-LEFT", KEY_LEFT, -4
+    defconst "KEY-RIGHT", KEY_RIGHT, -3
+    defconst "KEY-HOME", KEY_HOME, -101
+    defconst "KEY-END", KEY_END, -104
+    defconst "KEY-INSERT", KEY_INSERT, -102
+    defconst "KEY-DELETE", KEY_DELETE, -103
+    defconst "KEY-PGUP", KEY_PGUP, -105
+    defconst "KEY-PGDOWN", KEY_PGDOWN, -106
+    defconst "KEY-BACKSPACE", KEY_BACKSPACE, 127
 
 @ ---------------------------------------------------------------------
 @ -- Control flow -----------------------------------------------------
 
-    defcode "BRANCH", 7, , BRANCH
-    ldr r7, [r7]
+    defcode "BRANCH", BRANCH
+    ldr r0, [r7]
+    add r7, r0
     NEXT
 
-    defcode "0BRANCH", 7, , ZBRANCH
+    defcode "0BRANCH", ZBRANCH
     pop {r0}
     cmp r0, #0
     beq code_BRANCH
     add r7, r7, #4
     NEXT
 
-    defword "BEGIN", 5, F_IMMED, BEGIN
+    defword "BEGIN", BEGIN, F_IMMED
     .word HERE, EXIT
 
-    defword "AGAIN", 5, F_IMMED, AGAIN
-    .word LIT, BRANCH, COMMAXT, COMMADEST, EXIT
+    defword "AGAIN", AGAIN, F_IMMED
+    .word LIT, BRANCH, COMMAXT, HERE, SUB, COMMA, EXIT
 
-    defword "UNTIL", 5, F_IMMED, UNTIL
-    .word LIT, ZBRANCH, COMMAXT, COMMADEST, EXIT
+    defword "UNTIL", UNTIL, F_IMMED
+    .word LIT, ZBRANCH, COMMAXT, HERE, SUB, COMMA, EXIT
 
-    defword "IF", 2, F_IMMED, IF
-    .word LIT, ZBRANCH, COMMAXT, HERE, DUP, COMMADEST, EXIT
+    defword "IF", IF, F_IMMED
+    .word LIT, ZBRANCH, COMMAXT, HERE, DUP, COMMA, EXIT
 
-    defword "ELSE", 4, F_IMMED, ELSE
-    .word LIT, BRANCH, COMMAXT, HERE, DUP, COMMADEST
+    defword "ELSE", ELSE, F_IMMED
+    .word LIT, BRANCH, COMMAXT, HERE, DUP, COMMA
     .word SWAP, THEN, EXIT
 
-    defword "THEN", 4, F_IMMED, THEN
-    .word HERE, SWAP, STORE, EXIT
+    defword "THEN", THEN, F_IMMED
+    .word HERE, OVER, SUB, SWAP, STORE, EXIT
 
-    defword "WHILE", 5, F_IMMED, WHILE
+    defword "WHILE", WHILE, F_IMMED
     .word IF, EXIT
 
-    defword "REPEAT", 6, F_IMMED, REPEAT
-    .word SWAP, LIT, BRANCH, COMMAXT, COMMADEST
+    defword "REPEAT", REPEAT, F_IMMED
+    .word SWAP, LIT, BRANCH, COMMAXT, HERE, SUB, COMMA
     .word THEN, EXIT
 
-    defword "CASE", 4 , F_IMMED, CASE
+    defword "CASE", CASE, F_IMMED
     .word LIT, 0, EXIT
 
-    defword "OF", 2, F_IMMED, OF
+    defword "OF", OF, F_IMMED
     .word LIT, OVER, COMMA, LIT, EQU, COMMA, IF, LIT, DROP, COMMA, EXIT
 
-    defword "ENDCASE", 7, F_IMMED, ENDCASE
+    defword "ENDCASE", ENDCASE, F_IMMED
     .word LIT, DROP, COMMA
-1:  .word DUP, ZBRANCH, 2f
-    .word THEN, BRANCH, 1b
+1:  .word DUP, ZBRANCH, 2f - .
+    .word THEN, BRANCH, 1b - .
 2:  .word DROP, EXIT
 
-    defcode "(DO)", 4, , XDO
+    defcode "(DO)", XDO
     pop {r0, r1}
     ldr r2, [r6]
     str r1, [r6]
@@ -1166,12 +1156,12 @@ is_positive:
     str r2, [r6]
     NEXT
 
-    defcode "I", 1, , INDEX
+    defcode "I", INDEX
     ldr r0, [r6, #4]
     push {r0}
     NEXT
 
-    defcode "(LOOP)", 6, , XLOOP
+    defcode "(LOOP)", XLOOP
     ldr r0, [r6, #4]
     add r0, r0, #1
     ldr r1, [r6, #8]
@@ -1188,13 +1178,13 @@ is_positive:
     push {r0}
     NEXT
 
-    defword "DO", 2, F_IMMED, DO
+    defword "DO", DO, F_IMMED
     .word LIT, XDO, COMMAXT, HERE, EXIT
 
-    defword "LOOP", 4, F_IMMED, LOOP
-    .word LIT, XLOOP, COMMAXT, LIT, ZBRANCH, COMMAXT, COMMADEST, EXIT
+    defword "LOOP", LOOP, F_IMMED
+    .word LIT, XLOOP, COMMAXT, LIT, ZBRANCH,  COMMAXT, COMMADEST, EXIT
 
-    defcode "DELAY", 5, , DELAY
+    defcode "DELAY", DELAY
     pop {r0}
     bl delay
     NEXT
@@ -1202,70 +1192,70 @@ is_positive:
 @ ---------------------------------------------------------------------
 @ -- Compiler and interpreter ----------------------------------------
 
-    defcode "BYE", 3, , BYE
+    defcode "BYE", BYE
     ldr r0, =0xfffffff
     bx r0
 
-    defcode "WFI", 3, , WFI
+    defcode "WFI", WFI
     wfi
     NEXT
 
-    defcode "RESET", 5, , RESET
+    defcode "RESET", RESET
     ldr r0, =0xe000ed0c
     ldr r1, =0x05fa0004
     str r1, [r0]
 
-    defcode "HALT", 3, , HALT
+    defcode "HALT", HALT
     b .
 
-    defcode "(ABRANCH)", 9, , ASMBRANCH
+    defcode "(ABRANCH)", ASMBRANCH
     pop {r0}
     bl calc_wide_branch
     push {r0}
     NEXT
 
-    defword "HERE", 4, , HERE
+    defword "HERE", HERE
     .word DP, FETCH, EXIT
 
-    defword "ALLOT", 5, , ALLOT
+    defword "ALLOT", ALLOT
     .word DP, ADDSTORE, EXIT
 
-    defword ",", 1, , COMMA
+    defword ",", COMMA
     .word HERE, STORE, CELL, ALLOT, EXIT
 
-    defword "+FIXUP", 6, , ADDFIXUP
-    .word ROMTOP, GT, ZBRANCH, 1f
-    .word FIXUPS, FETCH, QDUP, ZBRANCH, 1f
+    defword "+FIXUP", ADDFIXUP
+    .word ROMTOP, GT, ZBRANCH, 1f - .
+    .word FIXUPS, FETCH, QDUP, ZBRANCH, 1f - .
     .word DUP, FETCH, INCR, CELLS, OVER, ADD, HERE, SWAP, STORE
     .word LIT, 1, SWAP, ADDSTORE
 1:
     .word EXIT
 
-    defword ",FIXED", 6, , COMMAFIXED
+    defword ",FIXED", COMMAFIXED
     .word DUP, ADDFIXUP, HERE, STORE, CELL, ALLOT, EXIT
 
-    defword ",DEST", 5, , COMMADEST
+    defword ",DEST", COMMADEST
     .word COMMAFIXED, EXIT
 
-    defword ",XT", 3, , COMMAXT
+    defword ",XT", COMMAXT
     .word COMMAFIXED, EXIT
 
-    defword ",LINK", 5, , COMMALINK
+    defword ",LINK", COMMALINK
     .word COMMAFIXED, EXIT
 
-    defword "C,", 2, , CCOMMA
+    defword "C,", CCOMMA
     .word HERE, STOREBYTE, LIT, 1, ALLOT, EXIT
 
-    defword "\'", 1, , TICK
+    defword "\'", TICK
     .word BL, WORD, FIND, DROP, EXIT  @ TODO abort if not found
 
-    defword "[\']", 3, F_IMMED, BRACKETTICK
+    defword "[\']", BRACKETTICK, F_IMMED
     .word TICK, LIT, LIT, COMMAXT, COMMAXT, EXIT
 
-    defword "(DOES>)", 7, , XDOES
+    defword "(DOES>)", XDOES
     .word RFROM, LATEST, FETCH, FROMLINK, STORE, EXIT
 
-    defword "DOES>", 5, F_IMMED, DOES
+    defword "DOES>", DOES, F_IMMED
     .word LIT, XDOES, COMMAXT
     .word LIT
     ldr.w r1, [pc, #4]
@@ -1276,7 +1266,7 @@ is_positive:
     .word COMMA
     .word LIT, DODOES + 1, COMMA, EXIT
 
-    defword "CREATE", 6, , CREATE
+    defword "CREATE", CREATE
     .word HERE, ALIGNED, DP, STORE
     .word LATEST, FETCH
     .word HERE, LATEST, STORE       @ update latest
@@ -1285,23 +1275,23 @@ is_positive:
     .word LIT, DOVAR, COMMAXT       @ set code field
     .word EXIT
 
-    defword "VARIABLE", 8, , VARIABLE
+    defword "VARIABLE", VARIABLE
     .word CREATE, COMMA, CELL, ALLOT, EXIT
 
-    defword "CONSTANT", 8, , CONSTANT
+    defword "CONSTANT", CONSTANT
     .word CREATE, COMMA, XDOES
     add r0, r0, #4
     ldr r0, [r0]
     push {r0}
     NEXT
 
-    defcode "LIT", 3, , LIT
+    defcode "LIT", LIT
     ldr r0, [r7]
     add r7, r7, #4
     push {r0}
     NEXT
 
-    defcode "FIND", 4, , FIND
+    defcode "FIND", FIND
     pop {r0}
     mov r10, r0
     ldrb r1, [r0]
@@ -1372,17 +1362,17 @@ is_positive:
 
     .ltorg
 
-    defword "\\", 1, F_IMMED, BACKSLASH
+    defword "\\", BACKSLASH, F_IMMED
     .word SOURCECOUNT, FETCH, SOURCEINDEX, STORE, EXIT
 
-    defword "(", 1, F_IMMED, LPAREN
+    defword "(", LPAREN, F_IMMED
     .word LIT, ')', WORD, DROP, EXIT
 
-    defword "WORD", 4, , WORD
+    defword "WORD", WORD
     .word DUP, SOURCE, SOURCEINDEX, FETCH, TRIMSTRING
     .word DUP, TOR, ROT, SKIP
     .word OVER, TOR, ROT, SCAN
-    .word DUP, ZNEQU, ZBRANCH, noskip_delim, DECR
+    .word DUP, ZNEQU, ZBRANCH, noskip_delim - ., DECR
 noskip_delim:
     .word RFROM, RFROM, ROT, SUB, SOURCEINDEX, ADDSTORE
     .word TUCK, SUB
@@ -1390,7 +1380,7 @@ noskip_delim:
     .word HERE, INCR, SWAP, CMOVE
     .word HERE, EXIT
 
-    defcode "LINK>", 5, , FROMLINK
+    defcode "LINK>", FROMLINK
     pop {r0}
     add r0, r0, #4      @ skip link pointer
     ldrb r1, [r0]       @ load flags+len
@@ -1403,7 +1393,7 @@ noskip_delim:
     push {r0}
     NEXT
 
-    defcode ">NAME", 5, , TONAME
+    defcode ">NAME", TONAME
     pop {r0}
     mvn r2, #F_IMMED
 1:  sub r0, r0, #1
@@ -1418,87 +1408,87 @@ noskip_delim:
 
     .ltorg
 
-    defword ">LINK", 5, , TOLINK
+    defword ">LINK", TOLINK
     .word TONAME, CELL, SUB, EXIT
 
-    defcode "EXECUTE",7, ,EXECUTE
+    defcode "EXECUTE", EXECUTE
     pop {r0}
     ldr r1, [r0]
     add r1, r1, #1
     mov pc, r1
 
-    defword "(INTERPRET)", 11, , XINTERPRET @ TODO restructure this
+    defword "(INTERPRET)", XINTERPRET @ TODO restructure this
 interpret_loop:
-    .word BL, WORD, DUP, FETCHBYTE, ZBRANCH, interpret_eol
-    .word FIND, QDUP, ZBRANCH, interpret_check_number
-    .word STATE, FETCH, ZBRANCH, interpret_execute
-    .word INCR, ZBRANCH, interpret_compile_word
-    .word EXECUTE, BRANCH, interpret_loop
+    .word BL, WORD, DUP, FETCHBYTE, ZBRANCH, interpret_eol - .
+    .word FIND, QDUP, ZBRANCH, interpret_check_number - .
+    .word STATE, FETCH, ZBRANCH, interpret_execute - .
+    .word INCR, ZBRANCH, interpret_compile_word - .
+    .word EXECUTE, BRANCH, interpret_loop - .
 interpret_compile_word:
-    .word COMMAXT, BRANCH, interpret_loop
+    .word COMMAXT, BRANCH, interpret_loop - .
 interpret_execute:
-    .word DROP, EXECUTE, BRANCH, interpret_loop
+    .word DROP, EXECUTE, BRANCH, interpret_loop - .
 interpret_check_number:
-    .word ISNUMBER, ZBRANCH, interpret_not_found
-    .word STATE, FETCH, ZBRANCH, interpret_loop
-    .word LIT, LIT, COMMAXT, COMMA, BRANCH, interpret_loop
+    .word ISNUMBER, ZBRANCH, interpret_not_found - .
+    .word STATE, FETCH, ZBRANCH, interpret_loop - .
+    .word LIT, LIT, COMMAXT, COMMA, BRANCH, interpret_loop - .
 interpret_not_found:
     .word LIT, 0, EXIT
 interpret_eol:
     .word LIT, -1, EXIT
 
-    defword "EVALUATE", 8, , EVALUATE
+    defword "EVALUATE", EVALUATE
     .word XSOURCE, STORE
     .word LIT, 0, STATE, STORE
 1:
-    .word XSOURCE, FETCH, DUP, FETCHBYTE, DUP, LIT, 255, NEQU, ZBRANCH, 2f
-    .word SOURCECOUNT, STORE, INCR, XSOURCE, STORE, LIT, 0, SOURCEINDEX, STORE, XINTERPRET, ZBRANCH, 3f, DROP
-    .word SOURCECOUNT, FETCH, XSOURCE, ADDSTORE, BRANCH, 1b
+    .word XSOURCE, FETCH, DUP, FETCHBYTE, DUP, LIT, 255, NEQU, ZBRANCH, 2f - .
+    .word SOURCECOUNT, STORE, INCR, XSOURCE, STORE, LIT, 0, SOURCEINDEX, STORE, XINTERPRET, ZBRANCH, 3f - ., DROP
+    .word SOURCECOUNT, FETCH, XSOURCE, ADDSTORE, BRANCH, 1b - .
 2:
     .word TWODROP, EXIT
 3:
     .word DROP, DUP, DOT, SPACE, COUNT, TYPE, LIT, '?', EMIT, CR, EXIT
 
-    defword "FORGET", 6, , FORGET
+    defword "FORGET", FORGET
     /* BL WORD DROP FIND DROP >LINK @ LATEST ! */
     .word BL, WORD, FIND, DROP, TOLINK, FETCH, LATEST, STORE, EXIT
 
-    defword "HIDE", 4, , HIDE
+    defword "HIDE", HIDE
     .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_HIDDEN, OR, SWAP, STOREBYTE, EXIT
 
-    defword "REVEAL", 6, , REVEAL
+    defword "REVEAL", REVEAL
     .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_HIDDEN, INVERT, AND, SWAP, STOREBYTE, EXIT
 
-    defword "IMMEDIATE", 9, , IMMEDIATE
+    defword "IMMEDIATE", IMMEDIATE
     .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_IMMED, OR, SWAP, STOREBYTE, EXIT
 
-    defword "[", 1, F_IMMED, LBRACKET
+    defword "[", LBRACKET, F_IMMED
     .word LIT, 0, STATE, STORE, EXIT
 
-    defword "]", 1, , RBRACKET
+    defword "]", RBRACKET
     .word LIT, -1, STATE, STORE, EXIT
 
-    defword ":", 1, , COLON
+    defword ":", COLON
     /* CREATE HIDE ] ' DOCOL HERE CELL - ! */
     .word CREATE, HIDE, RBRACKET, LIT, DOCOL, HERE, CELL, SUB, STORE, EXIT
 
-    defword ";", 1, F_IMMED, SEMICOLON
+    defword ";", SEMICOLON, F_IMMED
     .word LIT, EXIT, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    defword "WORDS", 5, , WORDS
+    defword "WORDS", WORDS
     .word LATEST, FETCH
 words_loop:
     .word DUP, CELL, ADD, COUNT, LIT, 31, AND, TYPE, SPACE
-    .word FETCH, QDUP, ZEQU, ZBRANCH, words_loop
+    .word FETCH, QDUP, ZEQU, ZBRANCH, words_loop - .
     .word EXIT
 
 @ ---------------------------------------------------------------------
 @ -- Disassembler -----------------------------------------------------
 
-    defword "QUOTE-CHAR", 10, , QUOTE_CHAR
+    defword "QUOTE-CHAR", QUOTE_CHAR
     .word LIT, QUOTE_CHARS
-2:  .word TWODUP, FETCHBYTE, DUP, ZNEQU, ZBRANCH, 3f, NEQU, ZBRANCH, 1f
-    .word CHAR, ADD, DUP, FETCHBYTE, ADD, CHAR, ADD, BRANCH, 2b
+2:  .word TWODUP, FETCHBYTE, DUP, ZNEQU, ZBRANCH, 3f - ., NEQU, ZBRANCH, 1f - .
+    .word CHAR, ADD, DUP, FETCHBYTE, ADD, CHAR, ADD, BRANCH, 2b - .
 1:  .word CHAR, ADD, NIP, LIT, -1, EXIT
 3:  .word TWODROP, DROP, LIT, 0, EXIT
 
@@ -1506,7 +1496,7 @@ QUOTE_MINUS:
     .ascii "-\005MINUS"
 QUOTE_CHARS:
     .ascii "-\001_"
-    .ascii "0\004ZERO"
+    .ascii "0\001Z"
     .ascii "1\003ONE"
     .ascii "2\003TWO"
     .ascii "`\010BACKTICK"
@@ -1540,43 +1530,43 @@ QUOTE_CHARS:
     .ascii "?\001Q"
     .byte 0
 
-    defword ".QUOTED", 7, , DOTQUOTED
-    .word OVER, FETCHBYTE, LIT, '-', EQU, ZBRANCH, 1f
-    .word SWAP, LIT, QUOTE_MINUS + 1, BRANCH, 5f
-1:  .word DUP, ZGT, ZBRANCH, 4f
-    .word DUP, LIT, 1, EQU, ZBRANCH, 6f
-    .word OVER, FETCHBYTE, LIT, '-', EQU, ZBRANCH, 6f
-    .word SWAP, LIT, QUOTE_MINUS + 1, BRANCH, 5f
-6:  .word SWAP, DUP, FETCHBYTE, QUOTE_CHAR, ZBRANCH, 2f 
-5:  .word COUNT, TYPE, BRANCH, 3f
+    defword ".QUOTED", DOTQUOTED
+    .word OVER, FETCHBYTE, LIT, '-', EQU, ZBRANCH, 1f - .
+    .word SWAP, LIT, QUOTE_MINUS + 1, BRANCH, 5f - .
+1:  .word DUP, ZGT, ZBRANCH, 4f - .
+    .word DUP, LIT, 1, EQU, ZBRANCH, 6f - .
+    .word OVER, FETCHBYTE, LIT, '-', EQU, ZBRANCH, 6f - .
+    .word SWAP, LIT, QUOTE_MINUS + 1, BRANCH, 5f - .
+6:  .word SWAP, DUP, FETCHBYTE, QUOTE_CHAR, ZBRANCH, 2f - . 
+5:  .word COUNT, TYPE, BRANCH, 3f - .
 2:  .word EMIT 
-3:  .word INCR, SWAP, DECR, BRANCH, 1b
+3:  .word INCR, SWAP, DECR, BRANCH, 1b - .
 4:  .word TWODROP, EXIT
 
-    defword "get-next", 8, , get_next
+    defword "get-next", get_next
     .word LATEST, FETCH
 get_next_loop:
-    .word TWODUP, FETCH, NEQU, ZBRANCH, get_next_done
-    .word FETCH, BRANCH, get_next_loop
+    .word TWODUP, FETCH, NEQU, ZBRANCH, get_next_done - .
+    .word FETCH, BRANCH, get_next_loop - .
 get_next_done:
     .word SWAP, DROP, EXIT
 
-    defword "print-word", 10, , print_word
-    .word DUP, DUP, FETCH, CELL, SUB, OVER, NEQU, ZBRANCH, print_code
+    defword "print-word", print_word
+    .word DUP, DUP, FETCH, CELL, SUB, OVER, NEQU, ZBRANCH, print_code - .
     .word DUP, FETCH
-    .word DUP, LIT, DOCOL, NEQU, ZBRANCH, print_docol
-    .word DUP, LIT, BRANCH, NEQU, ZBRANCH, print_branch
-    .word DUP, LIT, ZBRANCH, NEQU, ZBRANCH, print_zbranch
-    .word DUP, LIT, LIT, NEQU, ZBRANCH, print_literal
+    .word DUP, LIT, DOCOL, NEQU, ZBRANCH, print_docol - .
+    .word DUP, LIT, BRANCH, NEQU, ZBRANCH, print_branch - .
+    .word DUP, LIT, ZBRANCH, NEQU, ZBRANCH, print_zbranch - .
+    .word DUP, LIT, LIT, NEQU, ZBRANCH, print_literal - .
     .word TONAME, COUNT, LIT, 31, AND, TYPE, SPACE, TWODROP, CELL, EXIT
 print_code:
     .word DROP, LIT, print_label_code, LIT, 4, TYPE, SPACE, DROP, LIT, 0, EXIT
 print_docol:
     .word DROP, LIT, ':', EMIT, SPACE, TWODROP, CELL, EXIT
 print_branch:
-    .word DROP, LIT, print_label_branch, LIT, 6, TYPE, SPACE, CELL, ADD, FETCH, SWAP, SUB, CELL, DIV, DOT, LIT, 2, CELLS, EXIT
+    .word DROP, LIT, print_label_branch, LIT, 6, TYPE, SPACE, CELL, ADD, FETCH, NIP, CELL, DIV, DOT, LIT, 2, CELLS, EXIT
 print_zbranch:
-    .word DROP, LIT, print_label_zbranch, LIT, 7, TYPE, SPACE, CELL, ADD, FETCH, SWAP, SUB, CELL, DIV, DOT, LIT, 2, CELLS, EXIT
+    .word DROP, LIT, print_label_zbranch, LIT, 7, TYPE, SPACE, CELL, ADD, FETCH, NIP, CELL, DIV, DOT, LIT, 2, CELLS, EXIT
 print_literal:
     .word DROP, LIT, print_label_lit, LIT, 3, TYPE, SPACE, CELL, ADD, FETCH, DOT, DROP, LIT, 2, CELLS, EXIT
 print_label_code:
@@ -1589,19 +1579,19 @@ print_label_zbranch:
     .ascii "ZBRANCH"
     .align 2
 
-    defword "SEE", 3, , SEE
-    .word BL, WORD, FIND, ZBRANCH, see_not_found
+    defword "SEE", SEE
+    .word BL, WORD, FIND, ZBRANCH, see_not_found - .
     .word DUP, TOLINK, get_next
 see_loop:
-    .word OVER, TWODUP, NEQU, ZBRANCH, see_done
-    .word print_word, DUP, ZBRANCH, see_done
+    .word OVER, TWODUP, NEQU, ZBRANCH, see_done - .
+    .word print_word, DUP, ZBRANCH, see_done - .
     .word ROT, ADD, SWAP
-    .word BRANCH, see_loop
+    .word BRANCH, see_loop - .
 see_not_found:
 see_done:
     .word EXIT
 
-    defword "RELOCATE", 8, , RELOCATE
+    defword "RELOCATE", RELOCATE
 /*: RELOCATE   ( start end --  )
     
     SWAP DUP ROMTOP - >R   SWAP OVER -
@@ -1625,13 +1615,13 @@ see_done:
     .word SUB, TOR, SWAP, OVER, SUB
     .word FIXUPS, FETCH, DUP, CELL, ADD, SWAP, FETCH, LIT, 0x0, XDO
 1:  .word    DUP, INDEX, CELLS, ADD, FETCH, DUP, FETCH, RFETCH, SUB, SWAP, STORE
-    .word XLOOP, ZBRANCH, 1b, DROP, RDROP
+    .word XLOOP, ZBRANCH, 1b - ., DROP, RDROP
     .word ROT, TOR, LIT, 0x0, XDO
-2:  .word    DUP, INDEX, ADD, DUP, RFETCH, EQU, ZBRANCH, 4f, LIT, set_link, LIT, line_prefix - set_link, TYPE, BRANCH, 6f
-4:  .word    INDEX, LIT, 0x10, MOD, ZEQU, ZBRANCH, 3f, LIT, line_prefix, LIT, interbyte - line_prefix, TYPE, BRANCH, 6f
+2:  .word    DUP, INDEX, ADD, DUP, RFETCH, EQU, ZBRANCH, 4f - ., LIT, set_link, LIT, line_prefix - set_link, TYPE, BRANCH, 6f - .
+4:  .word    INDEX, LIT, 0x10, MOD, ZEQU, ZBRANCH, 3f - ., LIT, line_prefix, LIT, interbyte - line_prefix, TYPE, BRANCH, 6f - .
 3:  .word    LIT, interbyte, LIT, 5f - interbyte, TYPE
 6:  .word    FETCHBYTE, UDOT
-    .word XLOOP, ZBRANCH, 2b
+    .word XLOOP, ZBRANCH, 2b - .
     .word LIT, 10, EMIT, RDROP, BYE
 set_link:
     .ascii "\n.set link, .\n    .byte "
@@ -1641,42 +1631,42 @@ interbyte:
     .ascii ", "
 5:  .align 2, 0
 
-    defword "(PRECOMP-BEGIN)", 15, , XPRECOMP_BEGIN
+    defword "(PRECOMP-BEGIN)", XPRECOMP_BEGIN
     .word LIT, 0x20001B00, FIXUPS, STORE, LIT, 0, FIXUPS, FETCH, STORE, HERE
     .word EXIT
 
-    defword "PRECOMP-BEGIN", 13, , PRECOMP_BEGIN
+    defword "PRECOMP-BEGIN", PRECOMP_BEGIN
     .word XPRECOMP_BEGIN, EXIT
 
-    defword "PRECOMP-CORE-BEGIN", 18, , PRECOMP_CORE_BEGIN
+    defword "PRECOMP-CORE-BEGIN", PRECOMP_CORE_BEGIN
     .word LATESTCORE, LATEST, STORE, XPRECOMP_BEGIN, EXIT
 
-    defword "PRECOMP-END", 11, , PRECOMP_END
+    defword "PRECOMP-END", PRECOMP_END
     .word HERE, LATEST, FETCH, ROTROT, RELOCATE
     .word EXIT
 
 @ ---------------------------------------------------------------------
 @ -- User variables ---------------------------------------------------
 
-    defconst "ROMTOP", 6, , ROMTOP, end_of_rom
-    defconst "CORETOP", 7, , CORETOP, end_of_core
-    defconst "LATESTROM", 9, , LATESTROM, last_rom_word
-    defconst "LATESTCORE", 10, , LATESTCORE, last_core_word
-    defvar "STACK", 5, , STACK, 512
-    defvar "S0", 2, , TOS, 0
-    defvar "RSTACK", 6, , RSTACK, 256
-    defvar "R0", 2, , RTOS, 0
-    defvar "STATE", 5, , STATE
-    defvar "DP", 2, , DP
-    defvar "LATEST", 6, , LATEST
-    defvar "BASE", 4, , BASE
-    defvar "TIB", 3, , TIB, 132
-    defvar ">TIB", 4, , TIBINDEX
-    defvar "TIB#", 4, , TIBCOUNT
-    defvar "(SOURCE)", 8, , XSOURCE
-    defvar "SOURCE#", 7, , SOURCECOUNT
-    defvar ">SOURCE", 7, , SOURCEINDEX
-    defvar "FIXUPS", 6, , FIXUPS
+    defconst "ROMTOP", ROMTOP, end_of_rom
+    defconst "CORETOP", CORETOP, end_of_core
+    defconst "LATESTROM", LATESTROM, last_rom_word
+    defconst "LATESTCORE", LATESTCORE, last_core_word
+    defvar "STACK", STACK, , 512
+    defvar "S0", TOS, , 0
+    defvar "RSTACK", RSTACK, , 256
+    defvar "R0", RTOS, , 0
+    defvar "STATE", STATE
+    defvar "DP", DP
+    defvar "LATEST", LATEST
+    defvar "BASE", BASE
+    defvar "TIB", TIB, , 132
+    defvar ">TIB", TIBINDEX
+    defvar "TIB#", TIBCOUNT
+    defvar "(SOURCE)", XSOURCE
+    defvar "SOURCE#", SOURCECOUNT
+    defvar ">SOURCE", SOURCEINDEX
+    defvar "FIXUPS", FIXUPS
 
     .ltorg
 
