@@ -405,55 +405,55 @@ uart0_key_handler:
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
 
-    defconst "GPIOA", 5, , GPIO_A, GPIOA
-    defconst "GPIOB", 5, , GPIO_B, GPIOB
-    defconst "GPIOC", 5, , GPIO_C, GPIOC
-    defconst "GPIOD", 5, , GPIO_D, GPIOD
-    defconst "GPIOE", 5, , GPIO_E, GPIOE
+    defconst "GPIOA", GPIO_A, GPIOA
+    defconst "GPIOB", GPIO_B, GPIOB
+    defconst "GPIOC", GPIO_C, GPIOC
+    defconst "GPIOD", GPIO_D, GPIOD
+    defconst "GPIOE", GPIO_E, GPIOE
 
-    defword "GPIO-DIR", 8, , _GPIO_DIR, DOOFFSET
+    defword "GPIO-DIR", _GPIO_DIR, , DOOFFSET
     .word GPIO_DIR
 
-    defword "GPIO-AFSEL", 10, , _GPIO_AFSEL, DOOFFSET
+    defword "GPIO-AFSEL", _GPIO_AFSEL, , DOOFFSET
     .word GPIO_AFSEL
 
-    defword "GPIO-IS", 7, , _GPIO_IS, DOOFFSET
+    defword "GPIO-IS", _GPIO_IS, , DOOFFSET
     .word GPIO_IS
 
-    defword "GPIO-IBE", 8, , _GPIO_IBE, DOOFFSET
+    defword "GPIO-IBE", _GPIO_IBE, , DOOFFSET
     .word GPIO_IBE
 
-    defword "GPIO-IEV", 8, , _GPIO_IEV, DOOFFSET
+    defword "GPIO-IEV", _GPIO_IEV, , DOOFFSET
     .word GPIO_IEV
 
-    defword "GPIO-IM", 7, , _GPIO_IM, DOOFFSET
+    defword "GPIO-IM", _GPIO_IM, , DOOFFSET
     .word GPIO_IM
 
-    defword "GPIO-RIS", 8, , _GPIO_RIS, DOOFFSET
+    defword "GPIO-RIS", _GPIO_RIS, , DOOFFSET
     .word GPIO_RIS
 
-    defword "GPIO-MIS", 8, , _GPIO_MIS, DOOFFSET
+    defword "GPIO-MIS", _GPIO_MIS, , DOOFFSET
     .word GPIO_MIS
 
-    defword "GPIO-ICR", 8, , _GPIO_ICR, DOOFFSET
+    defword "GPIO-ICR", _GPIO_ICR, , DOOFFSET
     .word GPIO_ICR
 
-    defword "GPIO-DR2R", 9, , _GPIO_DR2R, DOOFFSET
+    defword "GPIO-DR2R", _GPIO_DR2R, , DOOFFSET
     .word GPIO_DR2R
 
-    defword "GPIO-ODR", 8, , _GPIO_ODR, DOOFFSET
+    defword "GPIO-ODR", _GPIO_ODR, , DOOFFSET
     .word GPIO_ODR
 
-    defword "GPIO-PUR", 8, , _GPIO_PUR, DOOFFSET
+    defword "GPIO-PUR", _GPIO_PUR, , DOOFFSET
     .word GPIO_PUR
 
-    defword "GPIO-PDR", 8, , _GPIO_PDR, DOOFFSET
+    defword "GPIO-PDR", _GPIO_PDR, , DOOFFSET
     .word GPIO_PDR
 
-    defword "GPIO-DEN", 8, , _GPIO_DEN, DOOFFSET
+    defword "GPIO-DEN", _GPIO_DEN, , DOOFFSET
     .word GPIO_DEN
 
-    defcode "GPIO-DATA!", 10, , _GPIO_DATA_STORE @ ( value mask gpio -- )
+    defcode "GPIO-DATA!", _GPIO_DATA_STORE @ ( value mask gpio -- )
     pop {r1}
     pop {r0}
     lsl r0, r0, #2
@@ -462,63 +462,63 @@ uart0_key_handler:
     strb r1, [r0]
     NEXT
 
-    defconst "UART0", 5, , UART_0, UART0
+    defconst "UART0", UART_0, UART0
 
-    defword "UART_DR", 7, , _UART_DR, DOOFFSET
+    defword "UART_DR", _UART_DR, , DOOFFSET
     .word UART_DR
 
-    defword "UART-RSR-ECR", 12, , _UART_RSR_ECR, DOOFFSET
+    defword "UART-RSR-ECR", _UART_RSR_ECR, , DOOFFSET
     .word UART_RSR_ECR
 
-    defword "UART-FR", 7, , _UART_FR, DOOFFSET
+    defword "UART-FR", _UART_FR, , DOOFFSET
     .word UART_FR
 
-    defword "UART-LPR", 8, , _UART_LPR, DOOFFSET
+    defword "UART-LPR", _UART_LPR, , DOOFFSET
     .word UART_LPR
 
-    defword "UART-IBRD", 9, , _UART_IBRD, DOOFFSET
+    defword "UART-IBRD", _UART_IBRD, , DOOFFSET
     .word UART_IBRD
 
-    defword "UART-FBRD", 9, , _UART_FBRD, DOOFFSET
+    defword "UART-FBRD", _UART_FBRD, , DOOFFSET
     .word UART_FBRD
 
-    defword "UART-LCRH", 9, , _UART_LCRH, DOOFFSET
+    defword "UART-LCRH", _UART_LCRH, , DOOFFSET
     .word UART_LCRH
 
-    defword "UART-CR", 7, , _UART_CR, DOOFFSET
+    defword "UART-CR", _UART_CR, , DOOFFSET
     .word UART_CR
 
-    defword "UART-IFLS", 9, , _UART_IFLS, DOOFFSET
+    defword "UART-IFLS", _UART_IFLS, , DOOFFSET
     .word UART_IFLS
 
-    defword "UART-IMSC", 9, , _UART_IMSC, DOOFFSET
+    defword "UART-IMSC", _UART_IMSC, , DOOFFSET
     .word UART_IMSC
 
-    defword "UART-RIS", 8, , _UART_RIS, DOOFFSET
+    defword "UART-RIS", _UART_RIS, , DOOFFSET
     .word UART_RIS
 
-    defword "UART-MIS", 8, , _UART_MIS, DOOFFSET
+    defword "UART-MIS", _UART_MIS, , DOOFFSET
     .word UART_MIS
 
-    defword "UART-ICR", 8, , _UART_ICR, DOOFFSET
+    defword "UART-ICR", _UART_ICR, , DOOFFSET
     .word UART_ICR
 
-    defword "UART-DMACR", 10, , _UART_DMACR, DOOFFSET
+    defword "UART-DMACR", _UART_DMACR, , DOOFFSET
     .word UART_DMACR
 
-    defconst "UART-RXFE", 9, ,  _UART_RXFE, UART_RXFE
-    defconst "UART-TXFF", 9, , _UART_TXFF, UART_TXFF
+    defconst "UART-RXFE",  _UART_RXFE, UART_RXFE
+    defconst "UART-TXFF", _UART_TXFF, UART_TXFF
 
-    defconst "NVIC", 4, , _NVIC, NVIC
+    defconst "NVIC", _NVIC, NVIC
 
-    defcode "NVIC-SETENA", 11, , NVIC_SETENA
+    defcode "NVIC-SETENA", NVIC_SETENA
     ldr r0, =NVIC
     ldr r1, =NVIC_SETENA_BASE
     add r0, r1, r0
     push {r0}
     NEXT
 
-    defconst "DISP-FONT", 9, , _DISP_FONT, DISP_FONT
+    defconst "DISP-FONT", _DISP_FONT, DISP_FONT
 DISP_FONT:
     .byte 0x00, 0x00, 0x00, 0x00, 0x00   @ " "
     .byte 0x00, 0x00, 0x4f, 0x00, 0x00   @ !
@@ -616,24 +616,24 @@ DISP_FONT:
     .byte 0x00, 0x41, 0x36, 0x08, 0x00   @ }
     .byte 0x02, 0x01, 0x02, 0x04, 0x02   @ ~
 
-    defcode "RETI", 4, , RETI
+    defcode "RETI", RETI
     pop {r4 - r12, pc}
 
-    defword ";I", 2, F_IMMED, SEMICOLONI
+    defword ";I", SEMICOLONI, F_IMMED
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    defvar "SBUF", 4, , SBUF, 16
-    defvar "SBUF-HEAD", 9, , SBUF_HEAD
-    defvar "SBUF-TAIL", 9, , SBUF_TAIL
-    defvar "IVT", 3, , IVT, 48 * 4
-    defvar "(I2C-DELAY)", 11, , XI2C_DELAY
+    defvar "SBUF", SBUF, , 16
+    defvar "SBUF-HEAD", SBUF_HEAD
+    defvar "SBUF-TAIL", SBUF_TAIL
+    defvar "IVT", IVT, , 48 * 4
+    defvar "(I2C-DELAY)", XI2C_DELAY
 
     .ltorg
 
-    defword "(COLD)", 6, , XCOLD
+    defword "(COLD)", XCOLD
     .word LIT, eval_words, EVALUATE
 
-    defword "(COLD-PRECOMPILE)", 17, , XCOLD_PRECOMPILE
+    defword "(COLD-PRECOMPILE)", XCOLD_PRECOMPILE
 .ifdef PRECOMP_CORE
     .word PRECOMP_CORE_BEGIN
 .else
@@ -642,7 +642,7 @@ DISP_FONT:
     .word LIT, eval_words, EVALUATE
     .word PRECOMP_END
 
-    defword "COLD", 4, , COLD
+    defword "COLD", COLD
 .ifdef PRECOMPILE
     .word XCOLD_PRECOMPILE
 .else
