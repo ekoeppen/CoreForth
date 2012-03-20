@@ -890,6 +890,7 @@ fill_done:
     .ltorg
 
     defcode ".S", PRINTSTACK
+    .set DOTS, PRINTSTACK
     bl printstack
     NEXT
 
@@ -1182,7 +1183,7 @@ is_positive:
     .word LIT, XDO, COMMAXT, HERE, EXIT
 
     defword "LOOP", LOOP, F_IMMED
-    .word LIT, XLOOP, COMMAXT, LIT, ZBRANCH, COMMAXT, COMMADEST, EXIT
+    .word LIT, XLOOP, COMMAXT, LIT, ZBRANCH, COMMAXT, HERE, SUB, COMMA, EXIT
 
     defcode "DELAY", DELAY
     pop {r0}
@@ -1543,7 +1544,7 @@ QUOTE_CHARS:
 3:  .word INCR, SWAP, DECR, BRANCH, 1b - .
 4:  .word TWODROP, EXIT
 
-    defword "get-next", get_next
+    defword "NEXT_WORD", NEXT_WORD
     .word LATEST, FETCH
     .word TWODUP, EQU, ZBRANCH, 1f - .
     .word TWODROP, HERE, EXIT
@@ -1551,7 +1552,16 @@ QUOTE_CHARS:
     .word FETCH, BRANCH, 1b - .
 2:  .word SWAP, DROP, EXIT
 
-    defword "print-word", print_word
+    defword ".DOCOL", DOTDOCOL
+    .word LIT, 1f, COUNT, TYPE
+    .word TONAME, COUNT, TWODUP, LIT, 31, AND, TYPE
+    .word LIT, 2f, COUNT, TYPE
+    .word DOTQUOTED, CR
+    .word EXIT
+1:  .ascii "\016    defword \""
+2:  .ascii "\003\", "
+
+    defword ".WORD", DOTWORD
     .word DUP, DUP, FETCH, CELL, SUB, OVER, NEQU, ZBRANCH, print_code - .
     .word DUP, FETCH
     .word DUP, LIT, DOCOL, NEQU, ZBRANCH, print_docol - .
@@ -1559,11 +1569,11 @@ QUOTE_CHARS:
     .word DUP, LIT, ZBRANCH, NEQU, ZBRANCH, print_zbranch - .
     .word DUP, LIT, LIT, NEQU, ZBRANCH, print_literal - .
     .word DUP, LIT, XDOES, NEQU, ZBRANCH, print_xdoes - .
-    .word TONAME, COUNT, LIT, 31, AND, TYPE, SPACE, TWODROP, CELL, EXIT
+    .word TONAME, COUNT, LIT, 31, AND, DOTQUOTED, SPACE, TWODROP, CELL, EXIT
 print_code:
     .word DROP, LIT, print_label_code, LIT, 4, TYPE, SPACE, DROP, LIT, 0, EXIT
 print_docol:
-    .word DROP, LIT, ':', EMIT, SPACE, TWODROP, CELL, EXIT
+    .word DROP, PRINTSTACK, DOTDOCOL, DROP, CELL, EXIT
 print_branch:
     .word DROP, LIT, print_label_branch, COUNT, TYPE, SPACE, CELL, ADD, FETCH, NIP, CELL, DIV, DOT, LIT, 2, CELLS, EXIT
 print_zbranch:
@@ -1588,9 +1598,9 @@ print_label_dodoes:
 
     defword "SEE", SEE
     .word BL, WORD, FIND, ZBRANCH, 3f - .
-    .word DUP, TOLINK, get_next
+    .word DUP, TOLINK, NEXT_WORD
 1:  .word OVER, TWODUP, NEQU, ZBRANCH, 2f - .
-    .word print_word, DUP, ZBRANCH, 2f - .
+    .word DOTWORD, DUP, ZBRANCH, 2f - .
     .word ROT, ADD, SWAP
     .word BRANCH, 1b - .
 2:  .word TWODROP

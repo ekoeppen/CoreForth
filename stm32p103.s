@@ -425,13 +425,12 @@ DISP_FONT:
     defword ";I", SEMICOLONI, F_IMMED
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    defvar "SBUF", SBUF, , 128
-    defvar "SBUF-HEAD", SBUF_HEAD
-    defvar "SBUF-TAIL", SBUF_TAIL
     defvar "IVT", IVT, , 75 * 4
 
     defword "COLD", COLD
     .word LIT, eval_words, EVALUATE
+
+    .ltorg
 
     .set last_rom_word, link
     .set end_of_rom, .
