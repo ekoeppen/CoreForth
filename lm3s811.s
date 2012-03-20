@@ -622,10 +622,10 @@ DISP_FONT:
     defword ";I", SEMICOLONI, F_IMMED
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    defvar "SBUF", SBUF, , 16
+    defvar "SBUF", SBUF, 16
     defvar "SBUF-HEAD", SBUF_HEAD
     defvar "SBUF-TAIL", SBUF_TAIL
-    defvar "IVT", IVT, , 48 * 4
+    defvar "IVT", IVT, 48 * 4
     defvar "(I2C-DELAY)", XI2C_DELAY
 
     .ltorg

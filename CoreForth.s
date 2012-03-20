@@ -73,8 +73,8 @@ code_\label :
     @ parameter field follows
     .endm
 
-    .macro defvar name, label, flags=0, size=4
-    defcode \name,\label,\flags
+    .macro defvar name, label, size=4
+    defcode \name,\label
     .set addr_\label, compiled_here
     ldr r0, =addr_\label
     push {r0}
@@ -82,13 +82,13 @@ code_\label :
     .set compiled_here, compiled_here + \size
     .endm
 
-    .macro defconst name, label, value, flags=0
+    .macro defconst name, label, value
     .align 2, 0
     .global name_\label
 name_\label :
     .int link
     .set link, name_\label
-    .byte \flags | (99f - 98f)
+    .byte (99f - 98f)
 98:
     .ascii "\name"
 99:
@@ -1281,6 +1281,7 @@ is_positive:
 
     defword "CONSTANT", CONSTANT
     .word CREATE, COMMA, XDOES
+    .set DOCONSTANT, .
     add r0, r0, #4
     ldr r0, [r0]
     push {r0}
@@ -1552,19 +1553,33 @@ QUOTE_CHARS:
     .word FETCH, BRANCH, 1b - .
 2:  .word SWAP, DROP, EXIT
 
+    defword "(.WORD-FLAGS)", XWORD_FLAGS
+    .word TONAME, FETCH, LIT, 0xc0, AND, LIT, ',', EMIT, SPACE, DOT, EXIT
+
+    defword "(.WORD-NAME)", XWORD_NAME
+    .word LIT, '"', EMIT, TONAME, COUNT, LIT, 31, AND, TWODUP, TYPE
+    .word LIT, 1f, COUNT, TYPE, DOTQUOTED, EXIT
+1:  .ascii "\003\", "
+
     defword ".DOCOL", DOTDOCOL
-    .word LIT, 1f, COUNT, TYPE
-    .word TONAME, COUNT, TWODUP, LIT, 31, AND, TYPE
-    .word LIT, 2f, COUNT, TYPE
-    .word DOTQUOTED, CR
-    .word EXIT
-1:  .ascii "\016    defword \""
-2:  .ascii "\003\", "
+    .word LIT, 1f, COUNT, TYPE, DUP, XWORD_NAME, XWORD_FLAGS, CR, EXIT
+1:  .ascii "\014    defword "
+
+    defword ".DOVAR", DOTDOVAR
+    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, CR, EXIT
+1:  .ascii "\013    defvar "
+
+    defword ".DOCON", DOTDOCON
+    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, LIT, ',', EMIT, SPACE, DUP, CELL, ADD, FETCH, DOT, CR, EXIT
+1:  .ascii "\015    defconst "
 
     defword ".WORD", DOTWORD
     .word DUP, DUP, FETCH, CELL, SUB, OVER, NEQU, ZBRANCH, print_code - .
     .word DUP, FETCH
     .word DUP, LIT, DOCOL, NEQU, ZBRANCH, print_docol - .
+    .word DUP, LIT, DOVAR, NEQU, ZBRANCH, print_dovar - .
+    .word DUP, LIT, DOCON, NEQU, ZBRANCH, print_docon - .
+    .word DUP, LIT, DOCONSTANT, NEQU, ZBRANCH, print_docon - .
     .word DUP, LIT, BRANCH, NEQU, ZBRANCH, print_branch - .
     .word DUP, LIT, ZBRANCH, NEQU, ZBRANCH, print_zbranch - .
     .word DUP, LIT, LIT, NEQU, ZBRANCH, print_literal - .
@@ -1573,7 +1588,11 @@ QUOTE_CHARS:
 print_code:
     .word DROP, LIT, print_label_code, LIT, 4, TYPE, SPACE, DROP, LIT, 0, EXIT
 print_docol:
-    .word DROP, PRINTSTACK, DOTDOCOL, DROP, CELL, EXIT
+    .word DROP, DOTDOCOL, DROP, CELL, EXIT
+print_dovar:
+    .word DROP, DOTDOVAR, DROP, LIT, 0,  EXIT
+print_docon:
+    .word DROP, DOTDOCON, DROP, LIT, 0,  EXIT
 print_branch:
     .word DROP, LIT, print_label_branch, COUNT, TYPE, SPACE, CELL, ADD, FETCH, NIP, CELL, DIV, DOT, LIT, 2, CELLS, EXIT
 print_zbranch:
@@ -1667,15 +1686,15 @@ interbyte:
     defconst "CORETOP", CORETOP, end_of_core
     defconst "LATESTROM", LATESTROM, last_rom_word
     defconst "LATESTCORE", LATESTCORE, last_core_word
-    defvar "STACK", STACK, , 512
-    defvar "S0", TOS, , 0
-    defvar "RSTACK", RSTACK, , 256
-    defvar "R0", RTOS, , 0
+    defvar "STACK", STACK, 512
+    defvar "S0", TOS, 0
+    defvar "RSTACK", RSTACK, 256
+    defvar "R0", RTOS, 0
     defvar "STATE", STATE
     defvar "DP", DP
     defvar "LATEST", LATEST
     defvar "BASE", BASE
-    defvar "TIB", TIB, , 132
+    defvar "TIB", TIB, 132
     defvar ">TIB", TIBINDEX
     defvar "TIB#", TIBCOUNT
     defvar "(SOURCE)", XSOURCE

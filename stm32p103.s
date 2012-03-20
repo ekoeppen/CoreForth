@@ -425,7 +425,7 @@ DISP_FONT:
     defword ";I", SEMICOLONI, F_IMMED
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    defvar "IVT", IVT, , 75 * 4
+    defvar "IVT", IVT, 75 * 4
 
     defword "COLD", COLD
     .word LIT, eval_words, EVALUATE
