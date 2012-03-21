@@ -1553,8 +1553,12 @@ QUOTE_CHARS:
     .word FETCH, BRANCH, 1b - .
 2:  .word SWAP, DROP, EXIT
 
+    defword "(.CSPACE)", XCSPACE
+    .word LIT, ',', EMIT, SPACE, EXIT
+
     defword "(.WORD-FLAGS)", XWORD_FLAGS
-    .word TONAME, FETCH, LIT, 0xc0, AND, LIT, ',', EMIT, SPACE, DOT, EXIT
+    .word TONAME, FETCH, LIT, 0xc0, AND, QDUP, ZBRANCH, 1f - ., XCSPACE, DOT
+1:  .word EXIT
 
     defword "(.WORD-NAME)", XWORD_NAME
     .word LIT, '"', EMIT, TONAME, COUNT, LIT, 31, AND, TWODUP, TYPE
@@ -1562,16 +1566,17 @@ QUOTE_CHARS:
 1:  .ascii "\003\", "
 
     defword ".DOCOL", DOTDOCOL
-    .word LIT, 1f, COUNT, TYPE, DUP, XWORD_NAME, XWORD_FLAGS, CR, EXIT
-1:  .ascii "\014    defword "
+    .word LIT, 1f, COUNT, TYPE, DUP, XWORD_NAME, XWORD_FLAGS, LIT, 2f, COUNT, TYPE, EXIT
+1:  .ascii "\015\n    defword "
+2:  .ascii "\014\n    .word "
 
     defword ".DOVAR", DOTDOVAR
     .word LIT, 1f, COUNT, TYPE, XWORD_NAME, CR, EXIT
-1:  .ascii "\013    defvar "
+1:  .ascii "\014\n    defvar "
 
     defword ".DOCON", DOTDOCON
-    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, LIT, ',', EMIT, SPACE, DUP, CELL, ADD, FETCH, DOT, CR, EXIT
-1:  .ascii "\015    defconst "
+    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, XCSPACE, DUP, CELL, ADD, FETCH, DOT, CR, EXIT
+1:  .ascii "\016\n    defconst "
 
     defword ".WORD", DOTWORD
     .word DUP, DUP, FETCH, CELL, SUB, OVER, NEQU, ZBRANCH, print_code - .
@@ -1616,9 +1621,13 @@ print_label_dodoes:
     .align 2
 
     defword "SEE", SEE
-    .word BL, WORD, FIND, ZBRANCH, 3f - .
+    .word LIT, 0, BL, WORD, FIND, ZBRANCH, 3f - .
     .word DUP, TOLINK, NEXT_WORD
-1:  .word OVER, TWODUP, NEQU, ZBRANCH, 2f - .
+1:  .word ROT, DUP, ZBRANCH, 4f - .
+    .word XCSPACE, BRANCH, 5f - .
+4:  .word DROP, LIT, -1
+5:  .word ROTROT
+    .word OVER, TWODUP, NEQU, ZBRANCH, 2f - .
     .word DOTWORD, DUP, ZBRANCH, 2f - .
     .word ROT, ADD, SWAP
     .word BRANCH, 1b - .
