@@ -1558,25 +1558,32 @@ QUOTE_CHARS:
     .word DUP, LIT, BRANCH, NEQU, ZBRANCH, print_branch - .
     .word DUP, LIT, ZBRANCH, NEQU, ZBRANCH, print_zbranch - .
     .word DUP, LIT, LIT, NEQU, ZBRANCH, print_literal - .
+    .word DUP, LIT, XDOES, NEQU, ZBRANCH, print_xdoes - .
     .word TONAME, COUNT, LIT, 31, AND, TYPE, SPACE, TWODROP, CELL, EXIT
 print_code:
     .word DROP, LIT, print_label_code, LIT, 4, TYPE, SPACE, DROP, LIT, 0, EXIT
 print_docol:
     .word DROP, LIT, ':', EMIT, SPACE, TWODROP, CELL, EXIT
 print_branch:
-    .word DROP, LIT, print_label_branch, LIT, 6, TYPE, SPACE, CELL, ADD, FETCH, NIP, CELL, DIV, DOT, LIT, 2, CELLS, EXIT
+    .word DROP, LIT, print_label_branch, COUNT, TYPE, SPACE, CELL, ADD, FETCH, NIP, CELL, DIV, DOT, LIT, 2, CELLS, EXIT
 print_zbranch:
-    .word DROP, LIT, print_label_zbranch, LIT, 7, TYPE, SPACE, CELL, ADD, FETCH, NIP, CELL, DIV, DOT, LIT, 2, CELLS, EXIT
+    .word DROP, LIT, print_label_zbranch, COUNT, TYPE, SPACE, CELL, ADD, FETCH, NIP, CELL, DIV, DOT, LIT, 2, CELLS, EXIT
 print_literal:
-    .word DROP, LIT, print_label_lit, LIT, 3, TYPE, SPACE, CELL, ADD, FETCH, DOT, DROP, LIT, 2, CELLS, EXIT
+    .word DROP, LIT, print_label_lit, COUNT, TYPE, SPACE, CELL, ADD, FETCH, DOT, DROP, LIT, 2, CELLS, EXIT
+print_xdoes:
+    .word TONAME, COUNT, TYPE, SPACE
+    .word CELL, ADD, DUP, FETCH, DOT, CELL, ADD, FETCH, DOT, LIT, print_label_dodoes, COUNT, TYPE, SPACE
+    .word DROP, LIT, 4, CELLS, EXIT
 print_label_code:
-    .ascii "CODE"
+    .ascii "\004CODE"
 print_label_lit:
-    .ascii "LIT"
+    .ascii "\003LIT"
 print_label_branch:
-    .ascii "BRANCH"
+    .ascii "\006BRANCH"
 print_label_zbranch:
-    .ascii "ZBRANCH"
+    .ascii "\007ZBRANCH"
+print_label_dodoes:
+    .ascii "\013DODOES + 1"
     .align 2
 
     defword "SEE", SEE
