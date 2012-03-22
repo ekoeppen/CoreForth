@@ -1610,8 +1610,8 @@ print_literal:
 print_no_xt:
     .word DOT, DROP, LIT, 2, CELLS, EXIT
 print_xdoes:
-    .word TONAME, COUNT, TYPE, SPACE
-    .word CELL, ADD, DUP, FETCH, DOT, CELL, ADD, FETCH, DOT, LIT, print_label_dodoes, COUNT, TYPE
+    .word TONAME, COUNT, DOTQUOTED, XCSPACE
+    .word CELL, ADD, DUP, FETCH, DOT, XCSPACE, CELL, ADD, FETCH, DOT, XCSPACE, LIT, print_label_dodoes, COUNT, TYPE
     .word DROP, LIT, 4, CELLS, EXIT
 print_xsquote:
     .word DOTSQUOTE, EXIT
