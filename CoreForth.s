@@ -1382,18 +1382,8 @@ noskip_delim:
     .word HERE, INCR, SWAP, CMOVE
     .word HERE, EXIT
 
-    defcode "LINK>", FROMLINK
-    pop {r0}
-    add r0, r0, #4      @ skip link pointer
-    ldrb r1, [r0]       @ load flags+len
-    add r0, r0, #1      @ skip flags+len bytes
-    and r1, r1, #F_LENMASK  @ mask out flags
-    add r0, r0, r1      @ skip name
-    add r0, r0, #3      @ align to 4-byte boundary
-    mvn r2, #3
-    and r0, r2
-    push {r0}
-    NEXT
+    defword "LINK>", FROMLINK
+    .word CELL, ADD, DUP, FETCHBYTE, LIT, F_LENMASK, AND, CHAR, ADD, ADD, ALIGNED, EXIT
 
     defcode ">NAME", TONAME
     pop {r0}
@@ -1604,7 +1594,7 @@ QUOTE_CHARS:
     .word DUP, LIT, XSQUOTE, NEQU, ZBRANCH, print_xsquote - .
     .word TONAME, COUNT, LIT, 31, AND, DOTQUOTED, TWODROP, CELL, EXIT
 print_code:
-    .word DROP, LIT, print_label_code, LIT, 4, TYPE, SPACE, DROP, LIT, 0, EXIT
+    .word DROP, LIT, print_label_code, COUNT, TYPE, SPACE, TWODROP, LIT, 0, EXIT
 print_docol:
     .word DROP, DOTDOCOL, DROP, CELL, EXIT
 print_dovar:
@@ -1638,8 +1628,7 @@ print_label_dodoes:
     .ascii "\013DODOES + 1"
     .align 2
 
-    defword "SEE", SEE
-    .word BL, WORD, FIND, ZBRANCH, 3f - .
+    defword "(SEE)", XSEE
     .word DUP, TOLINK, NEXT_WORD
     .word OVER, DOTWORD, DUP, ZBRANCH, 2f - .
     .word ROT, ADD, SWAP
@@ -1649,7 +1638,15 @@ print_label_dodoes:
     .word TWODUP, NEQU, ZBRANCH, 2f - .
     .word XCSPACE, BRANCH, 1b - .
 2:  .word TWODROP
-3:  .word DROP, EXIT
+    .word CR, EXIT
+
+    defword "SEE", SEE
+    .word BL, WORD, FIND, ZBRANCH, 3f - .
+    .word XSEE
+3:  .word EXIT
+
+    defword "SEE-RANGE", SEE_RANGE
+    .word DUP, XSEE, TOLINK, FETCH, FROMLINK, TWODUP, EQU, ZBRANCH, -0x20 , TWODROP, EXIT
 
     defword "RELOCATE", RELOCATE
 /*: RELOCATE   ( start end --  )
