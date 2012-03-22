@@ -1442,7 +1442,6 @@ interpret_eol:
     .word DROP, DUP, DOT, SPACE, COUNT, TYPE, LIT, '?', EMIT, CR, EXIT
 
     defword "FORGET", FORGET
-    /* BL WORD DROP FIND DROP >LINK @ LATEST ! */
     .word BL, WORD, FIND, DROP, TOLINK, FETCH, LATEST, STORE, EXIT
 
     defword "HIDE", HIDE
@@ -1461,7 +1460,6 @@ interpret_eol:
     .word LIT, -1, STATE, STORE, EXIT
 
     defword ":", COLON
-    /* CREATE HIDE ] ' DOCOL HERE CELL - ! */
     .word CREATE, HIDE, RBRACKET, LIT, DOCOL, HERE, CELL, SUB, STORE, EXIT
 
     defword ";", SEMICOLON, F_IMMED
@@ -1572,7 +1570,7 @@ QUOTE_CHARS:
 2:  .ascii "\014\n    .word "
 
     defword ".DOVAR", DOTDOVAR
-    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, CR, DOTS, EXIT
+    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, CR, EXIT
 1:  .ascii "\014\n    defvar "
 
     defword ".DOCON", DOTDOCON
