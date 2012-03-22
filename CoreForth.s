@@ -1738,6 +1738,32 @@ interbyte:
 .endif
 
 @ ---------------------------------------------------------------------
+@ -- Symbol aliases ---------------------------------------------------
+
+    .set PLUS, ADD
+    .set MINUS, SUB
+    .set SZ, TOS
+    .set RZ, RTOS
+    .set LPARENSOURCERPAREN, XSOURCE
+    .set SOURCENUM, SOURCECOUNT
+    .set GTSOURCE, SOURCEINDEX
+    .set GTR, TOR
+    .set RGT, FRROM
+    .set LPARENSQUOTRPAREN, XSQUOTE
+    .set LPARENLPARENBLOCKRPARENRPAREN, XXBLOCK
+    .set GTTIB, TIBINDEX
+    .set CMOVEGT, CMOVEUP
+    .set CSTORE, STOREBYTE
+    .set CFETCH, FETCHBYTE
+    .set PLUSSTORE, ADDSTORE
+    .set MINUSSTORE, SUBSTORE
+    .set ONEPLUS, INCR
+    .set ONEMINUS, DECR
+    .set MINUSROT, ROTROT
+    .set NUMTIB, TIBSIZE
+
+@ ---------------------------------------------------------------------
 
     .set last_core_word, link
     .set end_of_core, .
+
