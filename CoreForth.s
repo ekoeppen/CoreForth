@@ -952,7 +952,7 @@ fill_done:
     push {r0}
     NEXT
 
-    defcode "ACCEPT", ACCEPT
+    defcode "ACCEPT", SIMPLE_ACCEPT
     pop {r1}
     pop {r0}
     bl readline
@@ -1729,9 +1729,7 @@ interbyte:
 @ ---------------------------------------------------------------------
 @ -- Precompiled words ------------------------------------------------
 
-.ifndef PRECOMP_CORE
     .include "CoreForth.precomp.s"
-.endif
 
 @ ---------------------------------------------------------------------
 @ -- Symbol aliases ---------------------------------------------------

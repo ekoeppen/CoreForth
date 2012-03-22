@@ -634,11 +634,7 @@ DISP_FONT:
     .word LIT, eval_words, EVALUATE
 
     defword "(COLD-PRECOMPILE)", XCOLD_PRECOMPILE
-.ifdef PRECOMP_CORE
-    .word PRECOMP_CORE_BEGIN
-.else
     .word PRECOMP_BEGIN
-.endif
     .word LIT, eval_words, EVALUATE
     .word PRECOMP_END
 
@@ -654,17 +650,11 @@ DISP_FONT:
     .set end_of_rom, .
 
 eval_words:
-    .ifdef PRECOMP_CORE
-        .include "CoreForth.gen.s"
-    .else
-        .include "lm3s811.gen.s"
-    .endif
-
+    .include "lm3s811.gen.s"
 .else
 
-    .ifndef PRECOMP_CORE
-        .include "lm3s811.precomp.s"
-    .endif
+    .include "lm3s811.precomp.s"
+
     .set last_rom_word, link
     .set end_of_rom, .
 
