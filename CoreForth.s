@@ -1505,6 +1505,7 @@ QUOTE_CHARS:
     .ascii "~\005TILDE"
     .ascii "!\005STORE"
     .ascii "@\005FETCH"
+    .ascii "\"\004QUOT"
     .ascii "#\003NUM"
     .ascii "$\003VAL"
     .ascii "%\007PERCENT"
@@ -1569,13 +1570,27 @@ QUOTE_CHARS:
     .word LIT, 1f, COUNT, TYPE, DOTQUOTED, EXIT
 1:  .ascii "\003\", "
 
+    defword ".SQUOTE-ASCII", XDOTSQUOTE_ASCII
+    .word TONAME, COUNT, DOTQUOTED
+    .word SWAP, CELL, ADD, COUNT, DUP, LIT, 1f, COUNT, TYPE, DUP, DOT, CR
+    .word LIT, 2f, COUNT, TYPE, ROTROT, TYPE, LIT, '"', EMIT, ROTROT, DROP, SWAP, CELL, ADD, EXIT
+1:  .ascii "\013\n    .word "
+2:  .ascii "\014    .ascii \""
+
+    defword ".SQUOTE", DOTSQUOTE
+    .word TONAME, COUNT, DOTQUOTED, XCSPACE, DROP, CELL, ADD, DUP, FETCHBYTE, ALIGNED, DUP, ROTROT
+1:  .word SWAP, DUP, FETCH, DOT, OVER, CELL, NEQU, ZBRANCH, 2f - ., XCSPACE
+2:  .word CELL, ADD, SWAP, CELL, SUB, DUP, ZEQU, ZBRANCH, 1b - .
+    .word TWODROP, LIT, 2, CELLS, ADD, EXIT
+@    .word LIT, 2f, COUNT, TYPE, ROTROT, TYPE, LIT, '"', EMIT, ROTROT, DROP, SWAP, CELL, ADD, EXIT
+
     defword ".DOCOL", DOTDOCOL
     .word LIT, 1f, COUNT, TYPE, DUP, XWORD_NAME, XWORD_FLAGS, LIT, 2f, COUNT, TYPE, EXIT
 1:  .ascii "\015\n    defword "
 2:  .ascii "\014\n    .word "
 
     defword ".DOVAR", DOTDOVAR
-    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, CR, EXIT
+    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, CR, DOTS, EXIT
 1:  .ascii "\014\n    defvar "
 
     defword ".DOCON", DOTDOCON
@@ -1593,15 +1608,16 @@ QUOTE_CHARS:
     .word DUP, LIT, ZBRANCH, NEQU, ZBRANCH, print_zbranch - .
     .word DUP, LIT, LIT, NEQU, ZBRANCH, print_literal - .
     .word DUP, LIT, XDOES, NEQU, ZBRANCH, print_xdoes - .
+    .word DUP, LIT, XSQUOTE, NEQU, ZBRANCH, print_xsquote - .
     .word TONAME, COUNT, LIT, 31, AND, DOTQUOTED, TWODROP, CELL, EXIT
 print_code:
     .word DROP, LIT, print_label_code, LIT, 4, TYPE, SPACE, DROP, LIT, 0, EXIT
 print_docol:
     .word DROP, DOTDOCOL, DROP, CELL, EXIT
 print_dovar:
-    .word DROP, DOTDOVAR, DROP, LIT, 0,  EXIT
+    .word DROP, DOTDOVAR, DROP, LIT, 0, EXIT
 print_docon:
-    .word DROP, DOTDOCON, DROP, LIT, 0,  EXIT
+    .word DROP, DOTDOCON, DROP, LIT, 0, EXIT
 print_branch:
     .word DROP, LIT, print_label_branch, COUNT, TYPE, XCSPACE, CELL, ADD, FETCH, NIP, DOT, LIT, 2, CELLS, EXIT
 print_zbranch:
@@ -1615,6 +1631,8 @@ print_xdoes:
     .word TONAME, COUNT, TYPE, SPACE
     .word CELL, ADD, DUP, FETCH, DOT, CELL, ADD, FETCH, DOT, LIT, print_label_dodoes, COUNT, TYPE
     .word DROP, LIT, 4, CELLS, EXIT
+print_xsquote:
+    .word DOTSQUOTE, EXIT
 print_label_code:
     .ascii "\004CODE"
 print_label_lit:
