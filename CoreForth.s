@@ -1535,8 +1535,10 @@ QUOTE_CHARS:
 4:  .word TWODROP, EXIT
 
     defword "XT?", XTQ
+    .word DUP, LIT, 0x400, LIT, 0x3000000, WITHIN, ZBRANCH, 2f - .
     .word TOLINK, LATEST
 1:  .word FETCH, TWODUP, EQU, OVER, ZEQU, OR, ZBRANCH, 1b - ., NIP, EXIT
+2:  .word DROP, LIT, 0, EXIT
 
     defword "NEXT_WORD", NEXT_WORD
     .word LATEST, FETCH
