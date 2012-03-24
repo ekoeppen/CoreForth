@@ -40,6 +40,9 @@ clean:
 run: lm3s811.elf
 	qemu-system-arm -M lm3s811evb -serial stdio -kernel lm3s811.elf; stty sane
 
+run_text: lm3s811.elf
+	qemu-system-arm -M lm3s811evb -nographic -kernel lm3s811.elf; stty sane
+
 precomp: precomp.bin
 	qemu-system-arm -M lm3s811evb -serial stdio -kernel precomp.elf > precomp.s; stty sane
 
