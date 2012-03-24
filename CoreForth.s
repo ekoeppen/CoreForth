@@ -982,18 +982,15 @@ dump_end:
 
     defword "SCAN", SCAN
     .word TOR
-1:
-    .word OVER, FETCHBYTE, RFETCH, NEQU, OVER, ZGT, AND, ZBRANCH, 2f - .
+1:  .word OVER, FETCHBYTE, RFETCH, NEQU, OVER, ZGT, AND, ZBRANCH, 2f - .
     .word LIT, 1, TRIMSTRING, BRANCH, 1b - .
-2:
-    .word RDROP, EXIT
+2:  .word RDROP, EXIT
 
     defword "?SIGN", ISSIGN
     .word OVER, FETCHBYTE, LIT, 0x2c, SUB, DUP, ABS
     .word LIT, 1, EQU, AND, DUP, ZBRANCH, 1f - .
     .word INCR, TOR, LIT, 1, TRIMSTRING, RFROM
-1:
-    .word EXIT
+1:  .word EXIT
 
     defword "DIGIT?", ISDIGIT
     .word DUP, LIT, '9', GT, LIT, 0x100, AND, ADD
@@ -1535,9 +1532,9 @@ QUOTE_CHARS:
 4:  .word TWODROP, EXIT
 
     defword "VALID-ADDR?", ISVALIDADDR
-    .word DUP, LIT, 0x400, LIT, last_word, WITHIN, ZBRANCH, 1f - .
-    .word LIT, ram_start, LIT, ram_top, WITHIN, EXIT
-1:  .word DROP, LIT, 0, EXIT
+    .word DUP, LIT, 0x400, LIT, last_word, WITHIN, QDUP, ZBRANCH, 1f - .
+    .word NIP, EXIT
+1:  .word LIT, ram_start, LIT, ram_top, WITHIN, EXIT
     
 
     defword "XT?", XTQ
@@ -1605,32 +1602,21 @@ QUOTE_CHARS:
     .word DUP, LIT, DOVAR, NEQU, ZBRANCH, print_dovar - .
     .word DUP, LIT, DOCON, NEQU, ZBRANCH, print_docon - .
     .word DUP, LIT, DOCONSTANT, NEQU, ZBRANCH, print_docon - .
-    .word DUP, LIT, BRANCH, NEQU, ZBRANCH, print_branch - .
-    .word DUP, LIT, ZBRANCH, NEQU, ZBRANCH, print_zbranch - .
-    .word DUP, LIT, LIT, NEQU, ZBRANCH, print_literal - .
     .word DUP, LIT, XDOES, NEQU, ZBRANCH, print_xdoes - .
     .word DUP, LIT, XSQUOTE, NEQU, ZBRANCH, print_xsquote - .
-@    .word DUP, FETCH, LIT, 0x1004f8df, NEQU, ZBRANCH, print_dodoes - .
+    .word DUP, ISVALIDADDR, ZBRANCH, 1f - .
+    .word DUP, FETCH, LIT, 0x1004f8df, NEQU, ZBRANCH, print_dodoes - .
     .word DUP, XTQ, ZBRANCH, 1f - .
     .word TONAME, COUNT, LIT, 31, AND, DOTQUOTED, TWODROP, CELL, EXIT
 1:  .word UDOT, TWODROP, CELL, EXIT
 print_code:
-    .word DROP, LIT, print_label_code, COUNT, TYPE, SPACE, DROP, CELL, EXIT, LIT, 0, EXIT
+    .word DROP, LIT, print_label_code, COUNT, TYPE, DROP, CELL, EXIT
 print_docol:
     .word DROP, DOTDOCOL, DROP, CELL, EXIT
 print_dovar:
     .word DROP, DOTDOVAR, DROP, LIT, 0, EXIT
 print_docon:
     .word DROP, DOTDOCON, DROP, LIT, 0, EXIT
-print_branch:
-    .word DROP, LIT, print_label_branch, COUNT, TYPE, XCSPACE, CELL, ADD, FETCH, NIP, DOT, LIT, 2, CELLS, EXIT
-print_zbranch:
-    .word DROP, LIT, print_label_zbranch, COUNT, TYPE, XCSPACE, CELL, ADD, FETCH, NIP, DOT, LIT, 2, CELLS, EXIT
-print_literal:
-    .word DROP, LIT, print_label_lit, COUNT, TYPE, XCSPACE, CELL, ADD, FETCH, DUP, XTQ, ZBRANCH, print_no_xt - .
-    .word TONAME, COUNT, LIT, 31, AND, DOTQUOTED, DROP, LIT, 2, CELLS, EXIT
-print_no_xt:
-    .word DOT, DROP, LIT, 2, CELLS, EXIT
 print_xdoes:
     .word TONAME, COUNT, DOTQUOTED
     .word LIT, print_xdoes_xt, COUNT, TYPE, DUP, ANYTOLINK, CELL, ADD, COUNT, DOTQUOTED
