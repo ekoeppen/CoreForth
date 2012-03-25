@@ -1548,7 +1548,7 @@ QUOTE_CHARS:
 1:  .word FETCH, TWODUP, GT, ZBRANCH, 1b - .
     .word NIP, EXIT
 
-    defword "NEXT_WORD", NEXT_WORD
+    defword "NEXT-WORD", NEXT_WORD
     .word LATEST, FETCH
     .word TWODUP, EQU, ZBRANCH, 1f - .
     .word TWODROP, HERE, EXIT
@@ -1614,9 +1614,9 @@ print_code:
 print_docol:
     .word DROP, DOTDOCOL, DROP, CELL, EXIT
 print_dovar:
-    .word DROP, DOTDOVAR, DROP, LIT, 0, EXIT
+    .word DROP, DOTDOVAR, TWODROP, LIT, 0, EXIT
 print_docon:
-    .word DROP, DOTDOCON, DROP, LIT, 0, EXIT
+    .word DROP, DOTDOCON, TWODROP, LIT, 0, EXIT
 print_xdoes:
     .word TONAME, COUNT, DOTQUOTED
     .word LIT, print_xdoes_xt, COUNT, TYPE, DUP, ANYTOLINK, CELL, ADD, COUNT, DOTQUOTED
@@ -1661,7 +1661,7 @@ print_xt_suffix:
 3:  .word EXIT
 
     defword "SEE-RANGE", SEE_RANGE
-    .word DUP, XSEE, TOLINK, FETCH, FROMLINK, TWODUP, EQU, ZBRANCH, -0x20 , TWODROP, EXIT
+1:  .word DUP, XSEE, TOLINK, FETCH, FROMLINK, TWODUP, EQU, ZBRANCH, 1b - ., TWODROP, EXIT
 
     defword "RELOCATE", RELOCATE
 /*: RELOCATE   ( start end --  )
