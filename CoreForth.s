@@ -1583,7 +1583,7 @@ QUOTE_CHARS:
 1:  .ascii "\013\n    .word "
 
     defword ".DOVAR", DOTDOVAR
-    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, CR, EXIT
+    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, XCSPACE, TWODUP, SUB, CELL, SUB, DOT, CR, EXIT
 1:  .ascii "\014\n    defvar "
 
     defword ".DOCON", DOTDOCON
