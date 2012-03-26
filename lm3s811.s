@@ -520,8 +520,7 @@ uart0_key_handler:
     push {r0}
     NEXT
 
-    defconst "DISP-FONT", _DISP_FONT, DISP_FONT
-DISP_FONT:
+    defdata "DISP-FONT", DISP_FONT
     .byte 0x00, 0x00, 0x00, 0x00, 0x00   @ " "
     .byte 0x00, 0x00, 0x4f, 0x00, 0x00   @ !
     .byte 0x00, 0x07, 0x00, 0x07, 0x00   @ "

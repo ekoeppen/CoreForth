@@ -82,6 +82,10 @@ code_\label :
     .set compiled_here, compiled_here + \size
     .endm
 
+    .macro defdata name, label
+    defword \name,\label,,DODATA
+    .endm
+
     .macro defconst name, label, value
     .align 2, 0
     .global name_\label
@@ -127,6 +131,11 @@ DOCOL:
     NEXT
 
 DOVAR:
+    add r1, r0, #4
+    push {r1}
+    NEXT
+
+DODATA:
     add r1, r0, #4
     push {r1}
     NEXT
@@ -1264,14 +1273,20 @@ is_positive:
     .word COMMA
     .word LIT, DODOES + 1, COMMA, EXIT
 
-    defword "CREATE", CREATE
+    defword "(CREATE)", XCREATE
     .word HERE, ALIGNED, DP, STORE
     .word LATEST, FETCH
-    .word HERE, LATEST, STORE       @ update latest
-    .word COMMALINK                 @ set link
-    .word BL, WORD, FETCHBYTE, INCR, ALIGNED, ALLOT  @ set name field
-    .word LIT, DOVAR, COMMAXT       @ set code field
+    .word HERE, LATEST, STORE
+    .word COMMALINK
+    .word BL, WORD, FETCHBYTE, INCR, ALIGNED, ALLOT
     .word EXIT
+
+    defword "CREATE", CREATE
+    .word XCREATE, LIT, DOVAR, COMMAXT
+    .word EXIT
+
+    defword "DATA", DATA
+    .word XCREATE, LIT, DODATA, COMMAXT, EXIT
 
     defword "VARIABLE", VARIABLE
     .word CREATE, COMMA, CELL, ALLOT, EXIT
@@ -1539,8 +1554,8 @@ QUOTE_CHARS:
 
     defword "XT?", XTQ
     .word DUP, ISVALIDADDR, ZBRANCH, 2f - .
-    .word TOLINK, LATEST
-1:  .word FETCH, TWODUP, EQU, OVER, ZEQU, OR, ZBRANCH, 1b - ., NIP, EXIT
+    .word LATEST
+1:  .word FETCH, TWODUP, FROMLINK, EQU, OVER, ZEQU, OR, ZBRANCH, 1b - ., NIP, ZNEQU, EXIT
 2:  .word DROP, LIT, 0, EXIT
 
     defword "ANY>LINK", ANYTOLINK
@@ -1590,6 +1605,11 @@ QUOTE_CHARS:
     .word LIT, 1f, COUNT, TYPE, XWORD_NAME, XCSPACE, DUP, CELL, ADD, FETCH, DOT, CR, EXIT
 1:  .ascii "\016\n    defconst "
 
+    defword ".DODATA", DOTDODATA
+    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, LIT, 2f, COUNT, TYPE, EXIT
+1:  .ascii "\015\n    defdata "
+2:  .ascii "\013\n    .word "
+
     defword ".DOTDODOES", DOTDODOES
     .word SWAP, DOTDOCOL_HEADER, XCSPACE, ANYTOLINK, CELL, ADD, COUNT, DOTQUOTED
     .word LIT, 1f, COUNT, TYPE, LIT, 0, EXIT
@@ -1598,13 +1618,14 @@ QUOTE_CHARS:
     defword ".WORD", DOTWORD
     .word DUP, DUP, FETCH, CELL, SUB, OVER, NEQU, ZBRANCH, print_code - .
     .word DUP, FETCH
+    .word DUP, ISVALIDADDR, ZBRANCH, 1f - .
     .word DUP, LIT, DOCOL, NEQU, ZBRANCH, print_docol - .
     .word DUP, LIT, DOVAR, NEQU, ZBRANCH, print_dovar - .
     .word DUP, LIT, DOCON, NEQU, ZBRANCH, print_docon - .
+    .word DUP, LIT, DODATA, NEQU, ZBRANCH, print_dodata - .
     .word DUP, LIT, DOCONSTANT, NEQU, ZBRANCH, print_docon - .
     .word DUP, LIT, XDOES, NEQU, ZBRANCH, print_xdoes - .
     .word DUP, LIT, XSQUOTE, NEQU, ZBRANCH, print_xsquote - .
-    .word DUP, ISVALIDADDR, ZBRANCH, 1f - .
     .word DUP, FETCH, LIT, 0x1004f8df, NEQU, ZBRANCH, print_dodoes - .
     .word DUP, XTQ, ZBRANCH, 1f - .
     .word TONAME, COUNT, LIT, 31, AND, DOTQUOTED, TWODROP, CELL, EXIT
@@ -1617,6 +1638,8 @@ print_dovar:
     .word DROP, DOTDOVAR, TWODROP, LIT, 0, EXIT
 print_docon:
     .word DROP, DOTDOCON, TWODROP, LIT, 0, EXIT
+print_dodata:
+    .word DROP, DOTDODATA, DROP, CELL, EXIT
 print_xdoes:
     .word TONAME, COUNT, DOTQUOTED
     .word LIT, print_xdoes_xt, COUNT, TYPE, DUP, ANYTOLINK, CELL, ADD, COUNT, DOTQUOTED
