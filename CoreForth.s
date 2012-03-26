@@ -730,13 +730,13 @@ fill_done:
     push {r0}
     NEXT
 
-    defcode "2*", TWOSTAR
+    defcode "2*", TWOMUL
     ldr r0, [sp]
     lsl r0, r0, #1
     str r0, [sp]
     NEXT
 
-    defcode "2/", TWOSLASH
+    defcode "2/", TWODIV
     ldr r0, [sp]
     asr r0, r0, #1
     str r0, [sp]
@@ -911,9 +911,12 @@ fill_done:
     defcode "CR", CR
     mov r0, #13
     bl putchar
-    mov r0, #10
+1:  mov r0, #10
     bl putchar
     NEXT
+
+    defcode "LF", LF
+    b 1b
 
     defcode "BL", BL
     mov r0, #32
@@ -1575,8 +1578,7 @@ QUOTE_CHARS:
     .word LIT, ',', EMIT, SPACE, EXIT
 
     defword "(.WORD-FLAGS)", XWORD_FLAGS
-    .word TONAME, FETCH, LIT, 0xc0, AND, QDUP, ZBRANCH, 1f - ., XCSPACE, DOT
-1:  .word EXIT
+    .word TONAME, FETCH, LIT, 0xc0, AND, XCSPACE, DOT, EXIT
 
     defword "(.WORD-NAME)", XWORD_NAME
     .word LIT, '"', EMIT, TONAME, COUNT, LIT, 31, AND, TWODUP, TYPE
@@ -1598,11 +1600,11 @@ QUOTE_CHARS:
 1:  .ascii "\013\n    .word "
 
     defword ".DOVAR", DOTDOVAR
-    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, XCSPACE, TWODUP, SUB, CELL, SUB, DOT, CR, EXIT
+    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, XCSPACE, TWODUP, SUB, LIT, 2, CELLS, SUB, DOT, LF, EXIT
 1:  .ascii "\014\n    defvar "
 
     defword ".DOCON", DOTDOCON
-    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, XCSPACE, DUP, CELL, ADD, FETCH, DOT, CR, EXIT
+    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, XCSPACE, DUP, CELL, ADD, FETCH, DOT, LF, EXIT
 1:  .ascii "\016\n    defconst "
 
     defword ".DODATA", DOTDODATA
@@ -1612,8 +1614,8 @@ QUOTE_CHARS:
 
     defword ".DOTDODOES", DOTDODOES
     .word SWAP, DOTDOCOL_HEADER, XCSPACE, ANYTOLINK, CELL, ADD, COUNT, DOTQUOTED
-    .word LIT, 1f, COUNT, TYPE, LIT, 0, EXIT
-1:  .ascii "\004_XT\n"
+    .word LIT, 1f, COUNT, TYPE, EXIT
+1:  .ascii "\016_XT\n    .word "
 
     defword ".WORD", DOTWORD
     .word DUP, DUP, FETCH, CELL, SUB, OVER, NEQU, ZBRANCH, print_code - .
@@ -1649,7 +1651,7 @@ print_xdoes:
 print_xsquote:
     .word DOTSQUOTE, EXIT
 print_dodoes:
-    .word DOTDODOES, EXIT
+    .word DOTDODOES, DROP, CELL, EXIT
 print_label_code:
     .ascii "\004CODE"
 print_label_lit:
@@ -1676,7 +1678,7 @@ print_xt_suffix:
     .word TWODUP, NEQU, ZBRANCH, 2f - .
     .word XCSPACE, BRANCH, 1b - .
 2:  .word TWODROP
-    .word CR, EXIT
+    .word LF, EXIT
 
     defword "SEE", SEE
     .word BL, WORD, FIND, ZBRANCH, 3f - .
@@ -1686,59 +1688,11 @@ print_xt_suffix:
     defword "SEE-RANGE", SEE_RANGE
 1:  .word DUP, XSEE, TOLINK, FETCH, FROMLINK, TWODUP, EQU, ZBRANCH, 1b - ., TWODROP, EXIT
 
-    defword "RELOCATE", RELOCATE
-/*: RELOCATE   ( start end --  )
-    
-    SWAP DUP ROMTOP - >R   SWAP OVER -
-    FIXUPS @ DUP CELL + SWAP @ 0 DO
-        DUP I CELLS + @ DUP @ R@ - SWAP !
-    LOOP DROP RDROP
-    ROT >R 
-    0 DO
-        DUP I + DUP R@ = IF CR S"    .set link, ." TYPE CR S"    .byte " TYPE 
-        ELSE I 16 MOD 0= IF CR S"    .byte " TYPE ELSE S" , " TYPE THEN THEN
-        C@ .U
-    LOOP RDROP
-    BYE ;
- */
-    .word SWAP, DUP
-.ifdef PRECOMP_CORE
-    .word CORETOP
-.else
-    .word ROMTOP
-.endif
-    .word SUB, TOR, SWAP, OVER, SUB
-    .word FIXUPS, FETCH, DUP, CELL, ADD, SWAP, FETCH, LIT, 0x0, XDO
-1:  .word    DUP, INDEX, CELLS, ADD, FETCH, DUP, FETCH, RFETCH, SUB, SWAP, STORE
-    .word XLOOP, ZBRANCH, 1b - ., DROP, RDROP
-    .word ROT, TOR, LIT, 0x0, XDO
-2:  .word    DUP, INDEX, ADD, DUP, RFETCH, EQU, ZBRANCH, 4f - ., LIT, set_link, LIT, line_prefix - set_link, TYPE, BRANCH, 6f - .
-4:  .word    INDEX, LIT, 0x10, MOD, ZEQU, ZBRANCH, 3f - ., LIT, line_prefix, LIT, interbyte - line_prefix, TYPE, BRANCH, 6f - .
-3:  .word    LIT, interbyte, LIT, 5f - interbyte, TYPE
-6:  .word    FETCHBYTE, UDOT
-    .word XLOOP, ZBRANCH, 2b - .
-    .word LIT, 10, EMIT, RDROP, BYE
-set_link:
-    .ascii "\n.set link, .\n    .byte "
-line_prefix:
-    .ascii "\n    .byte "
-interbyte:
-    .ascii ", "
-5:  .align 2, 0
-
-    defword "(PRECOMP-BEGIN)", XPRECOMP_BEGIN
-    .word LIT, 0x20001B00, FIXUPS, STORE, LIT, 0, FIXUPS, FETCH, STORE, HERE
-    .word EXIT
-
     defword "PRECOMP-BEGIN", PRECOMP_BEGIN
-    .word XPRECOMP_BEGIN, EXIT
-
-    defword "PRECOMP-CORE-BEGIN", PRECOMP_CORE_BEGIN
-    .word LATESTCORE, LATEST, STORE, XPRECOMP_BEGIN, EXIT
+    .word LATEST, FETCH, FROMLINK, EXIT
 
     defword "PRECOMP-END", PRECOMP_END
-    .word HERE, LATEST, FETCH, ROTROT, RELOCATE
-    .word EXIT
+    .word LATEST, FETCH, FROMLINK, SEE_RANGE, BYE
 
 @ ---------------------------------------------------------------------
 @ -- User variables ---------------------------------------------------
@@ -1798,6 +1752,11 @@ interbyte:
     .set STORECURSOR, SAVECURSOR
     .set FETCHCURSOR, RESTORECURSOR
     .set LPARENINTERPRETRPAREN, XINTERPRET
+    .set LPARENDORPAREN, XDO
+    .set LPARENLOOPRPAREN, XLOOP
+    .set LPARENDOESGTRPAREN, XDOES
+    .set I, INDEX
+    .set TWOSLASH, TWODIV
 
 @ ---------------------------------------------------------------------
 

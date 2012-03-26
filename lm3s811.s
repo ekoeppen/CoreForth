@@ -627,7 +627,8 @@ uart0_key_handler:
     defvar "SBUF-HEAD", SBUF_HEAD
     defvar "SBUF-TAIL", SBUF_TAIL
     defvar "IVT", IVT, 48 * 4
-    defvar "(I2C-DELAY)", XI2C_DELAY
+@    defvar "(I2C-DELAY)", XI2C_DELAY
+    defvar "(I2C-DELAY)", LPARENITWOC_DELAYRPAREN, 0x4 
 
     .ltorg
 
