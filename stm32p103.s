@@ -432,11 +432,15 @@ DISP_FONT:
 
     .ltorg
 
+    .include "stm32p103.precomp.s"
+    .word 0xffffffff
+
     .set last_rom_word, link
     .set end_of_rom, .
 
 eval_words:
     .include "stm32p103ram.gen.s"
+    .word 0xffffffff
 
     .set last_word, link
     .set data_start, compiled_here 

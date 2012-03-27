@@ -402,8 +402,6 @@ uart0_key_handler:
 
     .include "CoreForth.s"
 
-    .org 0x6000
-
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
 
@@ -650,7 +648,9 @@ uart0_key_handler:
     .set end_of_rom, .
 
 eval_words:
+    .include "CoreForth.gen.s"
     .include "lm3s811.gen.s"
+    .word 0xffffffff
 .else
 
     .include "lm3s811.precomp.s"
@@ -660,6 +660,7 @@ eval_words:
 
 eval_words:
     .include "lm3s811ram.gen.s"
+    .word 0xffffffff
 .endif
 
     .set last_word, link
