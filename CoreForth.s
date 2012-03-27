@@ -73,19 +73,6 @@ code_\label :
     @ parameter field follows
     .endm
 
-    .macro defvar name, label, size=4
-    defcode \name,\label
-    .set addr_\label, compiled_here
-    ldr r0, =addr_\label
-    push {r0}
-    NEXT
-    .set compiled_here, compiled_here + \size
-    .endm
-
-    .macro defdata name, label
-    defword \name,\label,,DODATA
-    .endm
-
     .macro defconst name, label, value
     .align 2, 0
     .global name_\label
@@ -100,8 +87,18 @@ name_\label :
     .global \label
 \label :
     .int DOCON
-addr_\label :
+constaddr_\label :
     .word \value
+    .endm
+
+    .macro defvar name, label, size=4
+    defconst \name,\label,compiled_here
+    .set addr_\label, compiled_here
+    .set compiled_here, compiled_here + \size
+    .endm
+
+    .macro defdata name, label
+    defword \name,\label,,DODATA
     .endm
 
 @ ---------------------------------------------------------------------
