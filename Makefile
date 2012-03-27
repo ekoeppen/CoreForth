@@ -9,14 +9,14 @@ all: stm32p103.bin lm3s811.bin
 .s.o:
 	arm-none-eabi-as -mcpu=cortex-m3 -o $@ $< 
 
-stm32p103.o: CoreForth.s CoreForth.gen.s stm32p103ram.gen.s
+stm32p103.o: CoreForth.s stm32p103ram.gen.s
 
-lm3s811.o: CoreForth.s CoreForth.gen.s lm3s811ram.gen.s lm3s811.gen.s
+lm3s811.o: CoreForth.s lm3s811ram.gen.s
 
 lm3s811.o: lm3s811.s
 	arm-none-eabi-as -mcpu=cortex-m3 -defsym USE_50MHZ=1 -o $@ $<
 
-precomp_lm3s811.o: lm3s811.s CoreForth.gen.s lm3s811.gen.s
+precomp_lm3s811.o: lm3s811.s CoreForth.gen.s editor.gen.s lm3s811.gen.s
 	arm-none-eabi-as -mcpu=cortex-m3 -defsym PRECOMPILE=1 -defsym USE_50MHZ=1 -o $@ $<
 
 stm32p103.elf: stm32p103.o

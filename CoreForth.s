@@ -1725,7 +1725,6 @@ print_xt_suffix:
     .set GTR, TOR
     .set RGT, FRROM
     .set LPARENSQUOTRPAREN, XSQUOTE
-    .set LPARENLPARENBLOCKRPARENRPAREN, XXBLOCK
     .set GTTIB, TIBINDEX
     .set CMOVEGT, CMOVEUP
     .set CSTORE, STOREBYTE
@@ -1745,6 +1744,8 @@ print_xt_suffix:
     .set LPARENDOESGTRPAREN, XDOES
     .set I, INDEX
     .set TWOSLASH, TWODIV
+    .set LTGT, NEQU
+    .set SLASHMOD, DIVMOD
 
 @ ---------------------------------------------------------------------
 

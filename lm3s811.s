@@ -650,6 +650,7 @@ uart0_key_handler:
 eval_words:
     .include "CoreForth.gen.s"
     .include "lm3s811.gen.s"
+    .include "editor.gen.s"
     .word 0xffffffff
 .else
 

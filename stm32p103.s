@@ -28,24 +28,24 @@
     .set RCC_AHBRSTR, 0x40021028
     .set RCC_CFGR2,   0x4002102c
 
-    .set NVIC,        0xe000e000
+    .set _NVIC,        0xe000e000
     .set NVIC_SETENA_BASE, 0x100
     .set NVIC_ACTIVE_BASE, 0x300
 
-    .set GPIOA,       0x40010800
-    .set GPIOB,       0x40010c00
-    .set GPIOC,       0x40011000
-    .set GPIOD,       0x40011400
-    .set GPIOE,       0x40011800
-    .set GPIOF,       0x40011c00
-    .set GPIOG,       0x40012000
-    .set GPIO_CRL,         0x000
-    .set GPIO_CRH,         0x004
-    .set GPIO_IDR,         0x008
-    .set GPIO_ODR,         0x00c
-    .set GPIO_BSRR,        0x010
-    .set GPIO_BRR,         0x014
-    .set GPIO_LCKR,        0x018
+    .set _GPIOA,       0x40010800
+    .set _GPIOB,       0x40010c00
+    .set _GPIOC,       0x40011000
+    .set _GPIOD,       0x40011400
+    .set _GPIOE,       0x40011800
+    .set _GPIOF,       0x40011c00
+    .set _GPIOG,       0x40012000
+    .set _GPIO_CRL,         0x000
+    .set _GPIO_CRH,         0x004
+    .set _GPIO_IDR,         0x008
+    .set _GPIO_ODR,         0x00c
+    .set _GPIO_BSRR,        0x010
+    .set _GPIO_BRR,         0x014
+    .set _GPIO_LCKR,        0x018
 
     .set STCTRL,      0xe000e010
     .set STRELOAD,    0xe000e014
@@ -104,7 +104,7 @@ init_board:
 .endif
     str r1, [r0]
 
-    @ enable clocks on all timers, UARTS, ADC, PWM, SSI and I2C and GPIO ports
+    @ enable clocks on all timers, UARTS, ADC, PWM, SSI and I2C and _GPIO ports
     ldr r0, =RCC_APB2ENR
     ldr r1, =0x4
     str r1, [r0]
@@ -115,8 +115,8 @@ init_board:
     mov r0, #32
     bl delay
 
-    @ enable pins on GPIOA
-    ldr r0, =(GPIOA + GPIO_CRL)
+    @ enable pins on _GPIOA
+    ldr r0, =(_GPIOA + _GPIO_CRL)
     ldr r1, =0x44444b44
     str r1, [r0]
 
@@ -283,34 +283,34 @@ adcomp_handler:
     defconst "RCC-AHBRSTR", RCCAHBRSTR, RCC_AHBRSTR
     defconst "RCC-CFGR2", RCCCFGR2, RCC_CFGR2
 
-    defconst "GPIOA", GPIO_A, GPIOA
-    defconst "GPIOB", GPIO_B, GPIOB
-    defconst "GPIOC", GPIO_C, GPIOC
-    defconst "GPIOD", GPIO_D, GPIOD
-    defconst "GPIOE", GPIO_E, GPIOE
+    defconst "GPIOA", GPIOA, _GPIOA
+    defconst "GPIOB", GPIOB, _GPIOB
+    defconst "GPIOC", GPIOC, _GPIOC
+    defconst "GPIOD", GPIOD, _GPIOD
+    defconst "GPIOE", GPIOE, _GPIOE
 
-    defword "GPIO-CRL", _GPIO_CRL, , DOOFFSET
-    .word GPIO_CRL
+    defword "_GPIO-CRL", GPIO_CRL, , DOOFFSET
+    .word _GPIO_CRL
 
-    defword "GPIO-CRH", _GPIO_CRH, , DOOFFSET
-    .word GPIO_CRH
+    defword "_GPIO-CRH", GPIO_CRH, , DOOFFSET
+    .word _GPIO_CRH
 
-    defword "GPIO-IDR", _GPIO_IDR, , DOOFFSET
-    .word GPIO_IDR
+    defword "_GPIO-IDR", GPIO_IDR, , DOOFFSET
+    .word _GPIO_IDR
 
-    defword "GPIO-ODR", _GPIO_ODR, , DOOFFSET
-    .word GPIO_ODR
+    defword "_GPIO-ODR", GPIO_ODR, , DOOFFSET
+    .word _GPIO_ODR
 
-    defword "GPIO-BSRR", _GPIO_BSRR, , DOOFFSET
-    .word GPIO_BSRR
+    defword "_GPIO-BSRR", GPIO_BSRR, , DOOFFSET
+    .word _GPIO_BSRR
 
-    defword "GPIO-BRR", _GPIO_BRR, , DOOFFSET
-    .word GPIO_BRR
+    defword "_GPIO-BRR", GPIO_BRR, , DOOFFSET
+    .word _GPIO_BRR
 
-    defword "GPIO-LCKR", _GPIO_LCKR, , DOOFFSET
-    .word GPIO_LCKR
+    defword "_GPIO-LCKR", GPIO_LCKR, , DOOFFSET
+    .word _GPIO_LCKR
 
-    defconst "NVIC", _NVIC, NVIC
+    defconst "NVIC", NVIC, _NVIC
 
     defcode "NVIC-SETENA", NVIC_SETENA
     ldr r0, =NVIC

@@ -243,3 +243,7 @@ DATA DISP-SELECT-ROW1
 : SSIM-ENABLE   \ Initialize SSI Master with 100kHz using Freescale frame format, 8 bit data
     GPIOA GPIO-AFSEL DUP @ 3C OR SWAP !
     0 SSI-CR1 !   2 SSI-CPSR !   0F907 SSI-CR0 !   2 SSI-CR1 ! ;
+
+: ((BLOCK)) PAD ;
+: (BLOCK)   DROP 400 BLANK ;
+: (UPDATE)   2DROP ;
