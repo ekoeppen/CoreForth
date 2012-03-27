@@ -34,25 +34,25 @@
     .set NVIC_SETENA_BASE, 0x100
     .set NVIC_ACTIVE_BASE, 0x300
 
-    .set GPIOA,       0x40004000
-    .set GPIOB,       0x40005000
-    .set GPIOC,       0x40006000
-    .set GPIOD,       0x40007000
-    .set GPIOE,       0x40024000
-    .set GPIO_DIR,         0x400
-    .set GPIO_AFSEL,       0x420
-    .set GPIO_IS,          0x404 
-    .set GPIO_IBE,         0x408 
-    .set GPIO_IEV,         0x40c 
-    .set GPIO_IM,          0x410 
-    .set GPIO_RIS,         0x414 
-    .set GPIO_MIS,         0x418 
-    .set GPIO_ICR,         0x41c 
-    .set GPIO_DR2R,        0x500
-    .set GPIO_ODR,         0x50c
-    .set GPIO_PUR,         0x510
-    .set GPIO_PDR,         0x514
-    .set GPIO_DEN,         0x51c
+    .set _GPIOA,      0x40004000
+    .set _GPIOB,      0x40005000
+    .set _GPIOC,      0x40006000
+    .set _GPIOD,      0x40007000
+    .set _GPIOE,      0x40024000
+    .set _GPIO_DIR,        0x400
+    .set _GPIO_AFSEL,      0x420
+    .set _GPIO_IS,         0x404 
+    .set _GPIO_IBE,        0x408 
+    .set _GPIO_IEV,        0x40c 
+    .set _GPIO_IM,         0x410 
+    .set _GPIO_RIS,        0x414 
+    .set _GPIO_MIS,        0x418 
+    .set _GPIO_ICR,        0x41c 
+    .set _GPIO_DR2R,       0x500
+    .set _GPIO_ODR,        0x50c
+    .set _GPIO_PUR,        0x510
+    .set _GPIO_PDR,        0x514
+    .set _GPIO_DEN,        0x51c
 
     .set STCTRL,      0xe000e010
     .set STRELOAD,    0xe000e014
@@ -209,20 +209,20 @@ init_board:
     mov r0, #32
     bl delay
 
-    @ enable pins on GPIOA
-    ldr r0, =GPIOA
+    @ enable pins on _GPIOA
+    ldr r0, =_GPIOA
     mov r1, #3
-    str r1, [r0, GPIO_AFSEL]
+    str r1, [r0, _GPIO_AFSEL]
     mov r1, #0x0
-    str r1, [r0, GPIO_ODR]
+    str r1, [r0, _GPIO_ODR]
     mov r1, #0x0
-    str r1, [r0, GPIO_PDR]
+    str r1, [r0, _GPIO_PDR]
     mov r1, #0xff
-    str r1, [r0, GPIO_DEN]
+    str r1, [r0, _GPIO_DEN]
     mov r1, #0x00
-    str r1, [r0, GPIO_DIR]
+    str r1, [r0, _GPIO_DIR]
     mov r1, #0xff
-    str r1, [r0, GPIO_DR2R]
+    str r1, [r0, _GPIO_DR2R]
 
     mov r0, #32
     bl delay
@@ -407,53 +407,53 @@ uart0_key_handler:
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
 
-    defconst "GPIOA", GPIO_A, GPIOA
-    defconst "GPIOB", GPIO_B, GPIOB
-    defconst "GPIOC", GPIO_C, GPIOC
-    defconst "GPIOD", GPIO_D, GPIOD
-    defconst "GPIOE", GPIO_E, GPIOE
+    defconst "GPIOA", GPIOA, _GPIOA
+    defconst "GPIOB", GPIOB, _GPIOB
+    defconst "GPIOC", GPIOC, _GPIOC
+    defconst "GPIOD", GPIOD, _GPIOD
+    defconst "GPIOE", GPIOE, _GPIOE
 
-    defword "GPIO-DIR", _GPIO_DIR, , DOOFFSET
-    .word GPIO_DIR
+    defword "GPIO-DIR", GPIO_DIR, , DOOFFSET
+    .word _GPIO_DIR
 
-    defword "GPIO-AFSEL", _GPIO_AFSEL, , DOOFFSET
-    .word GPIO_AFSEL
+    defword "GPIO-AFSEL", GPIO_AFSEL, , DOOFFSET
+    .word _GPIO_AFSEL
 
-    defword "GPIO-IS", _GPIO_IS, , DOOFFSET
-    .word GPIO_IS
+    defword "GPIO-IS", GPIO_IS, , DOOFFSET
+    .word _GPIO_IS
 
-    defword "GPIO-IBE", _GPIO_IBE, , DOOFFSET
-    .word GPIO_IBE
+    defword "GPIO-IBE", GPIO_IBE, , DOOFFSET
+    .word _GPIO_IBE
 
-    defword "GPIO-IEV", _GPIO_IEV, , DOOFFSET
-    .word GPIO_IEV
+    defword "GPIO-IEV", GPIO_IEV, , DOOFFSET
+    .word _GPIO_IEV
 
-    defword "GPIO-IM", _GPIO_IM, , DOOFFSET
-    .word GPIO_IM
+    defword "GPIO-IM", GPIO_IM, , DOOFFSET
+    .word _GPIO_IM
 
-    defword "GPIO-RIS", _GPIO_RIS, , DOOFFSET
-    .word GPIO_RIS
+    defword "GPIO-RIS", GPIO_RIS, , DOOFFSET
+    .word _GPIO_RIS
 
-    defword "GPIO-MIS", _GPIO_MIS, , DOOFFSET
-    .word GPIO_MIS
+    defword "GPIO-MIS", GPIO_MIS, , DOOFFSET
+    .word _GPIO_MIS
 
-    defword "GPIO-ICR", _GPIO_ICR, , DOOFFSET
-    .word GPIO_ICR
+    defword "GPIO-ICR", GPIO_ICR, , DOOFFSET
+    .word _GPIO_ICR
 
-    defword "GPIO-DR2R", _GPIO_DR2R, , DOOFFSET
-    .word GPIO_DR2R
+    defword "GPIO-DR2R", GPIO_DR2R, , DOOFFSET
+    .word _GPIO_DR2R
 
-    defword "GPIO-ODR", _GPIO_ODR, , DOOFFSET
-    .word GPIO_ODR
+    defword "GPIO-ODR", GPIO_ODR, , DOOFFSET
+    .word _GPIO_ODR
 
-    defword "GPIO-PUR", _GPIO_PUR, , DOOFFSET
-    .word GPIO_PUR
+    defword "GPIO-PUR", GPIO_PUR, , DOOFFSET
+    .word _GPIO_PUR
 
-    defword "GPIO-PDR", _GPIO_PDR, , DOOFFSET
-    .word GPIO_PDR
+    defword "GPIO-PDR", GPIO_PDR, , DOOFFSET
+    .word _GPIO_PDR
 
-    defword "GPIO-DEN", _GPIO_DEN, , DOOFFSET
-    .word GPIO_DEN
+    defword "GPIO-DEN", GPIO_DEN, , DOOFFSET
+    .word _GPIO_DEN
 
     defcode "GPIO-DATA!", _GPIO_DATA_STORE @ ( value mask gpio -- )
     pop {r1}
@@ -627,8 +627,6 @@ uart0_key_handler:
     defvar "SBUF-HEAD", SBUF_HEAD
     defvar "SBUF-TAIL", SBUF_TAIL
     defvar "IVT", IVT, 48 * 4
-@    defvar "(I2C-DELAY)", XI2C_DELAY
-    defvar "(I2C-DELAY)", LPARENITWOC_DELAYRPAREN, 0x4 
 
     .ltorg
 
