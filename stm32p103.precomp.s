@@ -33,4 +33,3 @@
 
     defword "TIB-TAIL", TIB_TAIL, 0x0
     .word GTTIB, FETCH, TIBNUM, FETCH, OVER, MINUS, SWAP, TIB, PLUS, SWAP, EXIT
-

@@ -97,7 +97,7 @@ init_board:
     msr primask, r0
     mov r0, #0
     msr basepri, r0
-    ldr r0, =(NVIC + NVIC_SETENA_BASE)
+    ldr r0, =(_NVIC + NVIC_SETENA_BASE)
     mov r1, #0
 .ifdef UART_USE_INTERRUPTS
     orr r1, #0x20
@@ -289,25 +289,25 @@ adcomp_handler:
     defconst "GPIOD", GPIOD, _GPIOD
     defconst "GPIOE", GPIOE, _GPIOE
 
-    defword "_GPIO-CRL", GPIO_CRL, , DOOFFSET
+    defword "GPIO-CRL", GPIO_CRL, , DOOFFSET
     .word _GPIO_CRL
 
-    defword "_GPIO-CRH", GPIO_CRH, , DOOFFSET
+    defword "GPIO-CRH", GPIO_CRH, , DOOFFSET
     .word _GPIO_CRH
 
-    defword "_GPIO-IDR", GPIO_IDR, , DOOFFSET
+    defword "GPIO-IDR", GPIO_IDR, , DOOFFSET
     .word _GPIO_IDR
 
-    defword "_GPIO-ODR", GPIO_ODR, , DOOFFSET
+    defword "GPIO-ODR", GPIO_ODR, , DOOFFSET
     .word _GPIO_ODR
 
-    defword "_GPIO-BSRR", GPIO_BSRR, , DOOFFSET
+    defword "GPIO-BSRR", GPIO_BSRR, , DOOFFSET
     .word _GPIO_BSRR
 
-    defword "_GPIO-BRR", GPIO_BRR, , DOOFFSET
+    defword "GPIO-BRR", GPIO_BRR, , DOOFFSET
     .word _GPIO_BRR
 
-    defword "_GPIO-LCKR", GPIO_LCKR, , DOOFFSET
+    defword "GPIO-LCKR", GPIO_LCKR, , DOOFFSET
     .word _GPIO_LCKR
 
     defconst "NVIC", NVIC, _NVIC
