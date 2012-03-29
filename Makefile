@@ -17,7 +17,10 @@ lm3s811.o: lm3s811.s
 	arm-none-eabi-as -mcpu=cortex-m3 -defsym USE_50MHZ=1 -o $@ $<
 
 precomp_lm3s811.o: lm3s811.s CoreForth.gen.s editor.gen.s lm3s811.gen.s
-	arm-none-eabi-as -mcpu=cortex-m3 -defsym PRECOMPILE=1 -defsym USE_50MHZ=1 -o $@ $<
+	arm-none-eabi-as -mcpu=cortex-m3 -defsym PRECOMP_LM3S811=1 -defsym USE_50MHZ=1 -o $@ $<
+
+precomp_stm32p103.o: lm3s811.s CoreForth.gen.s editor.gen.s stm32p103.gen.s
+	arm-none-eabi-as -mcpu=cortex-m3 -defsym PRECOMP_STM32P103=1 -o $@ $<
 
 stm32p103.elf: stm32p103.o
 	arm-none-eabi-ld $< -o $@ -Tstm32p103.ld
@@ -27,6 +30,9 @@ lm3s811.elf: lm3s811.o
 
 precomp_lm3s811.elf: precomp_lm3s811.o
 	arm-none-eabi-ld $< -o $@ -Tlm3s811.ld
+
+precomp_stm32p103.elf: precomp_stm32p103.o
+	arm-none-eabi-ld $< -o $@ -Tstm32p103.ld
 
 clean:
 	rm -f *.elf *.bin *.o *.gen.s
@@ -39,3 +45,6 @@ run_text: lm3s811.elf
 
 precomp_lm3s811: precomp_lm3s811.bin
 	qemu-system-arm -M lm3s811evb -serial stdio -kernel precomp_lm3s811.elf > lm3s811.precomp.s; stty sane
+
+precomp_stm32p103: precomp_stm32p103.bin
+	qemu-system-arm -M lm3s811evb -serial stdio -kernel precomp_stm32p103.elf > stm32p103.precomp.s; stty sane

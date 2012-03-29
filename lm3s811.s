@@ -628,24 +628,9 @@ uart0_key_handler:
 
     .ltorg
 
-    defword "(COLD)", XCOLD
-    .word LIT, eval_words, EVALUATE
-
-    defword "(COLD-PRECOMPILE)", XCOLD_PRECOMPILE
-    .word PRECOMP_BEGIN
-    .word LIT, eval_words, EVALUATE
-    .word PRECOMP_END
-
+.ifdef PRECOMP_LM3S811
     defword "COLD", COLD
-.ifdef PRECOMPILE
-    .word XCOLD_PRECOMPILE
-.else
-    .word XCOLD
-.endif
-
-.ifdef PRECOMPILE
-    .set last_rom_word, link
-    .set end_of_rom, .
+    .word PRECOMP_BEGIN, LIT, eval_words, EVALUATE, PRECOMP_END
 
 eval_words:
     .include "CoreForth.gen.s"
@@ -653,16 +638,22 @@ eval_words:
     .include "editor.gen.s"
     .word 0xffffffff
 .else
+.ifdef PRECOMP_STM32P103
+    .error
+.else 
+    defword "COLD", COLD
+    .word LIT, eval_words, EVALUATE
 
     .include "lm3s811.precomp.s"
-
-    .set last_rom_word, link
-    .set end_of_rom, .
 
 eval_words:
     .include "lm3s811ram.gen.s"
     .word 0xffffffff
 .endif
+.endif
+
+    .set last_rom_word, link
+    .set end_of_rom, .
 
     .set last_word, link
     .set data_start, compiled_here 
