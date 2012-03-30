@@ -38,13 +38,13 @@ clean:
 	rm -f *.elf *.bin *.o *.gen.s
 
 run: lm3s811.elf
-	qemu-system-arm -M lm3s811evb -serial stdio -kernel lm3s811.elf; stty sane
+	qemu-system-arm -M lm3s811evb -serial stdio -kernel lm3s811.elf -semihosting; stty sane
 
 run_text: lm3s811.elf
-	qemu-system-arm -M lm3s811evb -nographic -kernel lm3s811.elf; stty sane
+	qemu-system-arm -M lm3s811evb -nographic -kernel lm3s811.elf -semihosting; stty sane
 
 precomp_lm3s811: precomp_lm3s811.bin
-	qemu-system-arm -M lm3s811evb -serial stdio -kernel precomp_lm3s811.elf > lm3s811.precomp.s; stty sane
+	qemu-system-arm -M lm3s811evb -serial stdio -kernel precomp_lm3s811.elf -semihosting > lm3s811.precomp.s; stty sane
 
 precomp_stm32p103: precomp_stm32p103.bin
-	qemu-system-arm -M lm3s811evb -serial stdio -kernel precomp_stm32p103.elf > stm32p103.precomp.s; stty sane
+	qemu-system-arm -M lm3s811evb -serial stdio -kernel precomp_stm32p103.elf -semihosting > stm32p103.precomp.s; stty sane

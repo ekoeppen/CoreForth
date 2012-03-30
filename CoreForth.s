@@ -1196,8 +1196,8 @@ is_positive:
 @ -- Compiler and interpreter ----------------------------------------
 
     defcode "BYE", BYE
-    ldr r0, =0xfffffff
-    bx r0
+    mov r0, #0x18
+    bkpt 0xab
 
     defcode "WFI", WFI
     wfi
