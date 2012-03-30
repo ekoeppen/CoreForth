@@ -270,57 +270,7 @@ adcomp_handler:
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
 
-    defconst "RCC-CR", RCCCR, RCC_CR
-    defconst "RCC-CFGR", RCCCFGR, RCC_CFGR
-    defconst "RCC-CIR", RCCCIR, RCC_CIR
-    defconst "RCC-APB2RSTR", RCCAPB2RSTR, RCC_APB2RSTR
-    defconst "RCC-APB1RSTR", RCCAPB1RSTR, RCC_APB1RSTR
-    defconst "RCC-AHBENR", RCCAHBENR, RCC_AHBENR
-    defconst "RCC-APB2ENR", RCCAPB2ENR, RCC_APB2ENR
-    defconst "RCC-APB1ENR", RCCAPB1ENR, RCC_APB1ENR
-    defconst "RCC-BDCR", RCCBDCR, RCC_BDCR
-    defconst "RCC-CSR", RCCCSR, RCC_CSR
-    defconst "RCC-AHBRSTR", RCCAHBRSTR, RCC_AHBRSTR
-    defconst "RCC-CFGR2", RCCCFGR2, RCC_CFGR2
-
-    defconst "GPIOA", GPIOA, _GPIOA
-    defconst "GPIOB", GPIOB, _GPIOB
-    defconst "GPIOC", GPIOC, _GPIOC
-    defconst "GPIOD", GPIOD, _GPIOD
-    defconst "GPIOE", GPIOE, _GPIOE
-
-    defword "GPIO-CRL", GPIO_CRL, , DOOFFSET
-    .word _GPIO_CRL
-
-    defword "GPIO-CRH", GPIO_CRH, , DOOFFSET
-    .word _GPIO_CRH
-
-    defword "GPIO-IDR", GPIO_IDR, , DOOFFSET
-    .word _GPIO_IDR
-
-    defword "GPIO-ODR", GPIO_ODR, , DOOFFSET
-    .word _GPIO_ODR
-
-    defword "GPIO-BSRR", GPIO_BSRR, , DOOFFSET
-    .word _GPIO_BSRR
-
-    defword "GPIO-BRR", GPIO_BRR, , DOOFFSET
-    .word _GPIO_BRR
-
-    defword "GPIO-LCKR", GPIO_LCKR, , DOOFFSET
-    .word _GPIO_LCKR
-
-    defconst "NVIC", NVIC, _NVIC
-
-    defcode "NVIC-SETENA", NVIC_SETENA
-    ldr r0, =NVIC
-    ldr r1, =NVIC_SETENA_BASE
-    add r0, r1, r0
-    push {r0}
-    NEXT
-
-    defconst "DISP-FONT", _DISP_FONT, DISP_FONT
-DISP_FONT:
+    defdata "DISP-FONT", DISP_FONT
     .byte 0x00, 0x00, 0x00, 0x00, 0x00   @ " "
     .byte 0x00, 0x00, 0x4f, 0x00, 0x00   @ !
     .byte 0x00, 0x07, 0x00, 0x07, 0x00   @ "

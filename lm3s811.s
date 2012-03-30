@@ -639,7 +639,14 @@ eval_words:
     .word 0xffffffff
 .else
 .ifdef PRECOMP_STM32P103
-    .error
+    defword "COLD", COLD
+    .word PRECOMP_BEGIN, LIT, eval_words, EVALUATE, PRECOMP_END
+
+eval_words:
+    .include "CoreForth.gen.s"
+    .include "stm32p103.gen.s"
+@    .include "editor.gen.s"
+    .word 0xffffffff
 .else 
     defword "COLD", COLD
     .word LIT, eval_words, EVALUATE

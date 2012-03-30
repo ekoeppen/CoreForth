@@ -1,3 +1,252 @@
+
+    defword "(UPDATE)", LPARENUPDATERPAREN, 0x0
+    .word TWODUP, TWOMUL, MMC_WRITE_BLK, DROP, ONEPLUS, SWAP, LIT, 0x200, PLUS, SWAP, MMC_WRITE_BLK, DROP, EXIT
+
+    defword "(BLOCK)", LPARENBLOCKRPAREN, 0x0
+    .word TWODUP, TWOMUL, MMC_READ_BLK, DROP, ONEPLUS, SWAP, LIT, 0x200, PLUS, SWAP, MMC_READ_BLK, DROP, EXIT
+
+    defword "((BLOCK))", LPARENLPARENBLOCKRPARENRPAREN, 0x0
+    .word PAD, EXIT
+
+    defword "MMC-WRITE-BLK", MMC_WRITE_BLK, 0x0
+    .word LIT, 0x200, MUL, LIT, 0x18, SWAP, MMC_CMD, MMC_RES_ONE, DROP, LIT, 0xff, SPI_DRSTORE, LIT, 0xfe, SPI_DRSTORE, LIT, 0x200, LIT, 0x0, LPARENDORPAREN, DUP, CFETCH, SPI_DRSTORE, ONEPLUS, LPARENLOOPRPAREN, ZBRANCH, 0xffffffe8, DROP, LIT, 0xff, DUP, SPI_DRSTORE, SPI_DRSTORE, LIT, 0xff, SPI_DRSTOREFETCH, LIT, 0x1f, AND, LIT, 0x5, EQU, LIT, 0xff, DUP, DUP, SPI_DRSTOREFETCH, EQU, ZBRANCH, 0xffffffec, DROP, EXIT
+
+    defword "MMC-READ-BLK", MMC_READ_BLK, 0x0
+    .word LIT, 0x200, MUL, LIT, 0x11, SWAP, MMC_CMD, MMC_RES_ONE, ZBRANCH, 0x10, LIT, 0x0, EXIT, MMC_RES_ONE, LIT, 0xfe, LTGT, ZBRANCH, 0x10, LIT, 0x0, EXIT, LIT, 0x200, LIT, 0x0, LPARENDORPAREN, DUP, LIT, 0xff, SPI_DRSTOREFETCH, SWAP, CSTORE, ONEPLUS, LPARENLOOPRPAREN, ZBRANCH, 0xffffffdc, DROP, LIT, 0xff, DUP, SPI_DRSTORE, SPI_DRSTORE, LIT, 0x200, EXIT
+
+    defword "MMC-INIT", MMC_INIT, 0x0
+    .word SPI_ENABLE, MMC_SPI_MODE, LIT, 0x0, LIT, 0x0, MMC_CMD, MMC_RES_ONE, DROP, LIT, 0x1, LIT, 0x0, MMC_CMD, MMC_RES_ONE, ZEQU, ZBRANCH, 0xffffffe0, EXIT
+
+    defword "MMC-RES-1", MMC_RES_ONE, 0x0
+    .word LIT, 0xff, DUP, SPI_DRSTOREFETCH, DUP, LIT, 0xff, LTGT, ZBRANCH, 0xffffffe8, SWAP, DROP, EXIT
+
+    defword "MMC-CMD", MMC_CMD, 0x0
+    .word SWAP, DUP, ZEQU, LIT, 0x94, AND, ONEPLUS, MINUSROT, LIT, 0x40, OR, SPI_DRSTORE, CHEW, SPI_DRSTORE, SPI_DRSTORE, SPI_DRSTORE, SPI_DRSTORE, SPI_DRSTORE, EXIT
+
+    defword "MMC-SPI-MODE", MMC_SPI_MODE, 0x0
+    .word HIGH, SPI_CSSTORE, LIT, 0xa, LIT, 0x0, LPARENDORPAREN, LIT, 0xff, SPI_DRSTORE, LPARENLOOPRPAREN, ZBRANCH, 0xffffffec, LOW, SPI_CSSTORE, EXIT
+
+    defword "SPI-DR@", SPI_DRFETCH, 0x0
+    .word SPI_WAIT_RXNE, SPITWO, SPI_DR, FETCH, EXIT
+
+    defword "SPI-DR!", SPI_DRSTORE, 0x0
+    .word SPI_DRSTOREFETCH, DROP, EXIT
+
+    defword "SPI-DR!@", SPI_DRSTOREFETCH, 0x0
+    .word SPI_WAIT_TXE, SPITWO, SPI_DR, TUCK, STORE, SPI_WAIT_RXNE, FETCH, EXIT
+
+    defword "SPI-WAIT-TXE", SPI_WAIT_TXE, 0x0
+    .word SPITWO, SPI_SR, DUP, FETCH, LIT, 0x2, AND, ZBRANCH, 0xffffffe8, DROP, EXIT
+
+    defword "SPI-WAIT-RXNE", SPI_WAIT_RXNE, 0x0
+    .word SPITWO, SPI_SR, DUP, FETCH, LIT, 0x1, AND, ZBRANCH, 0xffffffe8, DROP, EXIT
+
+    defword "SPI-TXNE?", SPI_TXNEQ, 0x0
+    .word SPITWO, SPI_SR, FETCH, LIT, 0x2, AND, INVERT, EXIT
+
+    defword "SPI-RXNE?", SPI_RXNEQ, 0x0
+    .word SPITWO, SPI_SR, FETCH, LIT, 0x1, AND, EXIT
+
+    defword "SPI-CS!", SPI_CSSTORE, 0x0
+    .word CELLS, NEGATE, GPIOB, GPIO_BRR, PLUS, LIT, 0x1000, SWAP, STORE, EXIT
+
+    defword "SPI-ENABLE", SPI_ENABLE, 0x0
+    .word LIT, 0x40000000, RCC_APBONEENR, SET_BITS, GPIOB, GPIO_CRH, DUP, FETCH, LIT, 0xffff, AND, LIT, 0xb4b30000, OR, SWAP, STORE, LIT, 0x4, SPITWO, SPI_CRTWO, STORE, LIT, 0x27c, SPITWO, SPI_CRONE, STORE, EXIT
+
+    defword "LED0!", LEDZSTORE, 0x0
+    .word CELLS, GPIOC, GPIO_BSRR, PLUS, LIT, 0x1000, SWAP, STORE, EXIT
+
+    defword "LED0-ENABLE", LEDZ_ENABLE, 0x0
+    .word GPIOC, GPIO_CRH, DUP, FETCH, LIT, 0xfff0ffff, AND, LIT, 0x50000, OR, SWAP, STORE, EXIT
+
+    defword "APB-ENABLE", APB_ENABLE, 0x0
+    .word LIT, 0x24000, RCC_APBONEENR, SET_BITS, LIT, 0x7d, RCC_APBTWOENR, SET_BITS, EXIT
+
+    defword "SPI-I2SPR", SPI_ITWOSPR, 0x0, REGISTER_XT
+    .word 0x20
+
+    defword "SPI-I2SCFGR", SPI_ITWOSCFGR, 0x0, REGISTER_XT
+    .word 0x1c
+
+    defword "SPI-TXCRCPR", SPI_TXCRCPR, 0x0, REGISTER_XT
+    .word 0x18
+
+    defword "SPI-RXCRCPR", SPI_RXCRCPR, 0x0, REGISTER_XT
+    .word 0x14
+
+    defword "SPI-CRCPR", SPI_CRCPR, 0x0, REGISTER_XT
+    .word 0x10
+
+    defword "SPI-DR", SPI_DR, 0x0, REGISTER_XT
+    .word 0xc
+
+    defword "SPI-SR", SPI_SR, 0x0, REGISTER_XT
+    .word 0x8
+
+    defword "SPI-CR2", SPI_CRTWO, 0x0, REGISTER_XT
+    .word 0x4
+
+    defword "SPI-CR1", SPI_CRONE, 0x0, REGISTER_XT
+    .word 0x0
+
+    defconst "SPI2", SPITWO, 0x40003800
+
+
+    defconst "SPI1", SPIONE, 0x40013000
+
+
+    defword "I2C-TRISE", ITWOC_TRISE, 0x0, REGISTER_XT
+    .word 0x20
+
+    defword "I2C-CCR", ITWOC_CCR, 0x0, REGISTER_XT
+    .word 0x1c
+
+    defword "I2C-SR2", ITWOC_SRTWO, 0x0, REGISTER_XT
+    .word 0x18
+
+    defword "I2C-SR1", ITWOC_SRONE, 0x0, REGISTER_XT
+    .word 0x14
+
+    defword "I2C-OAR2", ITWOC_OARTWO, 0x0, REGISTER_XT
+    .word 0x10
+
+    defword "I2C-OAR1", ITWOC_OARONE, 0x0, REGISTER_XT
+    .word 0xc
+
+    defword "I2C-CR2", ITWOC_CRTWO, 0x0, REGISTER_XT
+    .word 0x8
+
+    defword "I2C-CR1", ITWOC_CRONE, 0x0, REGISTER_XT
+    .word 0x4
+
+    defconst "I2C2", ITWOCTWO, 0x40005800
+
+
+    defconst "I2C1", ITWOCONE, 0x40005400
+
+
+    defconst "STCURRENT", STCURRENT, -0x1fff1fe8
+
+
+    defconst "STRELOAD", STRELOAD, -0x1fff1fec
+
+
+    defconst "STCTRL", STCTRL, -0x1fff1ff0
+
+
+    defword "GPIO-LCKR", GPIO_LCKR, 0x0, REGISTER_XT
+    .word 0x18
+
+    defword "GPIO-BRR", GPIO_BRR, 0x0, REGISTER_XT
+    .word 0x14
+
+    defword "GPIO-BSRR", GPIO_BSRR, 0x0, REGISTER_XT
+    .word 0x10
+
+    defword "GPIO-ODR", GPIO_ODR, 0x0, REGISTER_XT
+    .word 0xc
+
+    defword "GPIO-IDR", GPIO_IDR, 0x0, REGISTER_XT
+    .word 0x8
+
+    defword "GPIO-CRH", GPIO_CRH, 0x0, REGISTER_XT
+    .word 0x4
+
+    defword "GPIO-CRL", GPIO_CRL, 0x0, REGISTER_XT
+    .word 0x0
+
+    defconst "GPIOG", GPIOG, 0x40012000
+
+
+    defconst "GPIOF", GPIOF, 0x40011c00
+
+
+    defconst "GPIOE", GPIOE, 0x40011800
+
+
+    defconst "GPIOD", GPIOD, 0x40011400
+
+
+    defconst "GPIOC", GPIOC, 0x40011000
+
+
+    defconst "GPIOB", GPIOB, 0x40010c00
+
+
+    defconst "GPIOA", GPIOA, 0x40010800
+
+
+    defconst "RCC-CFGR2", RCC_CFGRTWO, 0x4002102c
+
+
+    defconst "RCC-AHBRSTR", RCC_AHBRSTR, 0x40021028
+
+
+    defconst "RCC-CSR", RCC_CSR, 0x40021024
+
+
+    defconst "RCC-BDCR", RCC_BDCR, 0x40021020
+
+
+    defconst "RCC-APB1ENR", RCC_APBONEENR, 0x4002101c
+
+
+    defconst "RCC-APB2ENR", RCC_APBTWOENR, 0x40021018
+
+
+    defconst "RCC-AHBENR", RCC_AHBENR, 0x40021014
+
+
+    defconst "RCC-APB1RSTR", RCC_APBONERSTR, 0x40021010
+
+
+    defconst "RCC-APB2RSTR", RCC_APBTWORSTR, 0x4002100c
+
+
+    defconst "RCC-CIR", RCC_CIR, 0x40021008
+
+
+    defconst "RCC-CFGR", RCC_CFGR, 0x40021004
+
+
+    defconst "RCC-CR", RCC_CR, 0x40021000
+
+
+    defconst "RCC", RCC, 0x40021000
+
+
+    defconst "NVIC", NVIC, -0x1fff2000
+
+
+    defconst "OFF", OFF, 0x0
+
+
+    defconst "ON", ON, 0x1
+
+
+    defconst "DISABLE", DISABLE, 0x0
+
+
+    defconst "ENABLE", ENABLE, 0x1
+
+
+    defconst "LOW", LOW, 0x0
+
+
+    defconst "HIGH", HIGH, 0x1
+
+
+    defword "CLEAR-BITS", CLEAR_BITS, 0x0
+    .word DUP, FETCH, ROT, INVERT, AND, SWAP, STORE, EXIT
+
+    defword "SET-BITS", SET_BITS, 0x0
+    .word DUP, FETCH, ROT, OR, SWAP, STORE, EXIT
+
+    defword "REGISTER", REGISTER, 0x0
+    .word CREATE, COMMA, LPARENDOESGTRPAREN
+    .set REGISTER_XT, .
+    .word 0x1004f8df, 0x4788, DODOES + 1, FETCH, PLUS, EXIT
+
     defword "QUIT", QUIT, 0x0
     .word SZ, SPSTORE, RZ, RPSTORE, LPARENSQUOTRPAREN, 0x726f4310, 0x726f4665, 0x72206874, 0x79646165, 0x2e, TYPE, CR, INTERPRET, BRANCH, 0xfffffff8, EXIT
 
