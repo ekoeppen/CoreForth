@@ -19,16 +19,4 @@ HEX
 
 : (.S) !CURSOR 0 18 AT-XY .S @CURSOR ;
 
-: FOPEN
-    PAD CELL + !
-    PAD 2 CELLS + >R
-    TUCK   R@ SWAP CMOVE  R@ + 0 SWAP C!
-    R> PAD TUCK !
-    (FOPEN) ;
-
-
-: FCLOSE   PAD TUCK !   (FCLOSE) ;
-
-: FREAD   PAD 2 CELLS + TUCK !   CELL - TUCK !   CELL - TUCK !   (FREAD) ;
-
 QUIT

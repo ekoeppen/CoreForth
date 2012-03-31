@@ -621,31 +621,57 @@ uart0_key_handler:
     defword ";I", SEMICOLONI, F_IMMED
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    defcode "(FOPEN)", XFOPEN
+    defcode "FOPEN", FOPEN
+    pop {r0, r1}
+    push {r0}
+    push {r1}
     mov r0, #1
-    pop {r1}
+    mov r1, sp
     bkpt #0xab
+    add sp, #8
     push {r0}
     NEXT
 
-    defcode "(FWRITE)", XWRITE
+    defcode "FWRITE", WRITE
+    pop {r0 - r2}
+    push {r0}
+    push {r1}
+    push {r2}
     mov r0, #5
-    pop {r1}
+    mov r1, sp
     bkpt #0xab
+    add sp, #12
     push {r0}
     NEXT
 
-    defcode "(FREAD)", XFREAD
+    defcode "FREAD", FREAD
+    pop {r0 - r2}
+    push {r0}
+    push {r1}
+    push {r2}
     mov r0, #6
-    pop {r1}
+    mov r1, sp
     bkpt #0xab
+    add sp, #12
     push {r0}
     NEXT
 
-    defcode "(FCLOSE)", XFCLOSE
-    mov r0, #2
-    pop {r1}
+    defcode "FSEEK", FSEEK
+    pop {r0, r1}
+    push {r0}
+    push {r1}
+    mov r0, #10
+    mov r1, sp
     bkpt #0xab
+    add sp, #4
+    push {r0}
+    NEXT
+
+    defcode "FCLOSE", FCLOSE
+    mov r0, #2
+    mov r1, sp
+    bkpt #0xab
+    add sp, #4
     push {r0}
     NEXT
 
