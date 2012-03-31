@@ -621,6 +621,34 @@ uart0_key_handler:
     defword ";I", SEMICOLONI, F_IMMED
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
+    defcode "(FOPEN)", XFOPEN
+    mov r0, #1
+    pop {r1}
+    bkpt #0xab
+    push {r0}
+    NEXT
+
+    defcode "(FWRITE)", XWRITE
+    mov r0, #5
+    pop {r1}
+    bkpt #0xab
+    push {r0}
+    NEXT
+
+    defcode "(FREAD)", XFREAD
+    mov r0, #6
+    pop {r1}
+    bkpt #0xab
+    push {r0}
+    NEXT
+
+    defcode "(FCLOSE)", XFCLOSE
+    mov r0, #2
+    pop {r1}
+    bkpt #0xab
+    push {r0}
+    NEXT
+
     defvar "SBUF", SBUF, 16
     defvar "SBUF-HEAD", SBUF_HEAD
     defvar "SBUF-TAIL", SBUF_TAIL
