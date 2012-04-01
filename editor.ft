@@ -2,6 +2,7 @@ BASE @
 
 DECIMAL
 
+1024 CONSTANT C/BLK
 64 CONSTANT C/L
 0 VARIABLE SCR
 -1 VARIABLE BLOCK#
@@ -21,7 +22,7 @@ DECIMAL
 : L ( -- ) 0 DUP AT-XY RE LIST ;
 : B ( -- ) -1 SCR +! ;
 : N ( -- ) 1 SCR +! ;
-: !XY ( i -- i ) 1023 AND DUP C/L /MOD 1+ AT-XY ;
+: !XY ( i -- i ) C/BLK 1- AND DUP C/L /MOD 1+ AT-XY ;
 : !CH ( c i -- c i )   DUP TAIL>   2DUP >BLK C!  DUP .TAIL ;
 
 : ?CH ( c i -- c i' )
