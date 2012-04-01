@@ -647,10 +647,19 @@ fill_done:
     defword "(S\")", XSQUOTE
     .word RFROM, COUNT, TWODUP, ADD, ALIGNED, TOR, EXIT
 
+    defword ">>SOURCE", GTGTSOURCE
+    .word LIT, 1, SOURCEINDEX, ADDSTORE, EXIT
+
     defword "S\"", SQUOTE, F_IMMED
-    .word LIT, XSQUOTE, COMMAXT, LIT, '"', WORD, FETCHBYTE, INCR, ALIGNED, ALLOT
-    .word LIT, 1, SOURCEINDEX, ADDSTORE
-    .word EXIT
+    .word LIT, XSQUOTE, COMMAXT, LIT, '"', WORD
+    .word FETCHBYTE, INCR, ALIGNED, ALLOT
+    .word GTGTSOURCE, EXIT
+
+    defword "SZ\"", SZQUOTE, F_IMMED
+    .word LIT, XSQUOTE, COMMAXT, LIT, '"', WORD
+    .word LIT, 1, OVER, ADDSTORE, LIT, 0, OVER, DUP, FETCHBYTE, ADD, STOREBYTE
+    .word FETCHBYTE, INCR, ALIGNED, ALLOT
+    .word GTGTSOURCE, EXIT
 
     defword "PAD", PAD
     .word HERE, LIT, 128, ADD, EXIT
