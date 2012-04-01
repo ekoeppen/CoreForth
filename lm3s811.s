@@ -630,7 +630,7 @@ uart0_key_handler:
     bkpt #0xab
     add sp, #8
     push {r0}
-    NEXT
+    NET
 
     defcode "FWRITE", WRITE
     pop {r0 - r2}
@@ -642,7 +642,7 @@ uart0_key_handler:
     bkpt #0xab
     add sp, #12
     push {r0}
-    NEXT
+    NET
 
     defcode "FREAD", FREAD
     pop {r0 - r2}
@@ -654,7 +654,7 @@ uart0_key_handler:
     bkpt #0xab
     add sp, #12
     push {r0}
-    NEXT
+    NET
 
     defcode "FSEEK", FSEEK
     pop {r0, r1}
