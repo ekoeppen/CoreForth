@@ -19,4 +19,13 @@ HEX
 
 : (.S) !CURSOR 0 18 AT-XY .S @CURSOR ;
 
+: DISK-NAME   SZ" disk.bin" ;
+: DISK-OPEN   DISK-NAME DROP 2 FOPEN ;
+: DISK-READ-BLK   ( addr blk# --  )
+    DISK-OPEN
+    DUP ROT 400 * FSEEK DROP
+    TUCK SWAP 400 FREAD DROP
+    FCLOSE DROP
+;
+
 QUIT

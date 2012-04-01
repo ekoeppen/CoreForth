@@ -663,7 +663,7 @@ uart0_key_handler:
     mov r0, #10
     mov r1, sp
     bkpt #0xab
-    add sp, #4
+    add sp, #8
     push {r0}
     NEXT
 
