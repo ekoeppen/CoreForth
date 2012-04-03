@@ -1310,6 +1310,17 @@ is_positive:
     push {r0}
     NEXT
 
+    defword "DEFER", DEFER
+    .word CREATE, LIT, QUIT, COMMA, XDOES
+    .set DEFER_XT, .
+    ldr.w r1, [pc, #4]
+    blx r1
+    .byte 0, 0
+    .word DODOES + 1, FETCH, EXECUTE, EXIT
+
+    defword "IS", IS
+    .word TICK, GTBODY, STORE, EXIT
+
     defcode "FIND", FIND
     pop {r0}
     mov r10, r0
@@ -1419,6 +1430,9 @@ noskip_delim:
 
     defword ">LINK", TOLINK
     .word TONAME, CELL, SUB, EXIT
+
+    defword ">BODY", GTBODY
+    .word CELL, ADD, EXIT
 
     defcode "EXECUTE", EXECUTE
     pop {r0}
