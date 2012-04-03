@@ -632,7 +632,7 @@ uart0_key_handler:
     push {r0}
     NEXT
 
-    defcode "FWRITE", WRITE
+    defcode "FWRITE", FWRITE
     pop {r0 - r2}
     push {r0}
     push {r1}
