@@ -1717,6 +1717,7 @@ print_xt_suffix:
     defconst "CORETOP", CORETOP, end_of_core
     defconst "LATESTROM", LATESTROM, last_rom_word
     defconst "LATESTCORE", LATESTCORE, last_core_word
+    defconst "C/BLK", CSLASHBLK, 1024
     defvar "STACK", STACK, 512
     defvar "S0", TOS, 0
     defvar "RSTACK", RSTACK, 256
