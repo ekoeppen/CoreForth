@@ -1311,7 +1311,7 @@ is_positive:
     NEXT
 
     defword "DEFER", DEFER
-    .word CREATE, LIT, QUIT, COMMA, XDOES
+    .word CREATE, LIT, EXIT, COMMA, XDOES
     .set DEFER_XT, .
     ldr.w r1, [pc, #4]
     blx r1
