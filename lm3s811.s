@@ -699,7 +699,7 @@ eval_words:
 eval_words:
     .include "CoreForth.gen.s"
     .include "stm32p103.gen.s"
-@    .include "editor.gen.s"
+    .include "editor.gen.s"
     .word 0xffffffff
 .else 
     defword "COLD", COLD
