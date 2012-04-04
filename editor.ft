@@ -14,7 +14,7 @@ DECIMAL
 : TAIL> ( i -- )   DUP >BLK DUP 1+ ROT >TAIL-LENGTH 1- CMOVE> ;
 : TAIL< ( i -- )   DUP DUP >BLK DUP 1+ SWAP ROT >TAIL-LENGTH CMOVE CLR-LAST ;
 : LL   C/L * SCR @ BLOCK + C/L TYPE ;
-: LIST ( n -- )  DUP SCR !  .D S" scr" TYPE CR 0 BEGIN DUP LL CR 1+ DUP 16 = UNTIL DROP ;
+: LIST ( n -- )  DUP SCR !  .D S"  scr" TYPE CR 0 BEGIN DUP LL CR 1+ DUP 16 = UNTIL DROP ;
 : RE ( -- n ) SCR @ ;
 : L ( -- ) 0 DUP AT-XY RE LIST ;
 : B ( -- ) -1 SCR +! ;
