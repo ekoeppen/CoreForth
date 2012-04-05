@@ -1055,57 +1055,6 @@ is_positive:
     .word LIT, 8, BASE, STORE, EXIT
 
 @ ---------------------------------------------------------------------
-@ -- ANSI terminal I/O ------------------------------------------------
-
-    defword "ANSI-ESC-START", ANSI_ESC_START
-    .word LIT, 27, EMIT, LIT, '[', EMIT, EXIT
-
-    defword "AT-XY", AT_XY
-    .word ANSI_ESC_START, INCR, DOTD, LIT, ';', EMIT, INCR, DOTD, LIT, 'H', EMIT, EXIT
-
-    defword "!CURSOR", SAVECURSOR
-    .word LIT, 27, EMIT, LIT, '7', EMIT, EXIT
-
-    defword "@CURSOR", RESTORECURSOR
-    .word LIT, 27, EMIT, LIT, '8', EMIT, EXIT
-
-    defword "CLS", CLS
-    .word ANSI_ESC_START, LIT, '2', EMIT, LIT, 'J', EMIT, LIT, 0, LIT, 0, AT_XY, EXIT
-
-    defword "CURSOR-UP", CURSOR_UP
-    .word ANSI_ESC_START, LIT, 'A', EMIT, EXIT
-
-    defword "CURSOR-DOWN", CURSOR_DOWN
-    .word ANSI_ESC_START, LIT, 'B', EMIT, EXIT
-
-    defword "CURSOR-RIGHT", CURSOR_RIGHT
-    .word ANSI_ESC_START, LIT, 'C', EMIT, EXIT
-
-    defword "CURSOR-LEFT", CURSOR_LEFT
-    .word ANSI_ESC_START, LIT, 'D', EMIT, EXIT
-
-    defword "CLR-EOL", CLR_EOL
-    .word ANSI_ESC_START, LIT, '0', EMIT, LIT, 'K', EMIT, EXIT
-
-    defword "CLR-SOL", CLR_SOL
-    .word ANSI_ESC_START, LIT, '1', EMIT, LIT, 'K', EMIT, EXIT
-
-    defword "CLR-LINE", CLR_LINE
-    .word ANSI_ESC_START, LIT, '2', EMIT, LIT, 'K', EMIT, EXIT
-
-    defconst "KEY-UP", KEY_UP, -1
-    defconst "KEY-DOWN", KEY_DOWN, -2
-    defconst "KEY-LEFT", KEY_LEFT, -4
-    defconst "KEY-RIGHT", KEY_RIGHT, -3
-    defconst "KEY-HOME", KEY_HOME, -101
-    defconst "KEY-END", KEY_END, -104
-    defconst "KEY-INSERT", KEY_INSERT, -102
-    defconst "KEY-DELETE", KEY_DELETE, -103
-    defconst "KEY-PGUP", KEY_PGUP, -105
-    defconst "KEY-PGDOWN", KEY_PGDOWN, -106
-    defconst "KEY-BACKSPACE", KEY_BACKSPACE, 127
-
-@ ---------------------------------------------------------------------
 @ -- Control flow -----------------------------------------------------
 
     defcode "BRANCH", BRANCH
@@ -1760,8 +1709,6 @@ print_xt_suffix:
     .set MINUSROT, ROTROT
     .set NUMTIB, TIBSIZE
     .set TIBNUM, TIBCOUNT
-    .set STORECURSOR, SAVECURSOR
-    .set FETCHCURSOR, RESTORECURSOR
     .set LPARENINTERPRETRPAREN, XINTERPRET
     .set LPARENDORPAREN, XDO
     .set LPARENLOOPRPAREN, XLOOP

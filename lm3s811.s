@@ -687,9 +687,11 @@ uart0_key_handler:
     .word PRECOMP_BEGIN, LIT, eval_words, EVALUATE, PRECOMP_END
 
 eval_words:
-    .include "CoreForth.gen.s"
     .include "lm3s811.gen.s"
+    .include "ansi.gen.s"
+    .include "accept.gen.s"
     .include "editor.gen.s"
+    .include "CoreForth.gen.s"
     .word 0xffffffff
 .else
 .ifdef PRECOMP_STM32P103
@@ -697,9 +699,11 @@ eval_words:
     .word PRECOMP_BEGIN, LIT, eval_words, EVALUATE, PRECOMP_END
 
 eval_words:
-    .include "CoreForth.gen.s"
     .include "stm32p103.gen.s"
+    .include "ansi.gen.s"
+    .include "accept.gen.s"
     .include "editor.gen.s"
+    .include "CoreForth.gen.s"
     .word 0xffffffff
 .else 
     defword "COLD", COLD
