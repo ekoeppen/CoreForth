@@ -19,4 +19,4 @@ HEX
 
 : (.S) !CURSOR 0 18 AT-XY .S @CURSOR ;
 
-QUIT
+ABORT

@@ -1,6 +1,6 @@
 all: stm32p103.bin lm3s811.bin
 
-GEN = CoreForth.gen.s ansi.gen.s accept.gen.s editor.gen.s
+GEN = ansi.gen.s accept.gen.s editor.gen.s quit.gen.s
 LM3S811_GEN = $(GEN) lm3s811.gen.s lm3s811ram.gen.s
 STM32P103_GEN = $(GEN) stm32p103.gen.s stm32p103ram.gen.s
 
@@ -13,9 +13,9 @@ STM32P103_GEN = $(GEN) stm32p103.gen.s stm32p103ram.gen.s
 .s.o:
 	arm-none-eabi-as -mcpu=cortex-m3 -o $@ $< 
 
-stm32p103.o: CoreForth.s $(STM32P103_GEN)
+stm32p103.o: CoreForth.s stm32p103.precomp.s $(STM32P103_GEN)
 
-lm3s811.o: CoreForth.s $(LM3S811_GEN)
+lm3s811.o: CoreForth.s lm3s811.precomp.s $(LM3S811_GEN)
 
 lm3s811.o: lm3s811.s
 	arm-none-eabi-as -mcpu=cortex-m3 -defsym USE_50MHZ=1 -o $@ $<

@@ -650,12 +650,12 @@ fill_done:
     defword ">>SOURCE", GTGTSOURCE
     .word LIT, 1, SOURCEINDEX, ADDSTORE, EXIT
 
-    defword "S\"", SQUOTE, F_IMMED
+    defword "S\"", SQUOT, F_IMMED
     .word LIT, XSQUOTE, COMMAXT, LIT, '"', WORD
     .word FETCHBYTE, INCR, ALIGNED, ALLOT
     .word GTGTSOURCE, EXIT
 
-    defword "SZ\"", SZQUOTE, F_IMMED
+    defword "SZ\"", SZQUOT, F_IMMED
     .word LIT, XSQUOTE, COMMAXT, LIT, '"', WORD
     .word LIT, 1, OVER, ADDSTORE, LIT, 0, OVER, DUP, FETCHBYTE, ADD, STOREBYTE
     .word FETCHBYTE, INCR, ALIGNED, ALLOT
@@ -937,6 +937,12 @@ fill_done:
     pop {r0}
     bl putstring
     NEXT
+
+    defword "TYPE-ESCAPED", TYPE_ESCAPED
+    .word QDUP, ZBRANCH, 0x4c
+    .word SWAP, DUP, CFETCH, DUP, LIT, '"', EQU, ZBRANCH, 0x10
+    .word LIT, '\\', EMIT
+    .word EMIT, ONEPLUS, SWAP, ONEMINUS, BRANCH, 0xffffffb0, DROP, EXIT
 
     defcode ".H", DOTH
     pop {r0}
@@ -1546,7 +1552,7 @@ QUOTE_CHARS:
     .word TONAME, FETCH, LIT, 0xc0, AND, XCSPACE, DOTH, EXIT
 
     defword "(.WORD-NAME)", XWORD_NAME
-    .word LIT, '"', EMIT, TONAME, COUNT, LIT, 31, AND, TWODUP, TYPE
+    .word LIT, '"', EMIT, TONAME, COUNT, LIT, 31, AND, TWODUP, TYPE_ESCAPED
     .word LIT, 1f, COUNT, TYPE, DOTQUOTED, EXIT
 1:  .ascii "\003\", "
 
