@@ -405,117 +405,13 @@ uart0_key_handler:
 @ ---------------------------------------------------------------------
 @ -- Board specific words ---------------------------------------------
 
-    defconst "GPIOA", GPIOA, _GPIOA
-    defconst "GPIOB", GPIOB, _GPIOB
-    defconst "GPIOC", GPIOC, _GPIOC
-    defconst "GPIOD", GPIOD, _GPIOD
-    defconst "GPIOE", GPIOE, _GPIOE
-
-    defword "GPIO-DIR", GPIO_DIR, , DOOFFSET
-    .word _GPIO_DIR
-
-    defword "GPIO-AFSEL", GPIO_AFSEL, , DOOFFSET
-    .word _GPIO_AFSEL
-
-    defword "GPIO-IS", GPIO_IS, , DOOFFSET
-    .word _GPIO_IS
-
-    defword "GPIO-IBE", GPIO_IBE, , DOOFFSET
-    .word _GPIO_IBE
-
-    defword "GPIO-IEV", GPIO_IEV, , DOOFFSET
-    .word _GPIO_IEV
-
-    defword "GPIO-IM", GPIO_IM, , DOOFFSET
-    .word _GPIO_IM
-
-    defword "GPIO-RIS", GPIO_RIS, , DOOFFSET
-    .word _GPIO_RIS
-
-    defword "GPIO-MIS", GPIO_MIS, , DOOFFSET
-    .word _GPIO_MIS
-
-    defword "GPIO-ICR", GPIO_ICR, , DOOFFSET
-    .word _GPIO_ICR
-
-    defword "GPIO-DR2R", GPIO_DR2R, , DOOFFSET
-    .word _GPIO_DR2R
-
-    defword "GPIO-ODR", GPIO_ODR, , DOOFFSET
-    .word _GPIO_ODR
-
-    defword "GPIO-PUR", GPIO_PUR, , DOOFFSET
-    .word _GPIO_PUR
-
-    defword "GPIO-PDR", GPIO_PDR, , DOOFFSET
-    .word _GPIO_PDR
-
-    defword "GPIO-DEN", GPIO_DEN, , DOOFFSET
-    .word _GPIO_DEN
-
-    defcode "GPIO-DATA!", _GPIO_DATA_STORE @ ( value mask gpio -- )
+    defcode "GPIO-DATA!", GPIO_DATASTORE @ ( value mask gpio -- )
     pop {r1}
     pop {r0}
     lsl r0, r0, #2
     add r0, r0, r1
     pop {r1}
     strb r1, [r0]
-    NEXT
-
-    defconst "UART0", UART_0, UART0
-
-    defword "UART_DR", _UART_DR, , DOOFFSET
-    .word UART_DR
-
-    defword "UART-RSR-ECR", _UART_RSR_ECR, , DOOFFSET
-    .word UART_RSR_ECR
-
-    defword "UART-FR", _UART_FR, , DOOFFSET
-    .word UART_FR
-
-    defword "UART-LPR", _UART_LPR, , DOOFFSET
-    .word UART_LPR
-
-    defword "UART-IBRD", _UART_IBRD, , DOOFFSET
-    .word UART_IBRD
-
-    defword "UART-FBRD", _UART_FBRD, , DOOFFSET
-    .word UART_FBRD
-
-    defword "UART-LCRH", _UART_LCRH, , DOOFFSET
-    .word UART_LCRH
-
-    defword "UART-CR", _UART_CR, , DOOFFSET
-    .word UART_CR
-
-    defword "UART-IFLS", _UART_IFLS, , DOOFFSET
-    .word UART_IFLS
-
-    defword "UART-IMSC", _UART_IMSC, , DOOFFSET
-    .word UART_IMSC
-
-    defword "UART-RIS", _UART_RIS, , DOOFFSET
-    .word UART_RIS
-
-    defword "UART-MIS", _UART_MIS, , DOOFFSET
-    .word UART_MIS
-
-    defword "UART-ICR", _UART_ICR, , DOOFFSET
-    .word UART_ICR
-
-    defword "UART-DMACR", _UART_DMACR, , DOOFFSET
-    .word UART_DMACR
-
-    defconst "UART-RXFE",  _UART_RXFE, UART_RXFE
-    defconst "UART-TXFF", _UART_TXFF, UART_TXFF
-
-    defconst "NVIC", _NVIC, NVIC
-
-    defcode "NVIC-SETENA", NVIC_SETENA
-    ldr r0, =NVIC
-    ldr r1, =NVIC_SETENA_BASE
-    add r0, r1, r0
-    push {r0}
     NEXT
 
     defdata "DISP-FONT", DISP_FONT

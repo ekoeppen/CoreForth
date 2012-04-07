@@ -173,6 +173,30 @@
     defword "ANSI-ESC-START", ANSI_ESC_START, 0x0
     .word LIT, 0x1b, EMIT, LIT, 0x5b, EMIT, EXIT
 
+    defword "LED0!", LEDZSTORE, 0x0
+    .word LIT, 0x1, EQU, LIT, 0x20, AND, LIT, 0x20, GPIOC, GPIO_DATASTORE, EXIT
+
+    defword "LED0-ENABLE", LEDZ_ENABLE, 0x0
+    .word LIT, 0x20, GPIOC, GPIO_DIR, SET_BITS, EXIT
+
+    defword "UART0-BRR@", UARTZ_BRRFETCH, 0x0
+    .word UARTZ, UART_IBRD, FETCH, UARTZ, UART_FBRD, FETCH, EXIT
+
+    defword "UART0-BRR!", UARTZ_BRRSTORE, 0x0
+    .word UARTZ, UART_FBRD, STORE, UARTZ, UART_IBRD, STORE, EXIT
+
+    defword "UART0-ENABLE", UARTZ_ENABLE, 0x0
+    .word LIT, 0x301, UARTZ, UART_CR, STORE, EXIT
+
+    defword "UART0-DISABLE", UARTZ_DISABLE, 0x0
+    .word LIT, 0x0, UARTZ, UART_CR, STORE, EXIT
+
+    defword "USE-PLL", USE_PLL, 0x0
+    .word SYSCTL_RCC, DUP, FETCH, LIT, 0xffff7ff, AND, SWAP, STORE, EXIT
+
+    defword "PLL-50HZ", PLL_5ZHZ, 0x0
+    .word SYSCTL_RCC, DUP, DUP, FETCH, LIT, 0xf83fffff, AND, LIT, 0x800, OR, SWAP, STORE, DUP, DUP, FETCH, LIT, 0xffffcfcf, AND, SWAP, STORE, DUP, FETCH, LIT, 0xf87ffc3f, AND, LIT, 0x1c002c0, OR, SWAP, STORE, SYSCTL_RIS, DUP, FETCH, LIT, 0x40, AND, ZBRANCH, 0xffffffe8, DROP, EXIT
+
     defword "(UPDATE)", LPARENUPDATERPAREN, 0x0
     .word DISK_WRITE_BLK, EXIT
 
@@ -282,7 +306,7 @@
 
 
     defword "BUTTON0-ENABLE", BUTTONZ_ENABLE, 0x0
-    .word LIT, 0x4, NVIC_SETENA, SET_BITS, LIT, BUTTONZ_IRQ, IVT, LIT, 0x11, CELLS, PLUS, STORE, LIT, 0x10, GPIOC, GPIO_IM, SET_BITS, EXIT
+    .word LIT, 0x4, NVIC_SETENAZ, SET_BITS, LIT, BUTTONZ_IRQ, IVT, LIT, 0x11, CELLS, PLUS, STORE, LIT, 0x10, GPIOC, GPIO_IM, SET_BITS, EXIT
 
     defword "BUTTON0-IRQ", BUTTONZ_IRQ, 0x0
     .word LIT, 0x10, GPIOC, GPIO_ICR, CSTORE, LIT, 0xff, PAD, STORE, RETI
@@ -515,6 +539,114 @@
     defconst "I2C", ITWOC, 0x40020000
 
 
+    defconst "UART-TXFF", UART_TXFF, 0x20
+
+
+    defconst "UART-RXFE", UART_RXFE, 0x10
+
+
+    defword "UART-DMACR", UART_DMACR, 0x0, REGISTER_XT
+    .word 0x48
+
+    defword "UART-ICR", UART_ICR, 0x0, REGISTER_XT
+    .word 0x44
+
+    defword "UART-MIS", UART_MIS, 0x0, REGISTER_XT
+    .word 0x40
+
+    defword "UART-RIS", UART_RIS, 0x0, REGISTER_XT
+    .word 0x3c
+
+    defword "UART-IMSC", UART_IMSC, 0x0, REGISTER_XT
+    .word 0x38
+
+    defword "UART-IFLS", UART_IFLS, 0x0, REGISTER_XT
+    .word 0x34
+
+    defword "UART-CR", UART_CR, 0x0, REGISTER_XT
+    .word 0x30
+
+    defword "UART-LCRH", UART_LCRH, 0x0, REGISTER_XT
+    .word 0x2c
+
+    defword "UART-FBRD", UART_FBRD, 0x0, REGISTER_XT
+    .word 0x28
+
+    defword "UART-IBRD", UART_IBRD, 0x0, REGISTER_XT
+    .word 0x24
+
+    defword "UART-LPR", UART_LPR, 0x0, REGISTER_XT
+    .word 0x20
+
+    defword "UART-FR", UART_FR, 0x0, REGISTER_XT
+    .word 0x18
+
+    defword "UART-RSR-ECR", UART_RSR_ECR, 0x0, REGISTER_XT
+    .word 0x4
+
+    defword "UART-DR", UART_DR, 0x0, REGISTER_XT
+    .word 0x0
+
+    defconst "UART0", UARTZ, 0x4000c000
+
+
+    defword "GPIO-DEN", GPIO_DEN, 0x0, REGISTER_XT
+    .word 0x51c
+
+    defword "GPIO-PDR", GPIO_PDR, 0x0, REGISTER_XT
+    .word 0x514
+
+    defword "GPIO-PUR", GPIO_PUR, 0x0, REGISTER_XT
+    .word 0x510
+
+    defword "GPIO-ODR", GPIO_ODR, 0x0, REGISTER_XT
+    .word 0x50c
+
+    defword "GPIO-DR2R", GPIO_DRTWOR, 0x0, REGISTER_XT
+    .word 0x500
+
+    defword "GPIO-ICR", GPIO_ICR, 0x0, REGISTER_XT
+    .word 0x41c
+
+    defword "GPIO-MIS", GPIO_MIS, 0x0, REGISTER_XT
+    .word 0x418
+
+    defword "GPIO-RIS", GPIO_RIS, 0x0, REGISTER_XT
+    .word 0x414
+
+    defword "GPIO-IM", GPIO_IM, 0x0, REGISTER_XT
+    .word 0x410
+
+    defword "GPIO-IEV", GPIO_IEV, 0x0, REGISTER_XT
+    .word 0x40c
+
+    defword "GPIO-IBE", GPIO_IBE, 0x0, REGISTER_XT
+    .word 0x408
+
+    defword "GPIO-IS", GPIO_IS, 0x0, REGISTER_XT
+    .word 0x404
+
+    defword "GPIO-AFSEL", GPIO_AFSEL, 0x0, REGISTER_XT
+    .word 0x420
+
+    defword "GPIO-DIR", GPIO_DIR, 0x0, REGISTER_XT
+    .word 0x400
+
+    defconst "GPIOE", GPIOE, 0x40024000
+
+
+    defconst "GPIOD", GPIOD, 0x40007000
+
+
+    defconst "GPIOC", GPIOC, 0x40006000
+
+
+    defconst "GPIOB", GPIOB, 0x40005000
+
+
+    defconst "GPIOA", GPIOA, 0x40004000
+
+
     defconst "SYSCTL-RCGC2", SYSCTL_RCGCTWO, 0x400fe108
 
 
@@ -546,6 +678,12 @@
 
 
     defconst "STCTRL", STCTRL, -0x1fff1ff0
+
+
+    defconst "NVIC-SETENA0", NVIC_SETENAZ, -0x1fff1f00
+
+
+    defconst "NVIC", NVIC, -0x1fff2000
 
 
     defword "CLEAR-BITS", CLEAR_BITS, 0x0

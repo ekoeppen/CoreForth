@@ -938,12 +938,6 @@ fill_done:
     bl putstring
     NEXT
 
-    defword "TYPE-ESCAPED", TYPE_ESCAPED
-    .word QDUP, ZBRANCH, 0x4c
-    .word SWAP, DUP, CFETCH, DUP, LIT, '"', EQU, ZBRANCH, 0x10
-    .word LIT, '\\', EMIT
-    .word EMIT, ONEPLUS, SWAP, ONEMINUS, BRANCH, 0xffffffb0, DROP, EXIT
-
     defcode ".H", DOTH
     pop {r0}
     bl putsignedhexnumber
@@ -1460,6 +1454,12 @@ words_loop:
 
 @ ---------------------------------------------------------------------
 @ -- Disassembler -----------------------------------------------------
+
+    defword "TYPE-ESCAPED", TYPE_ESCAPED
+    .word QDUP, ZBRANCH, 0x4c
+    .word SWAP, DUP, CFETCH, DUP, LIT, '"', EQU, ZBRANCH, 0x10
+    .word LIT, '\\', EMIT
+    .word EMIT, ONEPLUS, SWAP, ONEMINUS, BRANCH, 0xffffffb0, DROP, EXIT
 
     defword "QUOTE-CHAR", QUOTE_CHAR
     .word LIT, QUOTE_CHARS
