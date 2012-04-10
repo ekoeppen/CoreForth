@@ -357,27 +357,6 @@ stack_underflow_message:
 stack_underflow_message_end:
     .ltorg
 
-calc_wide_branch:
-    mov ip, #0x9000
-    ands r1, r0, #0x800000
-    ubfx r2, r0, #1, #11
-    movt ip, #0xffff
-    it ne
-    movne r1, #0x2000
-    orr r3, r2, ip
-    ands r2, r0, #0x400000
-    orr ip, r3, r1
-    it ne
-    movne r2, #0x800
-    ubfx r0, r0, #12, #10
-    orr r1, ip, r2
-    orr r0, r0, #0xf400
-    sxth r3, r1
-    lsls r3, r3, #16
-    adds r0, r3, r0
-    subs r0, r0, #1
-    bx lr
-
     @ Busy delay with three ticks per count
 delay:
     subs r0, #1
@@ -506,22 +485,11 @@ delay:
 @ ---------------------------------------------------------------------
 @ -- Memory operations -----------------------------------------------
 
-    defcode "CHAR", CHAR
-    mov r0, #1
-    push {r0}
-    NEXT
+    defconst "CHAR", CHAR, 1
+    defconst "CELL", CELL, 4
 
-    defcode "CELL", CELL
-    mov r0, #4
-    push {r0}
-    NEXT
-
-    defcode "CELLS", CELLS
-    pop {r0}
-    mov r1, #4
-    mul r0, r0, r1
-    push {r0}
-    NEXT
+    defword "CELLS", CELLS
+    .word LIT, 4, MUL, EXIT
 
     defcode "ALIGNED", ALIGNED
     pop {r0}
@@ -586,34 +554,33 @@ fill_loop:
 fill_done:
     NEXT
 
-    defcode "BLANK", BLANK
-    mov r2, #32
-    b fill_code
+    defword "BLANK", BLANK
+    .word BL, FILL, EXIT
 
-	defcode "CMOVE>", CMOVEUP
-	pop {r0}
-	pop {r1}
-	pop {r2}
+    defcode "CMOVE>", CMOVEUP
+    pop {r0}
+    pop {r1}
+    pop {r2}
 2:  sub r0, r0, #1
-    cmp	r0, #0
+    cmp r0, #0
     blt 1f
-	ldrb r3, [r2, r0]
-	strb r3, [r1, r0]
-	b 2b
+    ldrb r3, [r2, r0]
+    strb r3, [r1, r0]
+    b 2b
 1:  NEXT
 
-	defcode "CMOVE", CMOVE
-	pop {r0}
-	pop {r1}
-	pop {r2}
+    defcode "CMOVE", CMOVE
+    pop {r0}
+    pop {r1}
+    pop {r2}
 2:  sub r0, r0, #1
-    cmp	r0, #0
+    cmp r0, #0
     blt 1f
-	ldrb r3, [r2]
-	strb r3, [r1]
+    ldrb r3, [r2]
+    strb r3, [r1]
     add r1, #1
     add r2, #1
-	b 2b
+    b 2b
 1:  NEXT
 
     defcode "S=", SEQU
@@ -905,7 +872,6 @@ fill_done:
     .ltorg
 
     defcode ".S", PRINTSTACK
-    .set DOTS, PRINTSTACK
     bl printstack
     NEXT
 
@@ -914,23 +880,16 @@ fill_done:
     bl putchar
     NEXT
 
-    defcode "CR", CR
-    mov r0, #13
-    bl putchar
-1:  mov r0, #10
-    bl putchar
-    NEXT
+    defword "LF", LF
+    .word LIT, 10, EMIT, EXIT
 
-    defcode "LF", LF
-    b 1b
+    defword "CR", CR
+    .word LIT, 13, EMIT, LF, EXIT
 
-    defcode "BL", BL
-    mov r0, #32
-    push {r0}
-    NEXT
+    defconst "BL", BL, 32
 
     defword "SPACE", SPACE
-    .word LIT, 32, EMIT, EXIT
+    .word BL, EMIT, EXIT
 
     defcode "TYPE", TYPE
     pop {r1}
@@ -1168,12 +1127,6 @@ is_positive:
 
     defcode "HALT", HALT
     b .
-
-    defcode "(ABRANCH)", ASMBRANCH
-    pop {r0}
-    bl calc_wide_branch
-    push {r0}
-    NEXT
 
     defword "HERE", HERE
     .word DP, FETCH, EXIT
@@ -1723,6 +1676,7 @@ print_xt_suffix:
     .set TWOSLASH, TWODIV
     .set LTGT, NEQU
     .set SLASHMOD, DIVMOD
+    .set DOTS, PRINTSTACK
 
 @ ---------------------------------------------------------------------
 

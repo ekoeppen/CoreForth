@@ -409,7 +409,7 @@ uart0_key_handler:
     pop {r1}
     pop {r0}
     lsl r0, r0, #2
-    add r0, r0, r1
+    add r0, r1
     pop {r1}
     strb r1, [r0]
     NEXT
