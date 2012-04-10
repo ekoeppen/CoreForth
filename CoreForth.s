@@ -17,23 +17,23 @@
 
     .macro CHR, c
     push {r0, r1}
-    mov r0, \c
+    movs r0, \c
     bl putchar
     pop {r0, r1}
     .endm
 
     .macro REG, r
     push {r0, r1}
-    mov r0, \r
+    movs r0, \r
     bl puthexnumber
     pop {r0, r1}
     .endm
 
     .macro NEXT
     ldr r0, [r7]
-    add r7, r7, #4
+    adds r7, r7, #4
     ldr r1, [r0]
-    add r1, r1, #1
+    adds r1, r1, #1
     bx r1
     .endm
 
@@ -122,18 +122,18 @@ cold_start:
 @ -- Interpreter code -------------------------------------------------
 
 DOCOL:
-    sub r6, r6, #4
+    subs r6, r6, #4
     str r7, [r6]
-    add r7, r0, #4
+    adds r7, r0, #4
     NEXT
 
 DOVAR:
-    add r1, r0, #4
+    adds r1, r0, #4
     push {r1}
     NEXT
 
 DODATA:
-    add r1, r0, #4
+    adds r1, r0, #4
     push {r1}
     NEXT
 
@@ -143,24 +143,24 @@ DOCON:
     NEXT
 
 DODOES:
-    sub r6, r6, #4
+    subs r6, r6, #4
     str r7, [r6]
     mov r7, lr
-    add r7, r7, #5
-    add r0, r0, #4
+    adds r7, r7, #5
+    adds r0, r0, #4
     push {r0}
     NEXT
 
 DOOFFSET:
     ldr r1, [r0, #4]
     pop {r2}
-    add r1, r2, r1
+    adds r1, r2, r1
     push {r1}
     NEXT
 
     defcode "EXIT", EXIT
     ldr r7, [r6]
-    add r6, r6, #4
+    adds r6, r6, #4
     NEXT
 
 @ ---------------------------------------------------------------------
@@ -175,7 +175,7 @@ putstring:
     mov r6, r1
 putstring_loop:
     ldrb r0, [r5]
-    add r5, r5, #1
+    adds r5, r5, #1
     bl putchar
     subs r6, r6, #1
     bgt putstring_loop
@@ -185,18 +185,18 @@ putnumber:
     push {lr}
     cmp r0, #0
     bne 1f
-    mov r0, #48
+    movs r0, #48
     bl putchar
     pop {pc}
 1:  push {r4}
-    mov r4, #0
-    mov r3, #10
-    mov r1, #48
+    movs r4, #0
+    movs r3, #10
+    movs r1, #48
 2:  sdiv r2, r0, r3
     mls r0, r3, r2, r0
-    add r0, r1
+    adds r0, r1
     push {r0}
-    add r4, #1
+    adds r4, #1
     mov r0, r2
     cmp r0, #0
     bgt 2b
@@ -209,33 +209,33 @@ putnumber:
 puthexnumber:
     push {r4, r5, lr}
     mov r4, r0
-    mov r0, #'0'
+    movs r0, #'0'
     bl putchar
-    mov r0, #'x'
+    movs r0, #'x'
     bl putchar
     mov r0, r4
-    mov r3, #0
-    mov r5, #8
+    movs r3, #0
+    movs r5, #8
 puthexnumber_loop:
-    ror r0, r0, #28
+    rors r0, r0, #28
     mov r4, r0
-    and r0, r0, #15
+    ands r0, r0, #15
     cmp r3, #0
     bgt 3f
     cmp r0, #0
     beq 2f
-    mov r3, #1
-3:  add r0, r0, #'0'
+    movs r3, #1
+3:  adds r0, r0, #'0'
     cmp r0, #'9'
     ble 1f
-    add r0, r0, #'a' - '0' - 10
+    adds r0, r0, #'a' - '0' - 10
 1:  bl putchar
 2:  mov r0, r4
     subs r5, r5, #1
     bne puthexnumber_loop
     cmp r3, #0
     bne 4f
-    mov r0, #'0'
+    movs r0, #'0'
     bl putchar
 4:  pop {r4, r5, pc}
 
@@ -244,10 +244,10 @@ putsignedhexnumber:
     cmp r0, #0
     bge 1f
     push {r0}
-    mov r0, #'-'
+    movs r0, #'-'
     bl putchar
     pop {r1}
-    neg r0, r1
+    negs r0, r1
 1:  bl puthexnumber
     pop {pc}
 
@@ -268,25 +268,25 @@ readline_loop:
 readline_backspace:
     cmp r4, r5
     beq readline_loop
-    mov r0, #32
+    movs r0, #32
     strb r0, [r5]
-    sub r5, r5, #1
-    add r6, r6, #1
-    mov r0, #8
+    subs r5, r5, #1
+    adds r6, r6, #1
+    movs r0, #8
     bl putchar
-    mov r0, #32
+    movs r0, #32
     bl putchar
-    mov r0, #8
+    movs r0, #8
     bl putchar
     b readline_loop
 readline_addchar:
     bl putchar
     strb r0, [r5]
-    add r5, r5, #1
+    adds r5, r5, #1
     subs r6, r6, #1
     bgt readline_loop
 readline_end:
-    sub r0, r5, r4
+    subs r0, r5, r4
     pop {r4, r5, r6, pc}
 
 /* read keys including escape sequences. Reading escape itself is
@@ -305,23 +305,23 @@ read_widekey:
     blt 3f
     cmp r0, 'Z'
     bgt 3f
-    sub r4, r0, '@'
+    subs r4, r0, '@'
     b 4f
-3:  mov r4, #10
-    mov r5, #10
+3:  movs r4, #10
+    movs r5, #10
 2:  cmp r0, '~'
     beq 4f
     cmp r0, '0'
     blt 1f
     cmp r0, '9'
     bgt 1f
-    sub r0, '0'
-    mul r4, r4, r5
-    add r4, r0
+    subs r0, '0'
+    muls r4, r4, r5
+    adds r4, r0
     bl read_key
     b 2b
-4:  mov r0, #0
-    sub r0, r4
+4:  movs r0, #0
+    subs r0, r4
 1:  pop {r4, r5, pc}
 
 printstack:
@@ -331,25 +331,25 @@ printstack:
     blt 1f
     beq 2f
     ldr r0, =stack_underflow_message
-    mov r1, #(stack_underflow_message_end - stack_underflow_message)
+    movs r1, #(stack_underflow_message_end - stack_underflow_message)
     bl putstring
 2:  pop {r4, pc}
 1:  ldr r4, =addr_TOS
-    sub r4, r4, #4
+    subs r4, r4, #4
 printstack_loop:
     ldr r0, [r4]
     bl puthexnumber
-    mov r0, #32
+    movs r0, #32
     bl putchar
-    sub r4, r4, #8
+    subs r4, r4, #8
     cmp r4, sp
     beq printstack_end
-    add r4, r4, #4
+    adds r4, r4, #4
     b printstack_loop
 printstack_end:
-    mov r0, #13
+    movs r0, #13
     bl putchar
-    mov r0, #10
+    movs r0, #10
     bl putchar
     pop {r4, pc}
 stack_underflow_message:
@@ -367,7 +367,7 @@ delay:
 @ -- Stack manipulation -----------------------------------------------
 
     defcode "DROP", DROP
-    add sp, sp, #4
+    adds sp, sp, #4
     NEXT
 
     defcode "SWAP", SWAP
@@ -430,7 +430,7 @@ delay:
     NEXT
 
     defcode "2DROP", TWODROP
-    add sp, sp, #8
+    adds sp, sp, #8
     NEXT
 
     defcode "2OVER", TWOOVER
@@ -442,13 +442,13 @@ delay:
 
     defcode ">R", TOR
     pop {r0}
-    sub r6, r6, #4
+    subs r6, r6, #4
     str r0, [r6]
     NEXT
 
     defcode "R>", RFROM
     ldr r0, [r6]
-    add r6, r6, #4
+    adds r6, r6, #4
     push {r0}
     NEXT
 
@@ -458,7 +458,7 @@ delay:
     NEXT
 
     defcode "RDROP", RDROP
-    add r6, r6, #4
+    adds r6, r6, #4
     NEXT
 
     defcode "SP@", SPFETCH
@@ -493,9 +493,9 @@ delay:
 
     defcode "ALIGNED", ALIGNED
     pop {r0}
-    add r0, r0, #3
-    mvn r1, #3
-    and r0, r0, r1
+    adds r0, r0, #3
+    mvns r1, #3
+    ands r0, r0, r1
     push {r0}
     NEXT
 
@@ -527,7 +527,7 @@ delay:
     pop {r1}
     pop {r0}
     ldr r2, [r1]
-    add r2, r2, r0
+    adds r2, r2, r0
     str r2, [r1]
     NEXT
 
@@ -535,7 +535,7 @@ delay:
     pop {r1}
     pop {r0}
     ldr r2, [r1]
-    sub r2, r2, r0
+    subs r2, r2, r0
     str r2, [r1]
     NEXT
 
@@ -548,7 +548,7 @@ fill_code:
     beq fill_done
 fill_loop:
     strb r2, [r0]
-    add r0, r0, #1
+    adds r0, r0, #1
     subs r1, r1, #1
     bne fill_loop
 fill_done:
@@ -561,7 +561,7 @@ fill_done:
     pop {r0}
     pop {r1}
     pop {r2}
-2:  sub r0, r0, #1
+2:  subs r0, r0, #1
     cmp r0, #0
     blt 1f
     ldrb r3, [r2, r0]
@@ -573,13 +573,13 @@ fill_done:
     pop {r0}
     pop {r1}
     pop {r2}
-2:  sub r0, r0, #1
+2:  subs r0, r0, #1
     cmp r0, #0
     blt 1f
     ldrb r3, [r2]
     strb r3, [r1]
-    add r1, #1
-    add r2, #1
+    adds r1, #1
+    adds r2, #1
     b 2b
 1:  NEXT
 
@@ -591,12 +591,12 @@ fill_done:
 1:  cmp r2, #0
     beq 2f
     ldrb r4, [r0]
-    add r0, r0, #1
+    adds r0, r0, #1
     ldrb r5, [r1]
-    add r1, r1, #1
+    adds r1, r1, #1
     subs r5, r5, r4
     bne 3f
-    sub r2, r2, #1
+    subs r2, r2, #1
     b 1b
 3:  mov r2, r5
 2:  pop {r4, r5}
@@ -636,46 +636,46 @@ fill_done:
 
     defcode "1+", INCR
     ldr r0, [sp]
-    add r0, r0, #1
+    adds r0, r0, #1
     str r0, [sp]
     NEXT
 
     defcode "1-", DECR
     ldr r0, [sp]
-    sub r0, r0, #1
+    subs r0, r0, #1
     str r0, [sp]
     NEXT
 
     defcode "4+", INCR4
     ldr r0, [sp]
-    add r0, r0, #4
+    adds r0, r0, #4
     str r0, [sp]
     NEXT
 
     defcode "4-", DECR4
     ldr r0, [sp]
-    sub r0, r0, #4
+    subs r0, r0, #4
     str r0, [sp]
     NEXT
 
     defcode "+", ADD
     pop {r1}
     pop {r0}
-    add r0, r1, r0
+    adds r0, r1, r0
     push {r0}
     NEXT
 
     defcode "-", SUB
     pop {r1}
     pop {r0}
-    sub r0, r0, r1
+    subs r0, r0, r1
     push {r0}
     NEXT
 
     defcode "*", MUL
     pop {r0}
     pop {r1}
-    mul r0, r1, r0
+    muls r0, r1, r0
     push {r0}
     NEXT
 
@@ -705,13 +705,13 @@ fill_done:
 
     defcode "2*", TWOMUL
     ldr r0, [sp]
-    lsl r0, r0, #1
+    lsls r0, r0, #1
     str r0, [sp]
     NEXT
 
     defcode "2/", TWODIV
     ldr r0, [sp]
-    asr r0, r0, #1
+    asrs r0, r0, #1
     str r0, [sp]
     NEXT
 
@@ -719,8 +719,8 @@ fill_done:
     ldr r0, [sp]
     cmp r0, #0
     bge 1f
-    mvn r0, r0
-    add r0, #1
+    mvns r0, r0
+    adds r0, #1
     str r0, [sp]
 1:  NEXT
 
@@ -745,7 +745,7 @@ fill_done:
     defcode "ROR", ROR
     pop {r0}
     pop {r1}
-1:  ror r1, r0
+1:  rors r1, r0
     push {r1}
     NEXT
 
@@ -771,27 +771,27 @@ fill_done:
     defcode "AND", AND
     pop {r1}
     pop {r0}
-    and r0, r1, r0
+    ands r0, r1, r0
     push {r0}
     NEXT
 
     defcode "OR", OR
     pop {r1}
     pop {r0}
-    orr r0, r1, r0
+    orrs r0, r1, r0
     push {r0}
     NEXT
 
     defcode "XOR", XOR
     pop {r1}
     pop {r0}
-    eor r0, r1, r0
+    eors r0, r1, r0
     push {r0}
     NEXT
 
     defcode "INVERT", INVERT
     ldr r0, [sp]
-    mvn r0, r0
+    mvns r0, r0
     str r0, [sp]
     NEXT
 
@@ -801,30 +801,30 @@ fill_done:
     defcode "=", EQU
     pop {r1}
     pop {r0}
-    mov r2, #0
+    movs r2, #0
     cmp r0, r1
     bne 1f
-    mvn r2, r2
+    mvns r2, r2
 1:  push {r2}
     NEXT
 
     defcode "<", LT
     pop {r1}
     pop {r0}
-    mov r2, #0
+    movs r2, #0
     cmp r0, r1
     bge 1f
-    mvn r2, r2
+    mvns r2, r2
 1:  push {r2}
     NEXT
 
     defcode "U<", ULT
     pop {r1}
     pop {r0}
-    mov r2, #0
+    movs r2, #0
     cmp r0, r1
     bcs 1f
-    mvn r2, r2
+    mvns r2, r2
 1:  push {r2}
     NEXT
 
@@ -1018,14 +1018,14 @@ is_positive:
 
     defcode "BRANCH", BRANCH
     ldr r0, [r7]
-    add r7, r0
+    adds r7, r0
     NEXT
 
     defcode "0BRANCH", ZBRANCH
     pop {r0}
     cmp r0, #0
     beq code_BRANCH
-    add r7, r7, #4
+    adds r7, r7, #4
     NEXT
 
     defword "BEGIN", BEGIN, F_IMMED
@@ -1070,9 +1070,9 @@ is_positive:
     pop {r0, r1}
     ldr r2, [r6]
     str r1, [r6]
-    sub r6, r6, #4
+    subs r6, r6, #4
     str r0, [r6]
-    sub r6, r6, #4
+    subs r6, r6, #4
     str r2, [r6]
     NEXT
 
@@ -1083,18 +1083,18 @@ is_positive:
 
     defcode "(LOOP)", XLOOP
     ldr r0, [r6, #4]
-    add r0, r0, #1
+    adds r0, r0, #1
     ldr r1, [r6, #8]
     cmp r0, r1
     bge 1f
     str r0, [r6, #4]
-    mov r0, #0
+    movs r0, #0
     push {r0}
     NEXT
 1:  ldr r0, [r6]
-    add r6, r6, #8
+    adds r6, r6, #8
     str r0, [r6]
-    mvn r0, #0
+    mvns r0, #0
     push {r0}
     NEXT
 
@@ -1110,10 +1110,10 @@ is_positive:
     NEXT
 
 @ ---------------------------------------------------------------------
-@ -- Compiler and interpreter ----------------------------------------
+@ -- Compiler ands interpreter ----------------------------------------
 
     defcode "BYE", BYE
-    mov r0, #0x18
+    movs r0, #0x18
     bkpt 0xab
 
     defcode "WFI", WFI
@@ -1201,14 +1201,14 @@ is_positive:
     defword "CONSTANT", CONSTANT
     .word CREATE, COMMA, XDOES
     .set DOCONSTANT, .
-    add r0, r0, #4
+    adds r0, r0, #4
     ldr r0, [r0]
     push {r0}
     NEXT
 
     defcode "LIT", LIT
     ldr r0, [r7]
-    add r7, r7, #4
+    adds r7, r7, #4
     push {r0}
     NEXT
 
@@ -1227,63 +1227,63 @@ is_positive:
     pop {r0}
     mov r10, r0
     ldrb r1, [r0]
-    add r0, r0, #1
+    adds r0, r0, #1
     mov r2, r1          @ length
     mov r1, r0          @ address
     ldr r0, =addr_LATEST
     ldr r0, [r0]        @ current dictionary pointer
 1:  cmp r0, #0          @ NULL?
     bne 12f
-    mov r1, #0
+    movs r1, #0
     mov r0, r10
     b 4f              @ end of list!
 12: ldrb r3, [r0, #4]       @ flags+length field
-    and r3, r3, #(F_HIDDEN|F_LENMASK)
+    ands r3, r3, #(F_HIDDEN|F_LENMASK)
     cmp r3, r2          @ length the same?
     bne 2f              @ nope, skip this entry
     mov r4, r1          @ current char in string A
     mov r5, r0
-    add r5, r5, #5      @ current char in string B
+    adds r5, r5, #5      @ current char in string B
 10: push {r0, r1, r2}
-    mov r2, #32
+    movs r2, #32
     ldrb r0, [r4]
-    add r4, r4, #1
+    adds r4, r4, #1
     ldrb r1, [r5]
-    add r5, r5, #1
+    adds r5, r5, #1
     cmp r0, #64
     ble 11f
     cmp r0, #90
     bgt 11f
-    orr r0, r2
+    orrs r0, r2
 11: cmp r1, #64
     ble 12f
     cmp r1, #90
     bgt 12f
-    orr r1, r2
+    orrs r1, r2
 12: mov r8, r0
     mov r9, r1
     pop {r0, r1, r2}
     cmp r8, r9          @ A = B?
     bne 2f              @ nope
-    sub r3, r3, #1      @ decrement
+    subs r3, r3, #1      @ decrement
     cmp r3, #0
     bne 10b             @ > 0, keep going
-    add r0, r0, #4      @ skip link pointer
+    adds r0, r0, #4      @ skip link pointer
     ldrb r1, [r0]       @ load flags+len
-    mov r2, #F_IMMED
-    and r2, r1, r2    @ save to check flags
+    movs r2, #F_IMMED
+    ands r2, r1, r2    @ save to check flags
     cmp r2, #0
     beq 13f
-    mov r2, #1        @ 1 for immediate words
+    movs r2, #1        @ 1 for immediate words
     b 14f
-13: mov r2, #0        @ -1 for normal words
-    sub r2, r2, #1
-14: add r0, r0, #1      @ skip flags+len bytes
-    and r1, r1, #F_LENMASK  @ mask out flags
-    add r0, r0, r1      @ skip name
-    add r0, r0, #3      @ align to 4-byte boundary
-    mvn r3, #3
-    and r0, r0, r3
+13: movs r2, #0        @ -1 for normal words
+    subs r2, r2, #1
+14: adds r0, r0, #1      @ skip flags+len bytes
+    ands r1, r1, #F_LENMASK  @ mask out flags
+    adds r0, r0, r1      @ skip name
+    adds r0, r0, #3      @ align to 4-byte boundary
+    mvns r3, #3
+    ands r0, r0, r3
     mov r1, r2
     b 4f                @ strings are equal, r0 is the correct entry pointer
 2:  ldr r0, [r0]        @ previous dictionary pointer
@@ -1317,10 +1317,10 @@ noskip_delim:
 
     defcode ">NAME", TONAME
     pop {r0}
-    mvn r2, #F_IMMED
-1:  sub r0, r0, #1
+    mvns r2, #F_IMMED
+1:  subs r0, r0, #1
     ldrb r1, [r0]
-    and r1, r2
+    ands r1, r2
     cmp r1, #32
     bgt 1b
     cmp r1, #0
@@ -1339,7 +1339,7 @@ noskip_delim:
     defcode "EXECUTE", EXECUTE
     pop {r0}
     ldr r1, [r0]
-    add r1, r1, #1
+    adds r1, r1, #1
     mov pc, r1
 
     defword "(INTERPRET)", XINTERPRET @ TODO restructure this

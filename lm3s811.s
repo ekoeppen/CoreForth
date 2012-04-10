@@ -114,7 +114,7 @@ _start:
     .long 0                           /* Flash Memory Control */
 
 @ ---------------------------------------------------------------------
-@ -- Board specific code and initialization ---------------------------
+@ -- Board specific code ands initialization ---------------------------
 
 init_board:
     push {lr}
@@ -127,28 +127,28 @@ init_board:
     @ switch to 50Mhz SysClock
     ldr r0, =SYSCTL_RCC
 
-    @ set bypass and clear SYSDIV
+    @ set bypass ands clear SYSDIV
     ldr r1, [r0]
     ldr r2, =0x00008000
     ldr r3, =0xf83fffff
-    and r1, r3
-    orr r1, r2
+    ands r1, r3
+    orrs r1, r2
     str r1, [r0]
 
-    @ clear OSC source and power down PLL
+    @ clear OSC source ands power down PLL
     ldr r1, [r0]
     ldr r2, =0x00000000
     ldr r3, =0xffffcfcf
-    and r1, r3
-    orr r1, r2
+    ands r1, r3
+    orrs r1, r2
     str r1, [r0]
 
-    @ power up PLL and set XTAL and OSC source, set SYSDIV
+    @ power up PLL ands set XTAL and OSC source, set SYSDIV
     ldr r1, [r0]
     ldr r2, =0x01c002c0
     ldr r3, =0xf87ffc3f
-    and r1, r3
-    orr r1, r2
+    ands r1, r3
+    orrs r1, r2
     str r1, [r0]
 
     @ wait for PLL to become ready
@@ -165,8 +165,8 @@ init_board:
     ldr r1, [r0]
     ldr r2, =0x00000000
     ldr r3, =0xfffff7ff
-    and r1, r3
-    orr r1, r2
+    ands r1, r3
+    orrs r1, r2
     str r1, [r0]
 .else
     @ use 6MHz SysClock
@@ -175,27 +175,27 @@ init_board:
     str r1, [r0]
 .endif
 
-    mov r0, #32
+    movs r0, #32
     bl delay
 
     @ reset the interrupt vector table
     ldr r0, =addr_IVT
-    mov r1, #0
-    mov r2, 48
+    movs r1, #0
+    movs r2, #48
 1:  str r1, [r0], #4
     subs r2, r2, #1
     bgt 1b
 
     @ enable PIC interrupts
-    mov r0, #0
+    movs r0, #0
     msr primask, r0
-    mov r0, #0
+    movs r0, #0
     msr basepri, r0
     ldr r0, =(NVIC + NVIC_SETENA_BASE)
-    mov r1, #0x20
+    movs r1, #0x20
     str r1, [r0]
 
-    @ enable clocks on all timers, UARTS, ADC, PWM, SSI and I2C and GPIO ports
+    @ enable clocks on all timers, UARTS, ADC, PWM, SSI ands I2C and GPIO ports
     ldr r0, =SYSCTL_RCGC0
     ldr r1, =0x00110000
     str r1, [r0]
@@ -203,52 +203,52 @@ init_board:
     ldr r1, =0x00071013
     str r1, [r0]
     ldr r0, =SYSCTL_RCGC2
-    mov r1, #0x1f
+    movs r1, #0x1f
     str r1, [r0]
 
-    mov r0, #32
+    movs r0, #32
     bl delay
 
     @ enable pins on _GPIOA
     ldr r0, =_GPIOA
-    mov r1, #3
+    movs r1, #3
     str r1, [r0, _GPIO_AFSEL]
-    mov r1, #0x0
+    movs r1, #0x0
     str r1, [r0, _GPIO_ODR]
-    mov r1, #0x0
+    movs r1, #0x0
     str r1, [r0, _GPIO_PDR]
-    mov r1, #0xff
+    movs r1, #0xff
     str r1, [r0, _GPIO_DEN]
-    mov r1, #0x00
+    movs r1, #0x00
     str r1, [r0, _GPIO_DIR]
-    mov r1, #0xff
+    movs r1, #0xff
     str r1, [r0, _GPIO_DR2R]
 
-    mov r0, #32
+    movs r0, #32
     bl delay
 
     @ set UART baud rate
     ldr r0, =UART0
 .ifdef USE_50MHZ
-    mov r1, #27
-    mov r2, #2
+    movs r1, #27
+    movs r2, #2
 .else
-    mov r1, #3
-    mov r2, #16
+    movs r1, #3
+    movs r2, #16
 .endif
     str r1, [r0, #UART_IBRD]
     str r2, [r0, #UART_FBRD]
 
     @ set 8N1
-    mov r1, #0x60
+    movs r1, #0x60
     str r1, [r0, UART_LCRH]
 
     @ enable UART interrupts
-    mov r1, #0x0    @ trigger after one byte
+    movs r1, #0x0    @ trigger after one byte
     str r1, [r0, UART_IFLS]
-    mov r1, #0x10   @ trigger only receive interrupts
+    movs r1, #0x10   @ trigger only receive interrupts
     str r1, [r0, UART_IMSC]
-    mov r1, #0
+    movs r1, #0
     ldr r2, =addr_SBUF_HEAD
     str r1, [r2]
     ldr r2, =addr_SBUF_TAIL
@@ -263,7 +263,7 @@ init_board:
     ldr r1, =0x00ffffff
     str r1, [r0]
     ldr r0, =STCTRL
-    mov r1, #5
+    movs r1, #5
     str r1, [r0]
 
     pop {pc}
@@ -281,15 +281,15 @@ read_key:
     b 2b
 1:  ldr r0, =addr_SBUF
     ldrb r0, [r0, r3]
-    add r3, r3, #1
-    and r3, #0x0f
+    adds r3, r3, #1
+    ands r3, #0x0f
     strb r3, [r1]
     mov pc, lr
 
 putchar:
     push {r1, r2, r3, lr}
     ldr r1, =UART0
-    mov r2, #UART_TXFF
+    movs r2, #UART_TXFF
 1:  ldr r3, [r1, #UART_FR]
     ands r3, r3, r2
     bne 1b
@@ -307,9 +307,9 @@ putchar:
 generic_forth_handler:
     ldr r0, =addr_IVT
     mrs r1, ipsr
-    sub r1, r1, #1
-    lsl r1, #2
-    add r0, r0, r1
+    subs r1, r1, #1
+    lsls r1, #2
+    adds r0, r0, r1
     ldr r2, [r0]
     cmp r2, #0
     beq 1f
@@ -317,9 +317,9 @@ generic_forth_handler:
     ldr r6, =irq_stack_top
     mov r7, r0
     ldr r0, [r7]
-    add r7, r7, #4
+    adds r7, r7, #4
     ldr r1, [r0]
-    add r1, r1, #1
+    adds r1, r1, #1
     bx r1
 1:  bx lr
 
@@ -389,8 +389,8 @@ uart0_key_handler:
     ldr r2, =addr_SBUF_HEAD
     ldrb r3, [r2]
     strb r1, [r0, r3]
-    add r3, r3, #1
-    and r3, #0x0f
+    adds r3, r3, #1
+    ands r3, #0x0f
     strb r3, [r2]
     b 2b
 1:  bx lr
@@ -408,8 +408,8 @@ uart0_key_handler:
     defcode "GPIO-DATA!", GPIO_DATASTORE @ ( value mask gpio -- )
     pop {r1}
     pop {r0}
-    lsl r0, r0, #2
-    add r0, r1
+    lsls r0, r0, #2
+    adds r0, r1
     pop {r1}
     strb r1, [r0]
     NEXT
@@ -521,10 +521,10 @@ uart0_key_handler:
     pop {r0, r1}
     push {r0}
     push {r1}
-    mov r0, #1
+    movs r0, #1
     mov r1, sp
     bkpt #0xab
-    add sp, #8
+    adds sp, #8
     push {r0}
     NEXT
 
@@ -533,10 +533,10 @@ uart0_key_handler:
     push {r0}
     push {r1}
     push {r2}
-    mov r0, #5
+    movs r0, #5
     mov r1, sp
     bkpt #0xab
-    add sp, #12
+    adds sp, #12
     push {r0}
     NEXT
 
@@ -545,10 +545,10 @@ uart0_key_handler:
     push {r0}
     push {r1}
     push {r2}
-    mov r0, #6
+    movs r0, #6
     mov r1, sp
     bkpt #0xab
-    add sp, #12
+    adds sp, #12
     push {r0}
     NEXT
 
@@ -556,18 +556,18 @@ uart0_key_handler:
     pop {r0, r1}
     push {r0}
     push {r1}
-    mov r0, #10
+    movs r0, #10
     mov r1, sp
     bkpt #0xab
-    add sp, #8
+    adds sp, #8
     push {r0}
     NEXT
 
     defcode "FCLOSE", FCLOSE
-    mov r0, #2
+    movs r0, #2
     mov r1, sp
     bkpt #0xab
-    add sp, #4
+    adds sp, #4
     push {r0}
     NEXT
 
