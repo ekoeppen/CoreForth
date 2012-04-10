@@ -192,7 +192,7 @@ init_board:
     mov r0, #0
     msr basepri, r0
     ldr r0, =(NVIC + NVIC_SETENA_BASE)
-    mov r1, #0x20
+    mov r1, #0x20   @ UART
     str r1, [r0]
 
     @ enable clocks on all timers, UARTS, ADC, PWM, SSI and I2C and GPIO ports
@@ -260,14 +260,74 @@ init_board:
 
     @ enable SYSTICK (without interrupts)
     ldr r0, =STRELOAD
-    ldr r1, =0x00ffffff
+    @ ldr r1, =0x00ffffff
+    ldr r1, =5000000
     str r1, [r0]
     ldr r0, =STCTRL
-    mov r1, #5
+    mov r1, #7
     str r1, [r0]
+    b task_setup
 
     pop {pc}
     .align 2, 0
+    .ltorg
+
+task_setup:
+    ldr r0, =0x20001000
+    mov r1, #0
+    str r1, [r0]
+
+    ldr sp, =0x20001040
+    ldr r0, =0x01000000
+    push {r0}
+    ldr r0, =task_a
+    push {r0} 
+    ldr r0, =0xFFFFFFF9
+    push {r0} 
+    push {r0 - r3, r12}
+    ldr r0, =0x20001004
+    str sp, [r0]
+
+    ldr sp, =0x20001080
+    ldr r0, =0x01000000
+    push {r0}
+    ldr r0, =task_b
+    push {r0} 
+    ldr r0, =0xFFFFFFF9
+    push {r0} 
+    push {r0 - r3, r12}
+    ldr r0, =0x20001008
+    str sp, [r0]
+    b .
+
+systick_handler:
+    ldr r0, =0x20001000
+    ldr r1, [r0]
+    ldr r3, =0x20001004
+    cmp r1, #0
+    bne 2f
+    mov r2, #4
+    add r3, r2
+2:  mov r2, #1
+    sub r2, r1
+    str r2, [r0]
+    ldr sp, [r3]
+    bx lr
+
+task_a:
+    ldr r0, =0x20001100
+    ldr r1, [r0]
+    add r1, #1
+    str r1, [r0]
+    b task_a
+
+task_b:
+    ldr r0, =0x20001200
+    ldr r1, [r0]
+    add r1, #1
+    str r1, [r0]
+    b task_b
+
     .ltorg
 
 read_key:
@@ -346,9 +406,6 @@ debugmon_handler:
     b .
 
 pendsv_handler:
-    b .
-
-systick_handler:
     b .
 
 gpioa_handler:
