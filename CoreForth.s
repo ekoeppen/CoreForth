@@ -357,6 +357,25 @@ stack_underflow_message:
 stack_underflow_message_end:
     .ltorg
 
+printrstack:
+    push {r4, lr}
+    ldr r4, =addr_RTOS
+    subs r4, r4, #4
+1:  ldr r0, [r4]
+    bl puthexnumber
+    movs r0, #32
+    bl putchar
+    cmp r4, r6
+    beq 2f
+    subs r4, r4, #4
+    b 1b
+2:  movs r0, #13
+    bl putchar
+    movs r0, #10
+    bl putchar
+    pop {r4, pc}
+    .ltorg
+
     @ Busy delay with three ticks per count
 delay:
     subs r0, #1
@@ -367,7 +386,7 @@ delay:
 @ -- Stack manipulation -----------------------------------------------
 
     defcode "DROP", DROP
-    adds sp, sp, #4
+    add sp, sp, #4
     NEXT
 
     defcode "SWAP", SWAP
@@ -430,7 +449,7 @@ delay:
     NEXT
 
     defcode "2DROP", TWODROP
-    adds sp, sp, #8
+    add sp, sp, #8
     NEXT
 
     defcode "2OVER", TWOOVER
@@ -873,6 +892,10 @@ fill_done:
 
     defcode ".S", PRINTSTACK
     bl printstack
+    NEXT
+
+    defcode ".R", PRINTRSTACK
+    bl printrstack
     NEXT
 
     defcode "EMIT", EMIT

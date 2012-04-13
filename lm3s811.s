@@ -524,7 +524,7 @@ uart0_key_handler:
     movs r0, #1
     mov r1, sp
     bkpt #0xab
-    adds sp, #8
+    add sp, #8
     push {r0}
     NEXT
 
@@ -536,7 +536,7 @@ uart0_key_handler:
     movs r0, #5
     mov r1, sp
     bkpt #0xab
-    adds sp, #12
+    add sp, #12
     push {r0}
     NEXT
 
@@ -548,7 +548,7 @@ uart0_key_handler:
     movs r0, #6
     mov r1, sp
     bkpt #0xab
-    adds sp, #12
+    add sp, #12
     push {r0}
     NEXT
 
@@ -559,7 +559,7 @@ uart0_key_handler:
     movs r0, #10
     mov r1, sp
     bkpt #0xab
-    adds sp, #8
+    add sp, #8
     push {r0}
     NEXT
 
@@ -567,7 +567,7 @@ uart0_key_handler:
     movs r0, #2
     mov r1, sp
     bkpt #0xab
-    adds sp, #4
+    add sp, #4
     push {r0}
     NEXT
 
