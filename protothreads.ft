@@ -9,10 +9,10 @@ HEX
     ['] LIT ,XT   ,                                 \ push addr of IP cell
     ['] ! ,XT   ['] ; EXECUTE ; IMMEDIATE           \ set IP and compile normal exit
 
-: (YIELD)   ( f ip addr -- )            \ actual yield action
+: (?YIELD)   ( f ip addr -- )           \ actual yield action
     ROT IF ! RDROP ELSE 2DROP THEN ;    \ store new IP and return in case of yield
 
-: YIELD                                 \ insert yield
+: ?YIELD                                \ insert yield
     ['] LIT , ,                         \ push point of BEGIN
     ['] LIT , LATEST @ LINK> >BODY ,    \ push addr of IP cell
-    ['] (YIELD) , ; IMMEDIATE           \ compile yield action
+    ['] (?YIELD) , ; IMMEDIATE          \ compile yield action
