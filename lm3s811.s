@@ -271,6 +271,7 @@ init_board:
     .ltorg
 
 read_key:
+    push {r1, r2, r3, lr}
 2:  ldr r1, =addr_SBUF_TAIL
     ldrb r3, [r1]
     ldr r2, =addr_SBUF_HEAD
@@ -284,7 +285,7 @@ read_key:
     adds r3, r3, #1
     ands r3, #0x0f
     strb r3, [r1]
-    mov pc, lr
+    pop {r1, r2, r3, pc}
 
 putchar:
     push {r1, r2, r3, lr}

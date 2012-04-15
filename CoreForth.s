@@ -170,16 +170,16 @@ putstring:
     cmp r1, #0
     bgt 1f
     mov pc, lr
-1:  push {r5, r6, lr}
+1:  push {r4, r5, lr}
     mov r5, r0
-    mov r6, r1
+    mov r4, r1
 putstring_loop:
     ldrb r0, [r5]
     adds r5, r5, #1
     bl putchar
-    subs r6, r6, #1
+    subs r4, r4, #1
     bgt putstring_loop
-    pop {r5, r6, pc}
+    pop {r4, r5, pc}
 
 putnumber:
     push {lr}
@@ -252,10 +252,10 @@ putsignedhexnumber:
     pop {pc}
 
 readline:
-    push {r4, r5, r6, lr}
+    push {r3, r4, r5, lr}
     mov r4, r0
     mov r5, r0
-    movs r6, r1
+    movs r3, r1
     beq readline_end
 readline_loop:
     bl read_key
@@ -271,7 +271,7 @@ readline_backspace:
     movs r0, #32
     strb r0, [r5]
     subs r5, r5, #1
-    adds r6, r6, #1
+    adds r3, r3, #1
     movs r0, #8
     bl putchar
     movs r0, #32
@@ -283,11 +283,11 @@ readline_addchar:
     bl putchar
     strb r0, [r5]
     adds r5, r5, #1
-    subs r6, r6, #1
+    subs r3, r3, #1
     bgt readline_loop
 readline_end:
     subs r0, r5, r4
-    pop {r4, r5, r6, pc}
+    pop {r3, r4, r5, pc}
 
 /* read keys including escape sequences. Reading escape itself is
  * not supported yet. Escape sequences return negative numbers
@@ -948,7 +948,7 @@ fill_done:
     push {r0}
     NEXT
 
-    defcode "ACCEPT", SIMPLE_ACCEPT
+    defcode "READLINE", READLINE
     pop {r1}
     pop {r0}
     bl readline
