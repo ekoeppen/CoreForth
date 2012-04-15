@@ -1700,6 +1700,10 @@ print_xt_suffix:
     .set LTGT, NEQU
     .set SLASHMOD, DIVMOD
     .set DOTS, PRINTSTACK
+    .set LBRAC, LBRACKET
+    .set RBRAC, RBRACKET
+    .set LINKGT, FROMLINK
+    .set SEMI, SEMICOLON
 
 @ ---------------------------------------------------------------------
 
