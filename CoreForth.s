@@ -1490,9 +1490,9 @@ QUOTE_CHARS:
     .word DUP, LIT, 1, EQU, QBRANCH, 6f - .
     .word OVER, FETCHBYTE, LIT, '-', EQU, QBRANCH, 6f - .
     .word SWAP, LIT, QUOTE_MINUS + 1, BRANCH, 5f - .
-6:  .word SWAP, DUP, FETCHBYTE, QUOTE_CHAR, QBRANCH, 2f - . 
+6:  .word SWAP, DUP, FETCHBYTE, QUOTE_CHAR, QBRANCH, 2f - .
 5:  .word COUNT, TYPE, BRANCH, 3f - .
-2:  .word EMIT 
+2:  .word EMIT
 3:  .word INCR, SWAP, DECR, BRANCH, 1b - .
 4:  .word TWODROP, EXIT
 
@@ -1500,7 +1500,7 @@ QUOTE_CHARS:
     .word DUP, LIT, 0x400, LIT, last_word, WITHIN, QDUP, QBRANCH, 1f - .
     .word NIP, EXIT
 1:  .word LIT, ram_start, LIT, ram_top, WITHIN, EXIT
-    
+
 
     defword "XT?", XTQ
     .word DUP, ISVALIDADDR, QBRANCH, 2f - .

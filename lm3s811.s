@@ -41,13 +41,13 @@
     .set _GPIOE,      0x40024000
     .set _GPIO_DIR,        0x400
     .set _GPIO_AFSEL,      0x420
-    .set _GPIO_IS,         0x404 
-    .set _GPIO_IBE,        0x408 
-    .set _GPIO_IEV,        0x40c 
-    .set _GPIO_IM,         0x410 
-    .set _GPIO_RIS,        0x414 
-    .set _GPIO_MIS,        0x418 
-    .set _GPIO_ICR,        0x41c 
+    .set _GPIO_IS,         0x404
+    .set _GPIO_IBE,        0x408
+    .set _GPIO_IEV,        0x40c
+    .set _GPIO_IM,         0x410
+    .set _GPIO_RIS,        0x414
+    .set _GPIO_MIS,        0x418
+    .set _GPIO_ICR,        0x41c
     .set _GPIO_DR2R,       0x500
     .set _GPIO_ODR,        0x50c
     .set _GPIO_PUR,        0x510
@@ -603,7 +603,7 @@ eval_words:
     .include "protothreads.gen.s"
     .include "quit.gen.s"
     .word 0xffffffff
-.else 
+.else
     defword "COLD", COLD
     .word LIT, eval_words, EVALUATE
 
@@ -619,5 +619,5 @@ eval_words:
     .set end_of_rom, .
 
     .set last_word, link
-    .set data_start, ram_here 
+    .set data_start, ram_here
 
