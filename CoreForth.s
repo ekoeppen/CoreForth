@@ -769,7 +769,7 @@ fill_done:
     NEXT
 
     defword "ROTATE", ROTATE
-    .word DUP, ZGT, ZBRANCH, 1f - ., LIT, 32, SWAP, SUB, ROR, EXIT
+    .word DUP, ZGT, QBRANCH, 1f - ., LIT, 32, SWAP, SUB, ROR, EXIT
 1:  .word NEGATE, ROR, EXIT
 
     defword "NEGATE", NEGATE
@@ -956,14 +956,14 @@ fill_done:
     NEXT
 
     defword "DUMP", DUMP
-    .word QDUP, ZBRANCH, dump_end - .
+    .word QDUP, QBRANCH, dump_end - .
     .word SWAP
 dump_start_line:
     .word CR, DUP, DOT, LIT, 58, EMIT, BL, EMIT
 dump_line:
     .word DUP, FETCHBYTE, DOT, INCR
-    .word SWAP, DECR, QDUP, ZBRANCH, dump_end - .
-    .word SWAP, DUP, LIT, 7, AND, ZBRANCH, dump_start_line - .
+    .word SWAP, DECR, QDUP, QBRANCH, dump_end - .
+    .word SWAP, DUP, LIT, 7, AND, QBRANCH, dump_start_line - .
     .word BRANCH, dump_line - .
 dump_end:
     .word DROP, EXIT
@@ -971,20 +971,20 @@ dump_end:
     defword "SKIP", SKIP
     .word TOR
 1:
-    .word OVER, FETCHBYTE, RFETCH, EQU, OVER, ZGT, AND, ZBRANCH, 2f - .
+    .word OVER, FETCHBYTE, RFETCH, EQU, OVER, ZGT, AND, QBRANCH, 2f - .
     .word LIT, 1, TRIMSTRING, BRANCH, 1b - .
 2:
     .word RDROP, EXIT
 
     defword "SCAN", SCAN
     .word TOR
-1:  .word OVER, FETCHBYTE, RFETCH, NEQU, OVER, ZGT, AND, ZBRANCH, 2f - .
+1:  .word OVER, FETCHBYTE, RFETCH, NEQU, OVER, ZGT, AND, QBRANCH, 2f - .
     .word LIT, 1, TRIMSTRING, BRANCH, 1b - .
 2:  .word RDROP, EXIT
 
     defword "?SIGN", ISSIGN
     .word OVER, FETCHBYTE, LIT, 0x2c, SUB, DUP, ABS
-    .word LIT, 1, EQU, AND, DUP, ZBRANCH, 1f - .
+    .word LIT, 1, EQU, AND, DUP, QBRANCH, 1f - .
     .word INCR, TOR, LIT, 1, TRIMSTRING, RFROM
 1:  .word EXIT
 
@@ -1004,9 +1004,9 @@ dump_end:
     REPEAT ;
 */
 tonumber_loop:
-    .word DUP, ZBRANCH, tonumber_done - .
+    .word DUP, QBRANCH, tonumber_done - .
     .word OVER, FETCHBYTE, ISDIGIT
-    .word ZEQU, ZBRANCH, tonumber_cont - .
+    .word ZEQU, QBRANCH, tonumber_cont - .
     .word DROP, EXIT
 tonumber_cont:
     .word TOR, ROT, BASE, FETCH, MUL
@@ -1018,10 +1018,10 @@ tonumber_done:
 
     defword "?NUMBER", ISNUMBER /* ( c-addr -- n true | c-addr false ) */
     .word DUP, LIT, 0, DUP, ROT, COUNT
-    .word ISSIGN, TOR, TONUMBER, ZBRANCH, is_number - .
+    .word ISSIGN, TOR, TONUMBER, QBRANCH, is_number - .
     .word RDROP, TWODROP, DROP, LIT, 0, EXIT
 is_number:
-    .word TWOSWAP, TWODROP, DROP, RFROM, ZNEQU, ZBRANCH, is_positive - ., NEGATE
+    .word TWOSWAP, TWODROP, DROP, RFROM, ZNEQU, QBRANCH, is_positive - ., NEGATE
 is_positive:
     .word LIT, -1, EXIT
 
@@ -1044,7 +1044,7 @@ is_positive:
     adds r7, r0
     NEXT
 
-    defcode "0BRANCH", ZBRANCH
+    defcode "?BRANCH", QBRANCH
     pop {r0}
     cmp r0, #0
     beq code_BRANCH
@@ -1058,10 +1058,10 @@ is_positive:
     .word LIT, BRANCH, COMMAXT, HERE, SUB, COMMA, EXIT
 
     defword "UNTIL", UNTIL, F_IMMED
-    .word LIT, ZBRANCH, COMMAXT, HERE, SUB, COMMA, EXIT
+    .word LIT, QBRANCH, COMMAXT, HERE, SUB, COMMA, EXIT
 
     defword "IF", IF, F_IMMED
-    .word LIT, ZBRANCH, COMMAXT, HERE, DUP, COMMA, EXIT
+    .word LIT, QBRANCH, COMMAXT, HERE, DUP, COMMA, EXIT
 
     defword "ELSE", ELSE, F_IMMED
     .word LIT, BRANCH, COMMAXT, HERE, DUP, COMMA
@@ -1085,7 +1085,7 @@ is_positive:
 
     defword "ENDCASE", ENDCASE, F_IMMED
     .word LIT, DROP, COMMA
-1:  .word DUP, ZBRANCH, 2f - .
+1:  .word DUP, QBRANCH, 2f - .
     .word THEN, BRANCH, 1b - .
 2:  .word DROP, EXIT
 
@@ -1125,7 +1125,7 @@ is_positive:
     .word LIT, XDO, COMMAXT, HERE, EXIT
 
     defword "LOOP", LOOP, F_IMMED
-    .word LIT, XLOOP, COMMAXT, LIT, ZBRANCH, COMMAXT, HERE, SUB, COMMA, EXIT
+    .word LIT, XLOOP, COMMAXT, LIT, QBRANCH, COMMAXT, HERE, SUB, COMMA, EXIT
 
     defcode "DELAY", DELAY
     pop {r0}
@@ -1161,8 +1161,8 @@ is_positive:
     .word HERE, STORE, CELL, ALLOT, EXIT
 
     defword "+FIXUP", ADDFIXUP
-    .word ROMTOP, GT, ZBRANCH, 1f - .
-    .word FIXUPS, FETCH, QDUP, ZBRANCH, 1f - .
+    .word ROMTOP, GT, QBRANCH, 1f - .
+    .word FIXUPS, FETCH, QDUP, QBRANCH, 1f - .
     .word DUP, FETCH, INCR, CELLS, OVER, ADD, HERE, SWAP, STORE
     .word LIT, 1, SWAP, ADDSTORE
 1:
@@ -1327,7 +1327,7 @@ is_positive:
     .word DUP, SOURCE, SOURCEINDEX, FETCH, TRIMSTRING
     .word DUP, TOR, ROT, SKIP
     .word OVER, TOR, ROT, SCAN
-    .word DUP, ZNEQU, ZBRANCH, noskip_delim - ., DECR
+    .word DUP, ZNEQU, QBRANCH, noskip_delim - ., DECR
 noskip_delim:
     .word RFROM, RFROM, ROT, SUB, SOURCEINDEX, ADDSTORE
     .word TUCK, SUB
@@ -1367,18 +1367,18 @@ noskip_delim:
 
     defword "(INTERPRET)", XINTERPRET @ TODO restructure this
 interpret_loop:
-    .word BL, WORD, DUP, FETCHBYTE, ZBRANCH, interpret_eol - .
-    .word FIND, QDUP, ZBRANCH, interpret_check_number - .
-    .word STATE, FETCH, ZBRANCH, interpret_execute - .
-    .word INCR, ZBRANCH, interpret_compile_word - .
+    .word BL, WORD, DUP, FETCHBYTE, QBRANCH, interpret_eol - .
+    .word FIND, QDUP, QBRANCH, interpret_check_number - .
+    .word STATE, FETCH, QBRANCH, interpret_execute - .
+    .word INCR, QBRANCH, interpret_compile_word - .
     .word EXECUTE, BRANCH, interpret_loop - .
 interpret_compile_word:
     .word COMMAXT, BRANCH, interpret_loop - .
 interpret_execute:
     .word DROP, EXECUTE, BRANCH, interpret_loop - .
 interpret_check_number:
-    .word ISNUMBER, ZBRANCH, interpret_not_found - .
-    .word STATE, FETCH, ZBRANCH, interpret_loop - .
+    .word ISNUMBER, QBRANCH, interpret_not_found - .
+    .word STATE, FETCH, QBRANCH, interpret_loop - .
     .word LIT, LIT, COMMAXT, COMMA, BRANCH, interpret_loop - .
 interpret_not_found:
     .word LIT, 0, EXIT
@@ -1389,8 +1389,8 @@ interpret_eol:
     .word XSOURCE, STORE
     .word LIT, 0, STATE, STORE
 1:
-    .word XSOURCE, FETCH, DUP, FETCHBYTE, DUP, LIT, 255, NEQU, ZBRANCH, 2f - .
-    .word SOURCECOUNT, STORE, INCR, XSOURCE, STORE, LIT, 0, SOURCEINDEX, STORE, XINTERPRET, ZBRANCH, 3f - ., DROP
+    .word XSOURCE, FETCH, DUP, FETCHBYTE, DUP, LIT, 255, NEQU, QBRANCH, 2f - .
+    .word SOURCECOUNT, STORE, INCR, XSOURCE, STORE, LIT, 0, SOURCEINDEX, STORE, XINTERPRET, QBRANCH, 3f - ., DROP
     .word SOURCECOUNT, FETCH, XSOURCE, ADDSTORE, BRANCH, 1b - .
 2:
     .word TWODROP, EXIT
@@ -1425,21 +1425,21 @@ interpret_eol:
     .word LATEST, FETCH
 words_loop:
     .word DUP, CELL, ADD, COUNT, LIT, 31, AND, TYPE, SPACE
-    .word FETCH, QDUP, ZEQU, ZBRANCH, words_loop - .
+    .word FETCH, QDUP, ZEQU, QBRANCH, words_loop - .
     .word EXIT
 
 @ ---------------------------------------------------------------------
 @ -- Disassembler -----------------------------------------------------
 
     defword "TYPE-ESCAPED", TYPE_ESCAPED
-    .word QDUP, ZBRANCH, 0x4c
-    .word SWAP, DUP, CFETCH, DUP, LIT, '"', EQU, ZBRANCH, 0x10
+    .word QDUP, QBRANCH, 0x4c
+    .word SWAP, DUP, CFETCH, DUP, LIT, '"', EQU, QBRANCH, 0x10
     .word LIT, '\\', EMIT
     .word EMIT, ONEPLUS, SWAP, ONEMINUS, BRANCH, 0xffffffb0, DROP, EXIT
 
     defword "QUOTE-CHAR", QUOTE_CHAR
     .word LIT, QUOTE_CHARS
-2:  .word TWODUP, FETCHBYTE, DUP, ZNEQU, ZBRANCH, 3f - ., NEQU, ZBRANCH, 1f - .
+2:  .word TWODUP, FETCHBYTE, DUP, ZNEQU, QBRANCH, 3f - ., NEQU, QBRANCH, 1f - .
     .word CHAR, ADD, DUP, FETCHBYTE, ADD, CHAR, ADD, BRANCH, 2b - .
 1:  .word CHAR, ADD, NIP, LIT, -1, EXIT
 3:  .word TWODROP, DROP, LIT, 0, EXIT
@@ -1484,40 +1484,40 @@ QUOTE_CHARS:
     .byte 0
 
     defword ".QUOTED", DOTQUOTED
-    .word OVER, FETCHBYTE, LIT, '-', EQU, ZBRANCH, 1f - .
+    .word OVER, FETCHBYTE, LIT, '-', EQU, QBRANCH, 1f - .
     .word SWAP, LIT, QUOTE_MINUS + 1, BRANCH, 5f - .
-1:  .word DUP, ZGT, ZBRANCH, 4f - .
-    .word DUP, LIT, 1, EQU, ZBRANCH, 6f - .
-    .word OVER, FETCHBYTE, LIT, '-', EQU, ZBRANCH, 6f - .
+1:  .word DUP, ZGT, QBRANCH, 4f - .
+    .word DUP, LIT, 1, EQU, QBRANCH, 6f - .
+    .word OVER, FETCHBYTE, LIT, '-', EQU, QBRANCH, 6f - .
     .word SWAP, LIT, QUOTE_MINUS + 1, BRANCH, 5f - .
-6:  .word SWAP, DUP, FETCHBYTE, QUOTE_CHAR, ZBRANCH, 2f - . 
+6:  .word SWAP, DUP, FETCHBYTE, QUOTE_CHAR, QBRANCH, 2f - . 
 5:  .word COUNT, TYPE, BRANCH, 3f - .
 2:  .word EMIT 
 3:  .word INCR, SWAP, DECR, BRANCH, 1b - .
 4:  .word TWODROP, EXIT
 
     defword "VALID-ADDR?", ISVALIDADDR
-    .word DUP, LIT, 0x400, LIT, last_word, WITHIN, QDUP, ZBRANCH, 1f - .
+    .word DUP, LIT, 0x400, LIT, last_word, WITHIN, QDUP, QBRANCH, 1f - .
     .word NIP, EXIT
 1:  .word LIT, ram_start, LIT, ram_top, WITHIN, EXIT
     
 
     defword "XT?", XTQ
-    .word DUP, ISVALIDADDR, ZBRANCH, 2f - .
+    .word DUP, ISVALIDADDR, QBRANCH, 2f - .
     .word LATEST
-1:  .word FETCH, TWODUP, FROMLINK, EQU, OVER, ZEQU, OR, ZBRANCH, 1b - ., NIP, ZNEQU, EXIT
+1:  .word FETCH, TWODUP, FROMLINK, EQU, OVER, ZEQU, OR, QBRANCH, 1b - ., NIP, ZNEQU, EXIT
 2:  .word DROP, LIT, 0, EXIT
 
     defword "ANY>LINK", ANYTOLINK
     .word LATEST
-1:  .word FETCH, TWODUP, GT, ZBRANCH, 1b - .
+1:  .word FETCH, TWODUP, GT, QBRANCH, 1b - .
     .word NIP, EXIT
 
     defword "NEXT-WORD", NEXT_WORD
     .word LATEST, FETCH
-    .word TWODUP, EQU, ZBRANCH, 1f - .
+    .word TWODUP, EQU, QBRANCH, 1f - .
     .word TWODROP, HERE, EXIT
-1:  .word TWODUP, FETCH, NEQU, ZBRANCH, 2f - .
+1:  .word TWODUP, FETCH, NEQU, QBRANCH, 2f - .
     .word FETCH, BRANCH, 1b - .
 2:  .word SWAP, DROP, EXIT
 
@@ -1534,8 +1534,8 @@ QUOTE_CHARS:
 
     defword ".SQUOTE", DOTSQUOTE
     .word TONAME, COUNT, DOTQUOTED, XCSPACE, DROP, CELL, ADD, DUP, FETCHBYTE, CHAR, ADD, ALIGNED, DUP, ROTROT
-1:  .word SWAP, DUP, FETCH, DOTH, OVER, CELL, NEQU, ZBRANCH, 2f - ., XCSPACE
-2:  .word CELL, ADD, SWAP, CELL, SUB, DUP, ZEQU, ZBRANCH, 1b - .
+1:  .word SWAP, DUP, FETCH, DOTH, OVER, CELL, NEQU, QBRANCH, 2f - ., XCSPACE
+2:  .word CELL, ADD, SWAP, CELL, SUB, DUP, ZEQU, QBRANCH, 1b - .
     .word TWODROP, CELL, ADD, EXIT
 
     defword ".DOCOL-HEADER", DOTDOCOL_HEADER
@@ -1565,18 +1565,18 @@ QUOTE_CHARS:
 1:  .ascii "\016_XT\n    .word "
 
     defword ".WORD", DOTWORD
-    .word DUP, DUP, FETCH, CELL, SUB, OVER, NEQU, ZBRANCH, print_code - .
+    .word DUP, DUP, FETCH, CELL, SUB, OVER, NEQU, QBRANCH, print_code - .
     .word DUP, FETCH
-    .word DUP, ISVALIDADDR, ZBRANCH, 1f - .
-    .word DUP, LIT, DOCOL, NEQU, ZBRANCH, print_docol - .
-    .word DUP, LIT, DOVAR, NEQU, ZBRANCH, print_dovar - .
-    .word DUP, LIT, DOCON, NEQU, ZBRANCH, print_docon - .
-    .word DUP, LIT, DODATA, NEQU, ZBRANCH, print_dodata - .
-    .word DUP, LIT, DOCONSTANT, NEQU, ZBRANCH, print_docon - .
-    .word DUP, LIT, XDOES, NEQU, ZBRANCH, print_xdoes - .
-    .word DUP, LIT, XSQUOTE, NEQU, ZBRANCH, print_xsquote - .
-    .word DUP, FETCH, LIT, 0x1004f8df, NEQU, ZBRANCH, print_dodoes - .
-    .word DUP, XTQ, ZBRANCH, 1f - .
+    .word DUP, ISVALIDADDR, QBRANCH, 1f - .
+    .word DUP, LIT, DOCOL, NEQU, QBRANCH, print_docol - .
+    .word DUP, LIT, DOVAR, NEQU, QBRANCH, print_dovar - .
+    .word DUP, LIT, DOCON, NEQU, QBRANCH, print_docon - .
+    .word DUP, LIT, DODATA, NEQU, QBRANCH, print_dodata - .
+    .word DUP, LIT, DOCONSTANT, NEQU, QBRANCH, print_docon - .
+    .word DUP, LIT, XDOES, NEQU, QBRANCH, print_xdoes - .
+    .word DUP, LIT, XSQUOTE, NEQU, QBRANCH, print_xsquote - .
+    .word DUP, FETCH, LIT, 0x1004f8df, NEQU, QBRANCH, print_dodoes - .
+    .word DUP, XTQ, QBRANCH, 1f - .
     .word TONAME, COUNT, LIT, 31, AND, DOTQUOTED, TWODROP, CELL, EXIT
 1:  .word DOTUH, TWODROP, CELL, EXIT
 print_code:
@@ -1606,7 +1606,7 @@ print_label_lit:
 print_label_branch:
     .ascii "\006BRANCH"
 print_label_zbranch:
-    .ascii "\007ZBRANCH"
+    .ascii "\007QBRANCH"
 print_label_dodoes:
     .ascii "\012DODOES + 1"
 print_xdoes_xt:
@@ -1617,23 +1617,23 @@ print_xt_suffix:
 
     defword "(SEE)", XSEE
     .word DUP, TOLINK, NEXT_WORD
-    .word OVER, DOTWORD, DUP, ZBRANCH, 2f - .
+    .word OVER, DOTWORD, DUP, QBRANCH, 2f - .
     .word ROT, ADD, SWAP
-    .word TWODUP, NEQU, ZBRANCH, 2f - .
-1:  .word OVER, DOTWORD, DUP, ZBRANCH, 2f - .
+    .word TWODUP, NEQU, QBRANCH, 2f - .
+1:  .word OVER, DOTWORD, DUP, QBRANCH, 2f - .
     .word ROT, ADD, SWAP
-    .word TWODUP, NEQU, ZBRANCH, 2f - .
+    .word TWODUP, NEQU, QBRANCH, 2f - .
     .word XCSPACE, BRANCH, 1b - .
 2:  .word TWODROP
     .word LF, EXIT
 
     defword "SEE", SEE
-    .word BL, WORD, FIND, ZBRANCH, 3f - .
+    .word BL, WORD, FIND, QBRANCH, 3f - .
     .word XSEE
 3:  .word EXIT
 
     defword "SEE-RANGE", SEE_RANGE
-1:  .word DUP, XSEE, TOLINK, FETCH, FROMLINK, TWODUP, EQU, ZBRANCH, 1b - ., TWODROP, EXIT
+1:  .word DUP, XSEE, TOLINK, FETCH, FROMLINK, TWODUP, EQU, QBRANCH, 1b - ., TWODROP, EXIT
 
     defword "PRECOMP-BEGIN", PRECOMP_BEGIN
     .word LATEST, FETCH, FROMLINK, EXIT
