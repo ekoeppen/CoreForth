@@ -10,7 +10,7 @@
     .set F_LENMASK,         0x1f
 
     .set link,                 0
-    .set compiled_here, ram_start
+    .set ram_here, ram_start
 
 @ ---------------------------------------------------------------------
 @ -- Macros -----------------------------------------------------------
@@ -92,9 +92,9 @@ constaddr_\label :
     .endm
 
     .macro defvar name, label, size=4
-    defconst \name,\label,compiled_here
-    .set addr_\label, compiled_here
-    .set compiled_here, compiled_here + \size
+    defconst \name,\label,ram_here
+    .set addr_\label, ram_here
+    .set ram_here, ram_here + \size
     .endm
 
     .macro defdata name, label

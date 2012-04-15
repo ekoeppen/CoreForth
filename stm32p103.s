@@ -393,5 +393,5 @@ eval_words:
     .word 0xffffffff
 
     .set last_word, link
-    .set data_start, compiled_here 
+    .set data_start, ram_here 
 
