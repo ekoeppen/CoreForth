@@ -1,6 +1,6 @@
 all: stm32p103.bin lm3s811.bin
 
-GEN = ansi.gen.s accept.gen.s editor.gen.s quit.gen.s
+GEN = ansi.gen.s accept.gen.s editor.gen.s protothreads.gen.s quit.gen.s
 LM3S811_GEN = $(GEN) lm3s811.gen.s lm3s811ram.gen.s
 STM32P103_GEN = $(GEN) stm32p103.gen.s stm32p103ram.gen.s
 
