@@ -122,7 +122,7 @@ cold_start:
 @ -- Interpreter code -------------------------------------------------
 
 DOCOL:
-    subs r6, r6, #4
+    adds r6, r6, #4
     str r7, [r6]
     adds r7, r0, #4
     NEXT
@@ -143,7 +143,7 @@ DOCON:
     NEXT
 
 DODOES:
-    subs r6, r6, #4
+    adds r6, r6, #4
     str r7, [r6]
     mov r7, lr
     adds r7, r7, #5
@@ -160,7 +160,7 @@ DOOFFSET:
 
     defcode "EXIT", EXIT
     ldr r7, [r6]
-    adds r6, r6, #4
+    subs r6, r6, #4
     NEXT
 
 @ ---------------------------------------------------------------------
@@ -461,13 +461,13 @@ delay:
 
     defcode ">R", TOR
     pop {r0}
-    subs r6, r6, #4
+    adds r6, r6, #4
     str r0, [r6]
     NEXT
 
     defcode "R>", RFROM
     ldr r0, [r6]
-    adds r6, r6, #4
+    subs r6, r6, #4
     push {r0}
     NEXT
 
@@ -477,7 +477,7 @@ delay:
     NEXT
 
     defcode "RDROP", RDROP
-    adds r6, r6, #4
+    subs r6, r6, #4
     NEXT
 
     defcode "SP@", SPFETCH
@@ -1093,29 +1093,29 @@ is_positive:
     pop {r0, r1}
     ldr r2, [r6]
     str r1, [r6]
-    subs r6, r6, #4
+    adds r6, r6, #4
     str r0, [r6]
-    subs r6, r6, #4
+    adds r6, r6, #4
     str r2, [r6]
     NEXT
 
     defcode "I", INDEX
-    ldr r0, [r6, #4]
+    ldr r0, [r6, #-4]
     push {r0}
     NEXT
 
     defcode "(LOOP)", XLOOP
-    ldr r0, [r6, #4]
+    ldr r0, [r6, #-4]
     adds r0, r0, #1
-    ldr r1, [r6, #8]
+    ldr r1, [r6, #-8]
     cmp r0, r1
     bge 1f
-    str r0, [r6, #4]
+    str r0, [r6, #-4]
     movs r0, #0
     push {r0}
     NEXT
 1:  ldr r0, [r6]
-    adds r6, r6, #8
+    subs r6, r6, #8
     str r0, [r6]
     mvns r0, #0
     push {r0}
@@ -1649,10 +1649,10 @@ print_xt_suffix:
     defconst "LATESTROM", LATESTROM, last_rom_word
     defconst "LATESTCORE", LATESTCORE, last_core_word
     defconst "C/BLK", CSLASHBLK, 1024
-    defvar "STACK", STACK, 512
-    defvar "S0", TOS, 0
-    defvar "RSTACK", RSTACK, 256
     defvar "R0", RTOS, 0
+    defvar "RSTACK", RSTACK, 256
+    defvar "STACK", STACK, 256
+    defvar "S0", TOS, 0
     defvar "STATE", STATE
     defvar "DP", DP
     defvar "LATEST", LATEST
@@ -1673,7 +1673,7 @@ print_xt_suffix:
     .set PLUS, ADD
     .set MINUS, SUB
     .set SZ, TOS
-    .set RZ, RTOS
+    .set RZ, RSTACK
     .set LPARENSOURCERPAREN, XSOURCE
     .set SOURCENUM, SOURCECOUNT
     .set GTSOURCE, SOURCEINDEX

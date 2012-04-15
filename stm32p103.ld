@@ -23,5 +23,5 @@ SECTIONS
     } >SRAM AT> FLASH
 
     ram_top = 0x20000000 + 0x00002000 ;
-    irq_stack_top = ram_top ;
+    irq_stack_top = ram_top - 0x40;
 }
