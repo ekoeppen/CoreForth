@@ -360,14 +360,14 @@ stack_underflow_message_end:
 printrstack:
     push {r4, lr}
     ldr r4, =addr_RTOS
-    subs r4, r4, #4
+    adds r4, r4, #4
 1:  ldr r0, [r4]
     bl puthexnumber
     movs r0, #32
     bl putchar
     cmp r4, r6
     beq 2f
-    subs r4, r4, #4
+    adds r4, r4, #4
     b 1b
 2:  movs r0, #13
     bl putchar
