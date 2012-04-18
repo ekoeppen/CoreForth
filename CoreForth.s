@@ -146,7 +146,7 @@ DODOES:
     adds r6, r6, #4
     str r7, [r6]
     mov r7, lr
-    adds r7, r7, #5
+    adds r7, r7, #3
     adds r0, r0, #4
     push {r0}
     NEXT
@@ -1195,11 +1195,8 @@ is_positive:
     defword "DOES>", DOES, F_IMMED
     .word LIT, XDOES, COMMAXT
     .word LIT
-    ldr.w r1, [pc, #4]
-    .word COMMA
-    .word LIT
+    ldr r1, [pc]
     blx r1
-    .short 0
     .word COMMA
     .word LIT, DODOES + 1, COMMA, EXIT
 

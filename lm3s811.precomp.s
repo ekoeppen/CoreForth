@@ -20,7 +20,7 @@
     defword "PT:", PTCOLON, 0x0
     .word CREATE, HERE, CELL, PLUS, COMMA, RBRAC, LPARENDOESGTRPAREN
     .set PTCOLON_XT, .
-    .word 0x1004f8df, 0x4788, DODOES + 1, FETCH, GTR, EXIT
+    .word 0x47884900, 0x49b, DODOES + 1, GTR, EXIT
 
     defword "EDIT", EDIT, 0x0
     .word CLS, LIT, 0x0, DUP, AT_XY, LIST, LIT, 0x0, STOREXY, KEY, SWAP, QCH, SWAP, LIT, 0x18, EQU, QBRANCH, 0xffffffdc, UPDATE, DROP, L, EXIT
@@ -435,60 +435,24 @@
 
     defconst "ADC", ADC, 0x40038000
 
-
-    defword "GPTMTBR", GPTMTBR, 0x0, REGISTER_XT
-    .word 0x4c
-
-    defword "GPTMTAR", GPTMTAR, 0x0, REGISTER_XT
-    .word 0x48
-
-    defword "GPTMTBPMR", GPTMTBPMR, 0x0, REGISTER_XT
-    .word 0x44
-
-    defword "GPTMTAPMR", GPTMTAPMR, 0x0, REGISTER_XT
-    .word 0x40
-
-    defword "GPTMTBPR", GPTMTBPR, 0x0, REGISTER_XT
-    .word 0x3c
-
-    defword "GPTMTAPR", GPTMTAPR, 0x0, REGISTER_XT
-    .word 0x38
-
-    defword "GPTMTBMATCHR", GPTMTBMATCHR, 0x0, REGISTER_XT
-    .word 0x34
-
-    defword "GPTMTAMATCHR", GPTMTAMATCHR, 0x0, REGISTER_XT
-    .word 0x30
-
-    defword "GPTMTBILR", GPTMTBILR, 0x0, REGISTER_XT
-    .word 0x2c
-
-    defword "GPTMTAILR", GPTMTAILR, 0x0, REGISTER_XT
-    .word 0x28
-
-    defword "GPTMICR", GPTMICR, 0x0, REGISTER_XT
-    .word 0x24
-
-    defword "GPTMMIS", GPTMMIS, 0x0, REGISTER_XT
-    .word 0x20
-
-    defword "GPTMRIS", GPTMRIS, 0x0, REGISTER_XT
-    .word 0x1c
-
-    defword "GPTMMIR", GPTMMIR, 0x0, REGISTER_XT
-    .word 0x18
-
-    defword "GPTMCTL", GPTMCTL, 0x0, REGISTER_XT
-    .word 0xc
-
-    defword "GPTMTBMR", GPTMTBMR, 0x0, REGISTER_XT
-    .word 0x8
-
-    defword "GPTMTAMR", GPTMTAMR, 0x0, REGISTER_XT
-    .word 0x4
-
-    defword "GPTMCFG", GPTMCFG, 0x0, REGISTER_XT
-    .word 0x0
+0x200003a40x4c
+0x200003a40x48
+0x200003a40x44
+0x200003a40x40
+0x200003a40x3c
+0x200003a40x38
+0x200003a40x34
+0x200003a40x30
+0x200003a40x2c
+0x200003a40x28
+0x200003a40x24
+0x200003a40x20
+0x200003a40x1c
+0x200003a40x18
+0x200003a40xc
+0x200003a40x8
+0x200003a40x4
+0x200003a40x0
 
     defconst "TIMER2", TIMERTWO, 0x40032000
 
@@ -555,93 +519,37 @@
 
     defconst "UART-RXFE", UART_RXFE, 0x10
 
-
-    defword "UART-DMACR", UART_DMACR, 0x0, REGISTER_XT
-    .word 0x48
-
-    defword "UART-ICR", UART_ICR, 0x0, REGISTER_XT
-    .word 0x44
-
-    defword "UART-MIS", UART_MIS, 0x0, REGISTER_XT
-    .word 0x40
-
-    defword "UART-RIS", UART_RIS, 0x0, REGISTER_XT
-    .word 0x3c
-
-    defword "UART-IMSC", UART_IMSC, 0x0, REGISTER_XT
-    .word 0x38
-
-    defword "UART-IFLS", UART_IFLS, 0x0, REGISTER_XT
-    .word 0x34
-
-    defword "UART-CR", UART_CR, 0x0, REGISTER_XT
-    .word 0x30
-
-    defword "UART-LCRH", UART_LCRH, 0x0, REGISTER_XT
-    .word 0x2c
-
-    defword "UART-FBRD", UART_FBRD, 0x0, REGISTER_XT
-    .word 0x28
-
-    defword "UART-IBRD", UART_IBRD, 0x0, REGISTER_XT
-    .word 0x24
-
-    defword "UART-LPR", UART_LPR, 0x0, REGISTER_XT
-    .word 0x20
-
-    defword "UART-FR", UART_FR, 0x0, REGISTER_XT
-    .word 0x18
-
-    defword "UART-RSR-ECR", UART_RSR_ECR, 0x0, REGISTER_XT
-    .word 0x4
-
-    defword "UART-DR", UART_DR, 0x0, REGISTER_XT
-    .word 0x0
+0x200003a40x48
+0x200003a40x44
+0x200003a40x40
+0x200003a40x3c
+0x200003a40x38
+0x200003a40x34
+0x200003a40x30
+0x200003a40x2c
+0x200003a40x28
+0x200003a40x24
+0x200003a40x20
+0x200003a40x18
+0x200003a40x4
+0x200003a40x0
 
     defconst "UART0", UARTZ, 0x4000c000
 
-
-    defword "GPIO-DEN", GPIO_DEN, 0x0, REGISTER_XT
-    .word 0x51c
-
-    defword "GPIO-PDR", GPIO_PDR, 0x0, REGISTER_XT
-    .word 0x514
-
-    defword "GPIO-PUR", GPIO_PUR, 0x0, REGISTER_XT
-    .word 0x510
-
-    defword "GPIO-ODR", GPIO_ODR, 0x0, REGISTER_XT
-    .word 0x50c
-
-    defword "GPIO-DR2R", GPIO_DRTWOR, 0x0, REGISTER_XT
-    .word 0x500
-
-    defword "GPIO-ICR", GPIO_ICR, 0x0, REGISTER_XT
-    .word 0x41c
-
-    defword "GPIO-MIS", GPIO_MIS, 0x0, REGISTER_XT
-    .word 0x418
-
-    defword "GPIO-RIS", GPIO_RIS, 0x0, REGISTER_XT
-    .word 0x414
-
-    defword "GPIO-IM", GPIO_IM, 0x0, REGISTER_XT
-    .word 0x410
-
-    defword "GPIO-IEV", GPIO_IEV, 0x0, REGISTER_XT
-    .word 0x40c
-
-    defword "GPIO-IBE", GPIO_IBE, 0x0, REGISTER_XT
-    .word 0x408
-
-    defword "GPIO-IS", GPIO_IS, 0x0, REGISTER_XT
-    .word 0x404
-
-    defword "GPIO-AFSEL", GPIO_AFSEL, 0x0, REGISTER_XT
-    .word 0x420
-
-    defword "GPIO-DIR", GPIO_DIR, 0x0, REGISTER_XT
-    .word 0x400
+0x200003a40x51c
+0x200003a40x514
+0x200003a40x510
+0x200003a40x50c
+0x200003a40x500
+0x200003a40x41c
+0x200003a40x418
+0x200003a40x414
+0x200003a40x410
+0x200003a40x40c
+0x200003a40x408
+0x200003a40x404
+0x200003a40x420
+0x200003a40x400
 
     defconst "GPIOE", GPIOE, 0x40024000
 
@@ -706,4 +614,4 @@
     defword "REGISTER", REGISTER, 0x0
     .word CREATE, COMMA, LPARENDOESGTRPAREN
     .set REGISTER_XT, .
-    .word 0x1004f8df, 0x4788, DODOES + 1, FETCH, PLUS, EXIT
+    .word 0x47884900, 0x49b, DODOES + 1, PLUS, EXIT
