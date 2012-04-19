@@ -286,7 +286,7 @@ DATA DISP-SELECT-ROW1
     GPIOA GPIO-AFSEL DUP @ 3C OR SWAP !
     0 SSI-CR1 !   2 SSI-CPSR !   0F907 SSI-CR0 !   2 SSI-CR1 ! ;
 
-: DISK-NAME   SZ" disk.bin" ;
+: DISK-NAME   SZ" disk.img" ;
 : DISK-OPEN   DISK-NAME DROP 2 FOPEN ;
 : DISK-READ-BLK   ( addr blk# --  )
     DISK-OPEN
