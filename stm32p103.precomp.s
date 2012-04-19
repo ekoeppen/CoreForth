@@ -246,29 +246,63 @@
 
     defword "APB-ENABLE", APB_ENABLE, 0x0
     .word LIT, 0x24000, RCC_APBONEENR, SET_BITS, LIT, 0x7d, RCC_APBTWOENR, SET_BITS, EXIT
-0x200003a40x20
-0x200003a40x1c
-0x200003a40x18
-0x200003a40x14
-0x200003a40x10
-0x200003a40xc
-0x200003a40x8
-0x200003a40x4
-0x200003a40x0
+
+    defword "SPI-I2SPR", SPI_ITWOSPR, 0x0, REGISTER_XT
+    .word 0x20
+
+    defword "SPI-I2SCFGR", SPI_ITWOSCFGR, 0x0, REGISTER_XT
+    .word 0x1c
+
+    defword "SPI-TXCRCPR", SPI_TXCRCPR, 0x0, REGISTER_XT
+    .word 0x18
+
+    defword "SPI-RXCRCPR", SPI_RXCRCPR, 0x0, REGISTER_XT
+    .word 0x14
+
+    defword "SPI-CRCPR", SPI_CRCPR, 0x0, REGISTER_XT
+    .word 0x10
+
+    defword "SPI-DR", SPI_DR, 0x0, REGISTER_XT
+    .word 0xc
+
+    defword "SPI-SR", SPI_SR, 0x0, REGISTER_XT
+    .word 0x8
+
+    defword "SPI-CR2", SPI_CRTWO, 0x0, REGISTER_XT
+    .word 0x4
+
+    defword "SPI-CR1", SPI_CRONE, 0x0, REGISTER_XT
+    .word 0x0
 
     defconst "SPI2", SPITWO, 0x40003800
 
 
     defconst "SPI1", SPIONE, 0x40013000
 
-0x200003a40x20
-0x200003a40x1c
-0x200003a40x18
-0x200003a40x14
-0x200003a40x10
-0x200003a40xc
-0x200003a40x8
-0x200003a40x4
+
+    defword "I2C-TRISE", ITWOC_TRISE, 0x0, REGISTER_XT
+    .word 0x20
+
+    defword "I2C-CCR", ITWOC_CCR, 0x0, REGISTER_XT
+    .word 0x1c
+
+    defword "I2C-SR2", ITWOC_SRTWO, 0x0, REGISTER_XT
+    .word 0x18
+
+    defword "I2C-SR1", ITWOC_SRONE, 0x0, REGISTER_XT
+    .word 0x14
+
+    defword "I2C-OAR2", ITWOC_OARTWO, 0x0, REGISTER_XT
+    .word 0x10
+
+    defword "I2C-OAR1", ITWOC_OARONE, 0x0, REGISTER_XT
+    .word 0xc
+
+    defword "I2C-CR2", ITWOC_CRTWO, 0x0, REGISTER_XT
+    .word 0x8
+
+    defword "I2C-CR1", ITWOC_CRONE, 0x0, REGISTER_XT
+    .word 0x4
 
     defconst "I2C2", ITWOCTWO, 0x40005800
 
@@ -284,13 +318,27 @@
 
     defconst "STCTRL", STCTRL, -0x1fff1ff0
 
-0x200003a40x18
-0x200003a40x14
-0x200003a40x10
-0x200003a40xc
-0x200003a40x8
-0x200003a40x4
-0x200003a40x0
+
+    defword "GPIO-LCKR", GPIO_LCKR, 0x0, REGISTER_XT
+    .word 0x18
+
+    defword "GPIO-BRR", GPIO_BRR, 0x0, REGISTER_XT
+    .word 0x14
+
+    defword "GPIO-BSRR", GPIO_BSRR, 0x0, REGISTER_XT
+    .word 0x10
+
+    defword "GPIO-ODR", GPIO_ODR, 0x0, REGISTER_XT
+    .word 0xc
+
+    defword "GPIO-IDR", GPIO_IDR, 0x0, REGISTER_XT
+    .word 0x8
+
+    defword "GPIO-CRH", GPIO_CRH, 0x0, REGISTER_XT
+    .word 0x4
+
+    defword "GPIO-CRL", GPIO_CRL, 0x0, REGISTER_XT
+    .word 0x0
 
     defconst "GPIOG", GPIOG, 0x40012000
 

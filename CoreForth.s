@@ -1572,7 +1572,7 @@ QUOTE_CHARS:
     .word DUP, LIT, DOCONSTANT, NEQU, QBRANCH, print_docon - .
     .word DUP, LIT, XDOES, NEQU, QBRANCH, print_xdoes - .
     .word DUP, LIT, XSQUOTE, NEQU, QBRANCH, print_xsquote - .
-    .word DUP, FETCH, LIT, 0x1004f8df, NEQU, QBRANCH, print_dodoes - .
+    .word DUP, FETCH, LIT, 0x47884900, NEQU, QBRANCH, print_dodoes - .
     .word DUP, XTQ, QBRANCH, 1f - .
     .word TONAME, COUNT, LIT, 31, AND, DOTQUOTED, TWODROP, CELL, EXIT
 1:  .word DOTUH, TWODROP, CELL, EXIT
@@ -1590,8 +1590,8 @@ print_xdoes:
     .word TONAME, COUNT, DOTQUOTED
     .word LIT, print_xdoes_xt, COUNT, TYPE, DUP, ANYTOLINK, CELL, ADD, COUNT, DOTQUOTED
     .word LIT, print_xt_suffix, COUNT, TYPE
-    .word CELL, ADD, DUP, FETCH, DOTH, XCSPACE, CELL, ADD, FETCH, DOTH, XCSPACE, LIT, print_label_dodoes, COUNT, TYPE
-    .word DROP, LIT, 4, CELLS, EXIT
+    .word CELL, ADD, FETCH, DOTH, XCSPACE, LIT, print_label_dodoes, COUNT, TYPE
+    .word DROP, LIT, 3, CELLS, EXIT
 print_xsquote:
     .word DOTSQUOTE, EXIT
 print_dodoes:
