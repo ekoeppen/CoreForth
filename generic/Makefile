@@ -9,7 +9,7 @@ GEN =  ../generic/ansi.gen.s ../generic/accept.gen.s ../generic/editor.gen.s ../
 .s.o:
 	arm-none-eabi-as -mcpu=cortex-m3 -I../generic/ -o $@ $< 
 
-all: coreforth.elf
+all: coreforth.bin
 
 clean:
 	rm -f *.elf *.bin *.o *.gen.s
