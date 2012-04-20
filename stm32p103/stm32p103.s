@@ -382,7 +382,7 @@ adcomp_handler:
 
     .ltorg
 
-    .include "stm32p103.precomp.s"
+    .include "precomp.s"
     .word 0xffffffff
 
     .set last_rom_word, link

@@ -608,7 +608,7 @@ eval_words:
     defword "COLD", COLD
     .word LIT, eval_words, EVALUATE
 
-    .include "lm3s811.precomp.s"
+    .include "precomp.s"
 
 eval_words:
     .include "lm3s811ram.gen.s"
