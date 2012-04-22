@@ -417,9 +417,5 @@ eval_words:
     .include "lm3s811_ram.gen.s"
     .word 0xffffffff
 
-    .set last_rom_word, link
-    .set end_of_rom, .
-
     .set last_word, link
     .set data_start, ram_here
-
