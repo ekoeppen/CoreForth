@@ -2,5 +2,6 @@
 *.elf
 *.o
 *.swp
+*.swo
 *.gen.s
 setenv.sh
