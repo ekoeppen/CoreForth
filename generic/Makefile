@@ -1,4 +1,6 @@
-GEN =  ../generic/ansi.gen.s ../generic/accept.gen.s ../generic/editor.gen.s ../generic/protothreads.gen.s ../generic/quit.gen.s
+GEN = ../generic/ansi.gen.s ../generic/accept.gen.s \
+      ../generic/editor.gen.s ../generic/protothreads.gen.s \
+      ../generic/quit.gen.s
 
 %.bin: %.elf
 	arm-none-eabi-objcopy -Obinary $< $@
@@ -20,8 +22,8 @@ run: coreforth.elf
 run_text: coreforth.elf
 	qemu-system-arm -M lm3s811evb -nographic -kernel coreforth.elf -semihosting; stty sane
 
-precomp: precomp.elf
-	qemu-system-arm -M lm3s6965evb -nographic -kernel precomp.elf -semihosting > precomp.s; stty sane
+precompile: precompiler.elf
+	qemu-system-arm -M lm3s6965evb -nographic -kernel precompiler.elf -semihosting > precompiled_words.s; stty sane
 
-precomp.elf: precomp.o
-	arm-none-eabi-ld $< -o $@ -T../generic/lm3s6965.ld
+precompiler.elf: precompiler.o
+	arm-none-eabi-ld $< -o $@ -T../precompiler/precompiler.ld

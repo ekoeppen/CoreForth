@@ -1,13 +1,9 @@
 include ../generic/Makefile
 
-GEN += lm3s811.gen.s lm3s811ram.gen.s
+GEN += lm3s811.gen.s lm3s811_ram.gen.s
 
-lm3s811.o: lm3s811.s ../generic/CoreForth.s precomp.s $(GEN)
-	arm-none-eabi-as -mcpu=cortex-m3 -I../generic/ -o $@ $<
+precompiler.s: ../precompiler/board.s lm3s811_words.s $(GEN)
+lm3s811_board.s: ../generic/CoreForth.s lm3s811_words.s precompiled_words.s $(GEN)
 
-precomp.o: lm3s811.s ../generic/CoreForth.s $(GEN)
-	arm-none-eabi-as -mcpu=cortex-m3 -defsym PRECOMP_LM3S811=1 -I../generic/ -o $@ $<
-
-coreforth.elf: lm3s811.o
+coreforth.elf: lm3s811_board.o
 	arm-none-eabi-ld $< -o $@ -Tlm3s811.ld
-
