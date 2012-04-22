@@ -113,7 +113,6 @@ cold_start:
     .word LIT, 10, BASE, STORE
     .word LIT, data_start, DP, STORE
     .word LIT, last_word, LATEST, STORE
-    .word LIT, 0, FIXUPS, STORE
     .word COLD
 
     .ltorg
@@ -1160,25 +1159,14 @@ is_positive:
     defword ",", COMMA
     .word HERE, STORE, CELL, ALLOT, EXIT
 
-    defword "+FIXUP", ADDFIXUP
-    .word ROMTOP, GT, QBRANCH, 1f - .
-    .word FIXUPS, FETCH, QDUP, QBRANCH, 1f - .
-    .word DUP, FETCH, INCR, CELLS, OVER, ADD, HERE, SWAP, STORE
-    .word LIT, 1, SWAP, ADDSTORE
-1:
-    .word EXIT
-
-    defword ",FIXED", COMMAFIXED
-    .word DUP, ADDFIXUP, HERE, STORE, CELL, ALLOT, EXIT
-
     defword ",DEST", COMMADEST
-    .word COMMAFIXED, EXIT
+    .word COMMA, EXIT
 
     defword ",XT", COMMAXT
-    .word COMMAFIXED, EXIT
+    .word COMMA, EXIT
 
     defword ",LINK", COMMALINK
-    .word COMMAFIXED, EXIT
+    .word COMMA, EXIT
 
     defword "C,", CCOMMA
     .word HERE, STOREBYTE, LIT, 1, ALLOT, EXIT
@@ -1641,10 +1629,6 @@ print_xt_suffix:
 @ ---------------------------------------------------------------------
 @ -- User variables ---------------------------------------------------
 
-    defconst "ROMTOP", ROMTOP, end_of_rom
-    defconst "CORETOP", CORETOP, end_of_core
-    defconst "LATESTROM", LATESTROM, last_rom_word
-    defconst "LATESTCORE", LATESTCORE, last_core_word
     defconst "C/BLK", CSLASHBLK, 1024
     defvar "R0", RTOS, 0
     defvar "RSTACK", RSTACK, 256
@@ -1660,7 +1644,6 @@ print_xt_suffix:
     defvar "(SOURCE)", XSOURCE
     defvar "SOURCE#", SOURCECOUNT
     defvar ">SOURCE", SOURCEINDEX
-    defvar "FIXUPS", FIXUPS
 
     .ltorg
 
