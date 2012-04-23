@@ -1223,9 +1223,8 @@ is_positive:
     defword "DEFER", DEFER
     .word CREATE, LIT, EXIT, COMMA, XDOES
     .set DEFER_XT, .
-    ldr.w r1, [pc, #4]
+    ldr r1, [pc]
     blx r1
-    .byte 0, 0
     .word DODOES + 1, FETCH, EXECUTE, EXIT
 
     defword "IS", IS
