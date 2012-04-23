@@ -114,7 +114,7 @@ _start:
     .long 0                           /* Flash Memory Control */
 
 @ ---------------------------------------------------------------------
-@ -- Board specific code ands initialization ---------------------------
+@ -- Board specific code and initialization ---------------------------
 
 init_board:
     push {lr}
@@ -182,7 +182,8 @@ init_board:
     ldr r0, =addr_IVT
     movs r1, #0
     movs r2, #48
-1:  str r1, [r0], #4
+1:  str r1, [r0]
+    adds r0, #4
     subs r2, r2, #1
     bgt 1b
 
@@ -282,8 +283,9 @@ read_key:
     b 2b
 1:  ldr r0, =addr_SBUF
     ldrb r0, [r0, r3]
-    adds r3, r3, #1
-    ands r3, #0x0f
+    adds r3, #1
+    movs r2, #0x0f
+    ands r3, r2
     strb r3, [r1]
     pop {r1, r2, r3, pc}
 
@@ -382,7 +384,7 @@ uart0_key_handler:
 2:  ldr r0, =(UART0 + UART_FR)
     ldr r1, [r0]
     ldr r2, =UART_RXFE
-    ands r1, r1, r2
+    ands r1, r2
     bne 1f
     ldr r0, =(UART0 + UART_DR)
     ldrb r1, [r0]
@@ -390,8 +392,9 @@ uart0_key_handler:
     ldr r2, =addr_SBUF_HEAD
     ldrb r3, [r2]
     strb r1, [r0, r3]
-    adds r3, r3, #1
-    ands r3, #0x0f
+    movs r1, #0x0f
+    adds r3, #1
+    ands r3, r1
     strb r3, [r2]
     b 2b
 1:  bx lr
