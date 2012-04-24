@@ -5,9 +5,9 @@
 @ ---------------------------------------------------------------------
 @ -- Variable definitions ---------------------------------------------
 
-    .set F_IMMED,           0x80
-    .set F_HIDDEN,          0x20
-    .set F_LENMASK,         0x1f
+    .set F_IMMED,           0x01
+    .set F_HIDDEN,          0x80
+    .set F_LENMASK,         0x7f
 
     .set link,                 0
     .set ram_here, ram_start
@@ -43,7 +43,8 @@
 name_\label :
     .int link
     .set link, name_\label
-    .byte \flags | (99f - 98f)
+    .byte \flags
+    .byte (99f - 98f)
 98:
     .ascii "\name"
 99:
@@ -60,7 +61,8 @@ name_\label :
 name_\label :
     .int link
     .set link, name_\label
-    .byte \flags | (99f - 98f)
+    .byte \flags
+    .byte (99f - 98f)
 98:
     .ascii "\name"
 99:
@@ -79,6 +81,7 @@ code_\label :
 name_\label :
     .int link
     .set link, name_\label
+    .byte 0
     .byte (99f - 98f)
 98:
     .ascii "\name"
@@ -1193,6 +1196,7 @@ is_positive:
     .word LATEST, FETCH
     .word HERE, LATEST, STORE
     .word COMMALINK
+    .word LIT, 0, STOREBYTE
     .word BL, WORD, FETCHBYTE, INCR, ALIGNED, ALLOT
     .word EXIT
 
@@ -1244,8 +1248,7 @@ is_positive:
     movs r1, #0
     mov r0, r10
     b 4f              @ end of list!
-12: ldrb r3, [r0, #4]       @ flags+length field
-    ands r3, r3, #(F_HIDDEN|F_LENMASK)
+12: ldrb r3, [r0, #5]       @ flags+length field
     cmp r3, r2          @ length the same?
     bne 2f              @ nope, skip this entry
     mov r4, r1          @ current char in string A
@@ -1275,18 +1278,17 @@ is_positive:
     subs r3, r3, #1      @ decrement
     cmp r3, #0
     bne 10b             @ > 0, keep going
-    adds r0, r0, #4      @ skip link pointer
-    ldrb r1, [r0]       @ load flags+len
-    movs r2, #F_IMMED
-    ands r2, r1, r2    @ save to check flags
-    cmp r2, #0
-    beq 13f
+    adds r0, r0, #4     @ skip link pointer
+    ldrb r2, [r0]       @ load flags
+    adds r0, r0, #1
+    ldrb r1, [r0]       @ load len
+    cmp r2, #F_IMMED
+    bne 13f
     movs r2, #1        @ 1 for immediate words
     b 14f
 13: movs r2, #0        @ -1 for normal words
     subs r2, r2, #1
 14: adds r0, r0, #1      @ skip flags+len bytes
-    ands r1, r1, #F_LENMASK  @ mask out flags
     adds r0, r0, r1      @ skip name
     adds r0, r0, #3      @ align to 4-byte boundary
     mvns r3, #3
