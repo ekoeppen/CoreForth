@@ -1,3 +1,27 @@
 HEX
 
+: UPPERCASE ( c -- C )   DUP 61 7B WITHIN 20 AND XOR ;
+: >UPPER  ( addr n -- )   OVER + SWAP DO I C@ UPPERCASE I C! LOOP ;
+
+: SI= ( addr1 addr2 n -- )
+    >R BEGIN
+        2DUP C@ UPPERCASE SWAP C@ UPPERCASE = IF
+            1+ SWAP 1+
+            R> 1- DUP >R 0=
+        ELSE
+            -1
+        THEN
+    UNTIL 2DROP R> 0= ;
+
+: _FIND
+    LATEST @ BEGIN
+        CELL + 2DUP OVER C@ 1+   \ a nfa a nfa n+1
+        SI= 0=                   \ a nfa f
+        DUP IF
+            DROP
+            CELL - @ DUP         \ a link link
+        THEN
+    0= UNTIL                     \ a nfa  OR  a 0
+    ;
+
 ABORT
