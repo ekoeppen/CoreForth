@@ -6,8 +6,8 @@
 @ -- Variable definitions ---------------------------------------------
 
     .set F_IMMED,           0x01
-    .set F_HIDDEN,          0x80
-    .set F_LENMASK,         0x7f
+    .set F_HIDDEN,          0x20
+    .set F_LENMASK,         0x1f
     .set F_MARKER,          0x80
 
     .set link,                 0
@@ -1197,8 +1197,8 @@ is_positive:
     .word LATEST, FETCH
     .word HERE, LATEST, STORE
     .word COMMALINK
-    .word LIT, 0, STOREBYTE
-    .word BL, WORD, FETCHBYTE, INCR, ALIGNED, ALLOT
+    .word LIT, F_MARKER, CCOMMA
+    .word BL, WORD, FETCHBYTE, INCR, INCR, ALIGNED, DECR, ALLOT
     .word EXIT
 
     defword "CREATE", CREATE
@@ -1254,7 +1254,7 @@ is_positive:
     bne 2f              @ nope, skip this entry
     mov r4, r1          @ current char in string A
     mov r5, r0
-    adds r5, r5, #5     @ current char in string B
+    adds r5, r5, #6     @ current char in string B
 10: push {r0, r1, r2}
     movs r2, #32
     ldrb r0, [r4]
@@ -1323,28 +1323,28 @@ noskip_delim:
     .word HERE, EXIT
 
     defword "LINK>", FROMLINK
-    .word CELL, ADD, DUP, FETCHBYTE, LIT, F_LENMASK, AND, CHAR, ADD, ADD, ALIGNED, EXIT
+    .word LINKTONAME, DUP, FETCHBYTE, LIT, F_LENMASK, AND, CHAR, ADD, ADD, ALIGNED, EXIT
 
     defcode ">NAME", TONAME
     pop {r0}
-    mvns r2, #F_IMMED
-1:  subs r0, r0, #1
+1:  subs r0, #1
     ldrb r1, [r0]
-    ands r1, r2
-    cmp r1, #32
-    bgt 1b
-    cmp r1, #0
-    beq 1b
+    cmp r1, #F_MARKER
+    blt 1b
+    adds r0, #1
     push {r0}
     NEXT
 
     .ltorg
 
     defword ">LINK", TOLINK
-    .word TONAME, CELL, SUB, EXIT
+    .word TONAME, LIT, 5, SUB, EXIT
 
     defword ">BODY", GTBODY
     .word CELL, ADD, EXIT
+
+    defword "LINK>NAME", LINKTONAME
+    .word LIT, 5, ADD, EXIT
 
     defcode "EXECUTE", EXECUTE
     pop {r0}
@@ -1388,13 +1388,13 @@ interpret_eol:
     .word BL, WORD, FIND, DROP, TOLINK, FETCH, LATEST, STORE, EXIT
 
     defword "HIDE", HIDE
-    .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_HIDDEN, OR, SWAP, STOREBYTE, EXIT
+    .word LATEST, FETCH, LINKTONAME, DUP, FETCHBYTE, LIT, F_HIDDEN, OR, SWAP, STOREBYTE, EXIT
 
     defword "REVEAL", REVEAL
-    .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_HIDDEN, INVERT, AND, SWAP, STOREBYTE, EXIT
+    .word LATEST, FETCH, LINKTONAME, DUP, FETCHBYTE, LIT, F_HIDDEN, INVERT, AND, SWAP, STOREBYTE, EXIT
 
     defword "IMMEDIATE", IMMEDIATE
-    .word LATEST, FETCH, CELL, ADD, DUP, FETCHBYTE, LIT, F_IMMED, OR, SWAP, STOREBYTE, EXIT
+    .word LATEST, FETCH, LINKTONAME, DUP, FETCHBYTE, LIT, F_IMMED, OR, SWAP, STOREBYTE, EXIT
 
     defword "[", LBRACKET, F_IMMED
     .word LIT, 0, STATE, STORE, EXIT
@@ -1660,7 +1660,7 @@ print_xt_suffix:
     .set SOURCENUM, SOURCECOUNT
     .set GTSOURCE, SOURCEINDEX
     .set GTR, TOR
-    .set RGT, FRROM
+    .set RGT, RFROM
     .set LPARENSQUOTRPAREN, XSQUOTE
     .set GTTIB, TIBINDEX
     .set CMOVEGT, CMOVEUP

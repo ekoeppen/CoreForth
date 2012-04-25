@@ -1,5 +1,7 @@
 HEX
 
+ABORT
+
 : UPPERCASE ( c -- C )   DUP 61 7B WITHIN 20 AND XOR ;
 : >UPPER  ( addr n -- )   OVER + SWAP DO I C@ UPPERCASE I C! LOOP ;
 
