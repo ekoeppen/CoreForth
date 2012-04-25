@@ -8,6 +8,7 @@
     .set F_IMMED,           0x01
     .set F_HIDDEN,          0x80
     .set F_LENMASK,         0x7f
+    .set F_MARKER,          0x80
 
     .set link,                 0
     .set ram_here, ram_start
@@ -43,7 +44,7 @@
 name_\label :
     .int link
     .set link, name_\label
-    .byte \flags
+    .byte \flags | F_MARKER
     .byte (99f - 98f)
 98:
     .ascii "\name"
@@ -61,7 +62,7 @@ name_\label :
 name_\label :
     .int link
     .set link, name_\label
-    .byte \flags
+    .byte \flags | F_MARKER
     .byte (99f - 98f)
 98:
     .ascii "\name"
@@ -81,7 +82,7 @@ code_\label :
 name_\label :
     .int link
     .set link, name_\label
-    .byte 0
+    .byte F_MARKER
     .byte (99f - 98f)
 98:
     .ascii "\name"
@@ -1247,13 +1248,13 @@ is_positive:
     bne 12f
     movs r1, #0
     mov r0, r10
-    b 4f              @ end of list!
-12: ldrb r3, [r0, #5]       @ flags+length field
+    b 4f                @ end of list!
+12: ldrb r3, [r0, #5]   @ length field
     cmp r3, r2          @ length the same?
     bne 2f              @ nope, skip this entry
     mov r4, r1          @ current char in string A
     mov r5, r0
-    adds r5, r5, #5      @ current char in string B
+    adds r5, r5, #5     @ current char in string B
 10: push {r0, r1, r2}
     movs r2, #32
     ldrb r0, [r4]
@@ -1275,7 +1276,7 @@ is_positive:
     pop {r0, r1, r2}
     cmp r8, r9          @ A = B?
     bne 2f              @ nope
-    subs r3, r3, #1      @ decrement
+    subs r3, r3, #1     @ decrement
     cmp r3, #0
     bne 10b             @ > 0, keep going
     adds r0, r0, #4     @ skip link pointer
@@ -1284,13 +1285,13 @@ is_positive:
     ldrb r1, [r0]       @ load len
     cmp r2, #F_IMMED
     bne 13f
-    movs r2, #1        @ 1 for immediate words
+    movs r2, #1         @ 1 for immediate words
     b 14f
-13: movs r2, #0        @ -1 for normal words
+13: movs r2, #0         @ -1 for normal words
     subs r2, r2, #1
-14: adds r0, r0, #1      @ skip flags+len bytes
-    adds r0, r0, r1      @ skip name
-    adds r0, r0, #3      @ align to 4-byte boundary
+14: adds r0, r0, #1     @ skip flags+len bytes
+    adds r0, r0, r1     @ skip name
+    adds r0, r0, #3     @ align to 4-byte boundary
     mvns r3, #3
     ands r0, r0, r3
     mov r1, r2
@@ -1410,7 +1411,7 @@ interpret_eol:
     defword "WORDS", WORDS
     .word LATEST, FETCH
 words_loop:
-    .word DUP, CELL, ADD, COUNT, LIT, 31, AND, TYPE, SPACE
+    .word DUP, CELL, ADD, CHAR, ADD, COUNT, TYPE, SPACE
     .word FETCH, QDUP, ZEQU, QBRANCH, words_loop - .
     .word EXIT
 
