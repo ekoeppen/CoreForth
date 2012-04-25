@@ -1549,7 +1549,7 @@ QUOTE_CHARS:
 2:  .ascii "\013\n    .word "
 
     defword ".DOTDODOES", DOTDODOES
-    .word SWAP, DOTDOCOL_HEADER, XCSPACE, ANYTOLINK, CELL, ADD, COUNT, DOTQUOTED
+    .word SWAP, DOTDOCOL_HEADER, XCSPACE, ANYTOLINK, LINKTONAME, COUNT, DOTQUOTED
     .word LIT, 1f, COUNT, TYPE, EXIT
 1:  .ascii "\016_XT\n    .word "
 
@@ -1580,7 +1580,7 @@ print_dodata:
     .word DROP, DOTDODATA, DROP, CELL, EXIT
 print_xdoes:
     .word TONAME, COUNT, DOTQUOTED
-    .word LIT, print_xdoes_xt, COUNT, TYPE, DUP, ANYTOLINK, CELL, ADD, COUNT, DOTQUOTED
+    .word LIT, print_xdoes_xt, COUNT, TYPE, DUP, ANYTOLINK, LINKTONAME, COUNT, DOTQUOTED
     .word LIT, print_xt_suffix, COUNT, TYPE
     .word CELL, ADD, FETCH, DOTH, XCSPACE, LIT, print_label_dodoes, COUNT, TYPE
     .word DROP, LIT, 3, CELLS, EXIT
