@@ -1283,6 +1283,8 @@ is_positive:
     ldrb r2, [r0]       @ load flags
     adds r0, r0, #1
     ldrb r1, [r0]       @ load len
+    movs r3, #F_IMMED
+    ands r2, r3
     cmp r2, #F_IMMED
     bne 13f
     movs r2, #1         @ 1 for immediate words
