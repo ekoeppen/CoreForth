@@ -9,6 +9,7 @@
     .set F_HIDDEN,          0x20
     .set F_LENMASK,         0x1f
     .set F_MARKER,          0x80
+    .set F_FLAGSMASK,       0x7f
 
     .set link,                 0
     .set ram_here, ram_start
@@ -1327,15 +1328,17 @@ noskip_delim:
     defword "LINK>", FROMLINK
     .word LINKTONAME, DUP, FETCHBYTE, LIT, F_LENMASK, AND, CHAR, ADD, ADD, ALIGNED, EXIT
 
-    defcode ">NAME", TONAME
+    defcode ">FLAGS", TOFLAGS
     pop {r0}
 1:  subs r0, #1
     ldrb r1, [r0]
     cmp r1, #F_MARKER
     blt 1b
-    adds r0, #1
     push {r0}
     NEXT
+
+    defword ">NAME", TONAME
+    .word TOFLAGS, CHAR, ADD, EXIT
 
     .ltorg
 
@@ -1347,6 +1350,9 @@ noskip_delim:
 
     defword "LINK>NAME", LINKTONAME
     .word LIT, 5, ADD, EXIT
+
+    defword "LINK>FLAGS", LINKTOFLAGS
+    .word CELL, ADD, EXIT
 
     defcode "EXECUTE", EXECUTE
     pop {r0}
@@ -1396,7 +1402,7 @@ interpret_eol:
     .word LATEST, FETCH, LINKTONAME, DUP, FETCHBYTE, LIT, F_HIDDEN, INVERT, AND, SWAP, STOREBYTE, EXIT
 
     defword "IMMEDIATE", IMMEDIATE
-    .word LATEST, FETCH, LINKTONAME, DUP, FETCHBYTE, LIT, F_IMMED, OR, SWAP, STOREBYTE, EXIT
+    .word LATEST, FETCH, LINKTOFLAGS, DUP, FETCHBYTE, LIT, F_IMMED, OR, SWAP, STOREBYTE, EXIT
 
     defword "[", LBRACKET, F_IMMED
     .word LIT, 0, STATE, STORE, EXIT
@@ -1514,7 +1520,7 @@ QUOTE_CHARS:
     .word LIT, ',', EMIT, SPACE, EXIT
 
     defword "(.WORD-FLAGS)", XWORD_FLAGS
-    .word TONAME, FETCH, LIT, 0xc0, AND, XCSPACE, DOTH, EXIT
+    .word TOFLAGS, FETCHBYTE, LIT, F_FLAGSMASK, AND, XCSPACE, DOTH, EXIT
 
     defword "(.WORD-NAME)", XWORD_NAME
     .word LIT, '"', EMIT, TONAME, COUNT, LIT, 31, AND, TWODUP, TYPE_ESCAPED
