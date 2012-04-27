@@ -316,7 +316,7 @@ generic_forth_handler:
     ldr r2, [r0]
     cmp r2, #0
     beq 1f
-    push {r4 - r12, lr}
+    push {r4 - r7, lr}
     ldr r6, =irq_stack_top
     mov r7, r0
     ldr r0, [r7]

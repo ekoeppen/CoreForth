@@ -105,7 +105,7 @@
     .byte 0x02, 0x01, 0x02, 0x04, 0x02   @ ~
 
     defcode "RETI", RETI
-    pop {r4 - r12, pc}
+    pop {r4 - r7, pc}
 
     defword ";I", SEMICOLONI, F_IMMED
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
