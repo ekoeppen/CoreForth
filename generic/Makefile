@@ -1,5 +1,6 @@
 GEN = ../generic/ansi.gen.s ../generic/accept.gen.s \
       ../generic/editor.gen.s ../generic/protothreads.gen.s \
+      ../generic/find.gen.s ../generic/strings.gen.s \
       ../generic/quit.gen.s
 
 %.bin: %.elf

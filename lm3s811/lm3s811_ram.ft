@@ -1,37 +1,3 @@
 HEX
 
 ABORT
-
-: UPPERCASE ( c -- C )   DUP 61 7B WITHIN 20 AND XOR ;
-: >UPPER  ( addr n -- )   OVER + SWAP DO I C@ UPPERCASE I C! LOOP ;
-
-: SI= ( addr1 addr2 n -- )
-    >R BEGIN
-        2DUP C@ UPPERCASE SWAP C@ UPPERCASE = IF
-            1+ SWAP 1+
-            R> 1- DUP >R 0=
-        ELSE
-            -1
-        THEN
-    UNTIL 2DROP R> 0= ;
-
-: WORD-NAME= ( addr1 d-addr2 n -- f )
-    -ROT   2DUP C@ SWAP C@ 3F AND =
-    IF
-        1+ SWAP 1+ SWAP ROT 3F AND 1- SI=
-    ELSE
-        DROP 2DROP 0
-    THEN ;
-
-: _FIND
-    LATEST @ BEGIN
-        CELL + 2DUP OVER C@ 1+   \ a nfa a nfa n+1
-        WORD-NAME= 0=            \ a nfa f
-        DUP IF
-            DROP
-            CELL - @ DUP         \ a link link
-        THEN
-    0= UNTIL                     \ a nfa  OR  a 0
-    ;
-
-ABORT

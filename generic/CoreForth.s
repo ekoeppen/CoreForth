@@ -1236,76 +1236,17 @@ is_positive:
     defword "IS", IS
     .word TICK, GTBODY, STORE, EXIT
 
-    defcode "FIND", FIND
-    pop {r0}
-    mov r10, r0
-    ldrb r1, [r0]
-    adds r0, r0, #1
-    mov r2, r1          @ length
-    mov r1, r0          @ address
-    ldr r0, =addr_LATEST
-    ldr r0, [r0]        @ current dictionary pointer
-1:  cmp r0, #0          @ NULL?
-    bne 12f
-    movs r1, #0
-    mov r0, r10
-    b 4f                @ end of list!
-12: ldrb r3, [r0, #5]   @ length field
-    cmp r3, r2          @ length the same?
-    bne 2f              @ nope, skip this entry
-    mov r4, r1          @ current char in string A
-    mov r5, r0
-    adds r5, r5, #6     @ current char in string B
-10: push {r0, r1, r2}
-    movs r2, #32
-    ldrb r0, [r4]
-    adds r4, r4, #1
-    ldrb r1, [r5]
-    adds r5, r5, #1
-    cmp r0, #64
-    ble 11f
-    cmp r0, #90
-    bgt 11f
-    orrs r0, r2
-11: cmp r1, #64
-    ble 12f
-    cmp r1, #90
-    bgt 12f
-    orrs r1, r2
-12: mov r8, r0
-    mov r9, r1
-    pop {r0, r1, r2}
-    cmp r8, r9          @ A = B?
-    bne 2f              @ nope
-    subs r3, r3, #1     @ decrement
-    cmp r3, #0
-    bne 10b             @ > 0, keep going
-    adds r0, r0, #4     @ skip link pointer
-    ldrb r2, [r0]       @ load flags
-    adds r0, r0, #1
-    ldrb r1, [r0]       @ load len
-    movs r3, #F_IMMED
-    ands r2, r3
-    cmp r2, #F_IMMED
-    bne 13f
-    movs r2, #1         @ 1 for immediate words
-    b 14f
-13: movs r2, #0         @ -1 for normal words
-    subs r2, r2, #1
-14: adds r0, r0, #1     @ skip flags+len bytes
-    adds r0, r0, r1     @ skip name
-    adds r0, r0, #3     @ align to 4-byte boundary
-    mvns r3, #3
-    ands r0, r0, r3
-    mov r1, r2
-    b 4f                @ strings are equal, r0 is the correct entry pointer
-2:  ldr r0, [r0]        @ previous dictionary pointer
-    b 1b                @ try again
-4:  push {r0}
-    push {r1}
-    NEXT
+    defword ">UPPER", GTUPPER, 0x0
+    .word OVER, PLUS, SWAP, LPARENDORPAREN, I, CFETCH, UPPERCASE, I, CSTORE, LPARENLOOPRPAREN, QBRANCH, 0xffffffe4, EXIT
 
-    .ltorg
+    defword "UPPERCASE", UPPERCASE, 0x0
+    .word DUP, LIT, 0x61, LIT, 0x7b, WITHIN, LIT, 0x20, AND, XOR, EXIT
+
+    defword "SI=", SIEQU, 0x0
+    .word GTR, RFETCH, DUP, QBRANCH, 0x24, DROP, TWODUP, CFETCH, UPPERCASE, SWAP, CFETCH, UPPERCASE, EQU, QBRANCH, 0x24, ONEPLUS, SWAP, ONEPLUS, RGT, ONEMINUS, GTR, BRANCH, 0xffffffac, TWODROP, RGT, ZEQU, EXIT
+
+    defword "FIND", FIND, 0x0
+    .word LATEST, FETCH, TWODUP, LINKGTNAME, OVER, CFETCH, ONEPLUS, SIEQU, ZEQU, DUP, QBRANCH, 0x10, DROP, FETCH, DUP, ZEQU, QBRANCH, 0xffffffc4, DUP, QBRANCH, 0x38, NIP, DUP, LINKGT, SWAP, LINKGTFLAGS, CFETCH, LIT, 0x1, AND, ZEQU, LIT, 0x1, OR, EXIT
 
     defword "\\", BACKSLASH, F_IMMED
     .word SOURCECOUNT, FETCH, SOURCEINDEX, STORE, EXIT
@@ -1693,6 +1634,8 @@ print_xt_suffix:
     .set LBRAC, LBRACKET
     .set RBRAC, RBRACKET
     .set LINKGT, FROMLINK
+    .set LINKGTNAME, LINKTONAME
+    .set LINKGTFLAGS, LINKTOFLAGS
     .set SEMI, SEMICOLON
 
 @ ---------------------------------------------------------------------

@@ -1,0 +1,11 @@
+HEX
+
+: UPPERCASE   ( c -- C )   DUP 61 7B WITHIN 20 AND XOR ;
+: >UPPER   ( addr n -- )   OVER + SWAP DO I C@ UPPERCASE I C! LOOP ;
+
+: SI=   ( addr1 addr2 n -- )
+    >R BEGIN
+        R@ DUP   IF DROP 2DUP C@ UPPERCASE SWAP C@ UPPERCASE = THEN
+    WHILE
+        1+ SWAP 1+   R> 1- >R
+    REPEAT 2DROP R> 0= ;

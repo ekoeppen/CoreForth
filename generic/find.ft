@@ -1,0 +1,10 @@
+: FIND   ( name -- xt -1/1 | name 0 )
+    LATEST @ BEGIN
+        2DUP LINK>NAME OVER C@ 1+   \ name link name nfa n+1
+        SI= 0=                      \ name link f
+        DUP IF DROP @ DUP THEN      \ name link link
+    0= UNTIL                        \ name link  OR  name 0
+    DUP IF
+        NIP DUP LINK> SWAP
+        LINK>FLAGS C@ 1 AND 0= 1 OR \ 1 for immed, -1 otherwise
+    THEN ;
