@@ -1210,7 +1210,7 @@ is_positive:
     .word XCREATE, LIT, DODATA, COMMAXT, EXIT
 
     defword "VARIABLE", VARIABLE
-    .word CREATE, COMMA, CELL, ALLOT, EXIT
+    .word CREATE, CELL, ALLOT, EXIT
 
     defword "CONSTANT", CONSTANT
     .word CREATE, COMMA, XDOES
@@ -1488,7 +1488,7 @@ QUOTE_CHARS:
 1:  .ascii "\013\n    .word "
 
     defword ".DOVAR", DOTDOVAR
-    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, XCSPACE, TWODUP, SUB, LIT, 2, CELLS, SUB, DOTH, LF, EXIT
+    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, XCSPACE, TWODUP, SUB, CELL, SUB, DOTH, LF, EXIT
 1:  .ascii "\014\n    defvar "
 
     defword ".DOCON", DOTDOCON

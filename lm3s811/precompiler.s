@@ -6,6 +6,7 @@ precompile_words:
     .include "ansi.gen.s"
     .include "accept.gen.s"
     .include "editor.gen.s"
+    .include "blocks.gen.s"
     .include "protothreads.gen.s"
     .include "quit.gen.s"
     .word 0xffffffff

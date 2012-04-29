@@ -1,0 +1,12 @@
+: LOAD   ( n -- )
+    0 STATE !
+    BLOCK DUP C/BLK +               \ blk blk-end
+    BEGIN 2DUP <                    \ blk blk-end f
+    WHILE
+        SWAP C/L                    \ blk-end blk c/l
+        2DUP SOURCE# ! (SOURCE) ! 0 >SOURCE !
+        (INTERPRET) 2DROP
+        + SWAP                      \ blk' blk-end
+    REPEAT ;
+
+: THRU   ( start end -- )   SWAP DO I LOAD LOOP ;

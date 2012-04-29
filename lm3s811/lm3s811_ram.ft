@@ -1,3 +1,6 @@
 HEX
 
+0 SCR !
+-1 BLOCK# !
+
 ABORT
