@@ -1295,6 +1295,11 @@ noskip_delim:
     defword "LINK>FLAGS", LINKTOFLAGS
     .word CELL, ADD, EXIT
 
+    defword "MARKER", MARKER, 0X0
+    .word CREATE, LATEST, FETCH, FETCH, COMMA, LPARENDOESGTRPAREN
+    .set marker_XT, .
+    .word 0x47884900, DODOES + 1, FETCH, LATEST, STORE, EXIT
+
     defcode "EXECUTE", EXECUTE
     pop {r0}
     ldr r1, [r0]
