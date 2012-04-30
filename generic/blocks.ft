@@ -7,6 +7,6 @@
         2DUP SOURCE# ! (SOURCE) ! 0 >SOURCE !
         (INTERPRET) 2DROP
         + SWAP                      \ blk' blk-end
-    REPEAT ;
+    REPEAT 2DROP ;
 
 : THRU   ( start end -- )   SWAP DO I LOAD LOOP ;
