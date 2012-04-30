@@ -13,13 +13,13 @@ VARIABLE BLOCK#
 : .TAIL ( i -- )   !CURSOR   DUP >BLK SWAP >TAIL-LENGTH TYPE   @CURSOR ;
 : TAIL> ( i -- )   DUP >BLK DUP 1+ ROT >TAIL-LENGTH 1- CMOVE> ;
 : TAIL< ( i -- )   DUP DUP >BLK DUP 1+ SWAP ROT >TAIL-LENGTH CMOVE CLR-LAST ;
-: LL   C/L * SCR @ BLOCK + C/L TYPE ;
+: LL ( l -- )  124 TUCK EMIT SPACE   C/L * SCR @ BLOCK + C/L TYPE   SPACE EMIT ;
 : LIST ( n -- )  DUP SCR !  .D S"  scr" TYPE CR 0 BEGIN DUP LL CR 1+ DUP 16 = UNTIL DROP ;
 : RE ( -- n ) SCR @ ;
 : L ( -- ) 0 DUP AT-XY RE LIST ;
 : B ( -- ) -1 SCR +! ;
 : N ( -- ) 1 SCR +! ;
-: !XY ( i -- i ) C/BLK 1- AND DUP C/L /MOD 1+ AT-XY ;
+: !XY ( i -- i ) C/BLK 1- AND DUP C/L /MOD 1+ SWAP 2 + SWAP AT-XY ;
 : !CH ( c i -- c i )   DUP TAIL>   2DUP >BLK C!  DUP .TAIL ;
 
 : ?CH ( c i -- c i' )
