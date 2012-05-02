@@ -517,7 +517,8 @@ delay:
     defcode "ALIGNED", ALIGNED
     pop {r0}
     adds r0, r0, #3
-    mvns r1, #3
+    movs r1, #3
+    mvns r1, r1
     ands r0, r0, r1
     push {r0}
     NEXT
@@ -1121,7 +1122,8 @@ is_positive:
 1:  ldr r0, [r6]
     subs r6, r6, #8
     str r0, [r6]
-    mvns r0, #0
+    movs r0, #0
+    mvns r0, r0
     push {r0}
     NEXT
 
