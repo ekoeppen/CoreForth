@@ -5,9 +5,10 @@ HEX
     DOES> @ >R ;                        \ fetch IP and jump there via the return stack
 
 : ;PT                                   \ restore IP at word exit
-    ['] LIT ,XT   LATEST @ LINK> >BODY DUP CELL + , \ push IP as word's body
-    ['] LIT ,XT   ,                                 \ push addr of IP cell
-    ['] ! ,XT   ['] ; EXECUTE ; IMMEDIATE           \ set IP and compile normal exit
+    LATEST @ LINK> >BODY DUP CELL + POSTPONE LITERAL    \ push IP as word's body
+    POSTPONE LITERAL                                    \ push addr of IP cell
+    POSTPONE ! POSTPONE EXIT POSTPONE [ REVEAL          \ set IP and compile normal exit
+; IMMEDIATE
 
 : ?YIELD                                \ insert yield
     ['] IF EXECUTE                      \ start IF
