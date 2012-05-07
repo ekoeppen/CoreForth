@@ -1056,6 +1056,17 @@ is_positive:
     adds r7, r7, #4
     NEXT
 
+    defword "POSTPONE", POSTPONE, F_IMMED
+    .word BL, WORD, FIND
+    .WORD ZLT, QBRANCH,  1f - .
+    .word LIT, LIT, COMMAXT, COMMA
+    .WORD LIT, COMMAXT, COMMAXT, BRANCH,  2f - .
+1:  .word COMMAXT
+2:  .word EXIT
+
+    defword "LITERAL", LITERAL, F_IMMED
+    .word LIT, LIT, COMMAXT, COMMA, EXIT
+
     defword "BEGIN", BEGIN, F_IMMED
     .word HERE, EXIT
 
