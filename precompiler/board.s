@@ -63,7 +63,7 @@
     .global _start
     .global reset_handler
 _start:
-    .long addr_TOS                    /* Top of Stack                 */
+    .long addr_TASKZTOS               /* Top of Stack                 */
     .long reset_handler + 1           /* Reset Handler                */
     .long nmi_handler + 1             /* NMI Handler                  */
     .long hardfault_handler + 1       /* Hard Fault Handler           */
