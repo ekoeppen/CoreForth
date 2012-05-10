@@ -889,6 +889,7 @@ fill_done:
 @ -- Input/output ----------------------------------------------------
 
     defconst "#TIB", TIBSIZE, 128
+    defconst "C/BLK", CSLASHBLK, 1024
 
     defword "SOURCE", SOURCE
     .word XSOURCE, FETCH, SOURCECOUNT, FETCH, EXIT
@@ -1608,13 +1609,8 @@ print_xt_suffix:
     .word LATEST, FETCH, FROMLINK, SEE_RANGE, BYE
 
 @ ---------------------------------------------------------------------
-@ -- User variables ---------------------------------------------------
+@ -- System variables -------------------------------------------------
 
-    defconst "C/BLK", CSLASHBLK, 1024
-    defvar "R0", RTOS, 0
-    defvar "RSTACK", RSTACK, 256
-    defvar "STACK", STACK, 256
-    defvar "S0", TOS, 0
     defvar "STATE", STATE
     defvar "DP", DP
     defvar "LATEST", LATEST
@@ -1625,6 +1621,15 @@ print_xt_suffix:
     defvar "(SOURCE)", XSOURCE
     defvar "SOURCE#", SOURCECOUNT
     defvar ">SOURCE", SOURCEINDEX
+
+@ ---------------------------------------------------------------------
+@ -- Main task user variables -----------------------------------------
+
+    defvar "TASK0", TASKZ, 0
+    defvar "R0", RTOS, 0
+    defvar "RSTACK", RSTACK, 256
+    defvar "STACK", STACK, 256
+    defvar "S0", TOS, 0
 
     .ltorg
 

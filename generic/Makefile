@@ -14,6 +14,8 @@ GEN = ../generic/ansi.gen.s ../generic/accept.gen.s \
 
 all: coreforth.bin
 
+coreforth.bin: coreforth.elf
+
 clean:
 	rm -f *.elf *.bin *.o *.gen.s
 
