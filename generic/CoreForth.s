@@ -998,7 +998,16 @@ dump_end:
     .word DUP, LIT, 0x140, GT, LIT, 0x107, AND, SUB, LIT, 0x30, SUB
     .word DUP, BASE, FETCH, ULT, EXIT
 
+    defword "SETBASE", SETBASE
+    .word OVER, FETCHBYTE
+    .word DUP, LIT, '$', EQU, QBRANCH, 1f - ., HEX, BRANCH, 4f - .
+1:  .word DUP, LIT, '#', EQU, QBRANCH, 2f - ., DECIMAL, BRANCH, 4f - .
+2:  .word DUP, LIT, '%', EQU, QBRANCH, 3f - ., BINARY, BRANCH, 4f - .
+3:  .word DROP, EXIT
+4:  .word DROP, LIT, 1, TRIMSTRING, EXIT
+
     defword ">NUMBER", TONUMBER
+    .word BASE, FETCH, TOR, SETBASE
 /*
     DUP WHILE
         OVER C@ DIGIT?
@@ -1019,7 +1028,7 @@ tonumber_cont:
     .word LIT, 1, TRIMSTRING
     .word BRANCH, tonumber_loop - .
 tonumber_done:
-    .word EXIT
+    .word RFROM, BASE, STORE, EXIT
 
     defword "?NUMBER", ISNUMBER /* ( c-addr -- n true | c-addr false ) */
     .word DUP, LIT, 0, DUP, ROT, COUNT
@@ -1040,6 +1049,9 @@ is_positive:
 
     defword "OCTAL", OCTAL
     .word LIT, 8, BASE, STORE, EXIT
+
+    defword "BINARY", BINARY
+    .word LIT, 2, BASE, STORE, EXIT
 
 @ ---------------------------------------------------------------------
 @ -- Control flow -----------------------------------------------------
