@@ -214,9 +214,7 @@ putnumber:
 puthexnumber:
     push {r4, r5, lr}
     mov r4, r0
-    movs r0, #'0'
-    bl putchar
-    movs r0, #'x'
+    movs r0, #'$'
     bl putchar
     mov r0, r4
     movs r3, #0
@@ -233,7 +231,7 @@ puthexnumber_loop:
 3:  adds r0, r0, #'0'
     cmp r0, #'9'
     ble 1f
-    adds r0, r0, #'a' - '0' - 10
+    adds r0, r0, #'A' - '0' - 10
 1:  bl putchar
 2:  mov r0, r4
     subs r5, r5, #1
