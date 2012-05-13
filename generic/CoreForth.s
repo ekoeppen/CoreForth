@@ -659,6 +659,9 @@ fill_done:
     .word FETCHBYTE, INCR, ALIGNED, ALLOT
     .word GTGTSOURCE, EXIT
 
+    defword ".\"", DOTQUOT, F_IMMED
+    .word SQUOT, LIT, TYPE, COMMAXT, EXIT
+
     defword "SZ\"", SZQUOT, F_IMMED
     .word LIT, XSQUOTE, COMMAXT, LIT, '"', WORD
     .word LIT, 1, OVER, ADDSTORE, LIT, 0, OVER, DUP, FETCHBYTE, ADD, STOREBYTE
