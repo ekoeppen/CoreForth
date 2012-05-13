@@ -111,11 +111,13 @@ constaddr_\label :
 
 reset_handler:
     bl init_board
-    ldr r6, =addr_RTOS
+    ldr r6, =addr_TASKZRTOS
     ldr r7, =cold_start
     NEXT
 cold_start:
     .word TASKZ, UPSTORE
+    .word TASKZRTOS, RZ, STORE
+    .word TASKZTOS, SZ, STORE
     .word LIT, 10, BASE, STORE
     .word LIT, data_start, DP, STORE
     .word LIT, last_word, LATEST, STORE
@@ -327,42 +329,9 @@ read_widekey:
     subs r0, r4
 1:  pop {r4, r5, pc}
 
-printstack:
-    ldr r0, =addr_TASKZTOS
-    cmp sp, r0
-    push {r4, lr}
-    blt 1f
-    beq 2f
-    ldr r0, =stack_underflow_message
-    movs r1, #(stack_underflow_message_end - stack_underflow_message)
-    bl putstring
-2:  pop {r4, pc}
-1:  ldr r4, =addr_TASKZTOS
-    subs r4, r4, #4
-printstack_loop:
-    ldr r0, [r4]
-    bl puthexnumber
-    movs r0, #32
-    bl putchar
-    subs r4, r4, #8
-    cmp r4, sp
-    beq printstack_end
-    adds r4, r4, #4
-    b printstack_loop
-printstack_end:
-    movs r0, #13
-    bl putchar
-    movs r0, #10
-    bl putchar
-    pop {r4, pc}
-stack_underflow_message:
-    .ascii "*** STACK UNDERFLOW ***\n"
-stack_underflow_message_end:
-    .ltorg
-
 printrstack:
     push {r4, lr}
-    ldr r4, =addr_RTOS
+    ldr r4, =addr_TASKZRTOS
     adds r4, r4, #4
 1:  ldr r0, [r4]
     bl puthexnumber
@@ -490,10 +459,6 @@ delay:
 
     defcode "RP@", RPFETCH
     push {r6}
-    ldr r0, =constaddr_UP
-    ldr r0, [r0]
-    ldr r0, [r0]
-    str r6, [r0, #8]
     NEXT
 
     defcode "SP!", SPSTORE
@@ -503,10 +468,6 @@ delay:
 
     defcode "RP!", RPSTORE
     pop {r6}
-    ldr r0, =constaddr_UP
-    ldr r0, [r0]
-    ldr r0, [r0]
-    str r6, [r0, #8]
     NEXT
 
     defword "-ROT", ROTROT
@@ -912,9 +873,10 @@ fill_done:
 
     .ltorg
 
-    defcode ".S", PRINTSTACK
-    bl printstack
-    NEXT
+    defword ".S", PRINTSTACK
+    .word SPFETCH, SZ, FETCH
+1:  .word TWODUP, LTGT, QBRANCH, 2f - ., CELL, MINUS, DUP, FETCH, DOT, BRANCH, 1b - .
+2:  .word TWODROP, CR, EXIT
 
     defcode ".R", PRINTRSTACK
     bl printrstack
@@ -1634,83 +1596,35 @@ print_xt_suffix:
     blx r1
     .word DODOES + 1, FETCH, UPFETCH, ADD, EXIT
 
-    defword "'S", TICKS
-    .word FOLLOWER, MINUS, PLUS, EXIT
-
-    defword "(WAKE)", XWAKE
-    .word RFROM, UP, STORE, TOS, FETCH, SPSTORE, RPSTORE, EXIT
-
-    defconst "WAKE", WAKE, XWAKE
-
-    defword "(PASS)", XPASS
-    .word RFROM, FETCH, TOR, EXIT
-
-    defconst "PASS", PASS, XPASS
-
-    defword "PAUSE", PAUSE
-    .word RPFETCH, SPFETCH, TOS, STORE, FOLLOWER, FETCH, TOR, EXIT
-
-    defword "STOP", STOP
-    .word PASS, STATUS, STORE, PAUSE, EXIT
-
-    defword "SLEEP", SLEEP
-    .word PASS, SWAP, STATUS, TICKS, STORE, EXIT
-
-    defword "AWAKE", AWAKE
-    .word WAKE, SWAP, STATUS, TICKS, STORE, EXIT
-
-    defword "ACTIVATE", ACTIVATE
-    .word DUP, TWOFETCH         @ ( tid sp rp )
-    .word RFROM, OVER, STORE    @ ( save entry at rp )
-    .word OVER, STORE           @ ( save rp at sp )
-    .word OVER, TOS, TICKS, STORE   @ ( save sp in tos )
-    .word AWAKE, EXIT
-
-    defword "BUILD", BUILD
-    .word DUP, SLEEP                                    @ ( sleep new task )
-    .word FOLLOWER, FETCH, OVER, FOLLOWER, TICKS, STORE @ ( link new task )
-    .word DUP, STATUS, TICKS, FOLLOWER, STORE           @ ( link old task )
-    .word DUP, TID, TICKS, STORE, EXIT                  @ ( link to tid )
-
-    defword "HAT", HAT          @ ( u s r "name" -- ) ( -- tid )
-    .word CREATE, ADD, SWAP, LIT, 8, CELLS, ADD
-    .word DUP, HERE, ADD, COMMA, ADD, DUP, HERE, ADD, COMMA, ALLOT, EXIT
-
     defword "UP@", UPFETCH
     .word UP, FETCH, EXIT
 
     defword "UP!", UPSTORE
     .word UP, STORE, EXIT
 
+    defword "TID", TID, , USER_XT
+    .word -0x0c
+
+    defword "TOS", TOS, , USER_XT
+    .word -0x08
+
+    defword "STATUS", STATUS, , USER_XT
+    .word -0x04
+
     defword "FOLLOWER", FOLLOWER, , USER_XT
     .word 0x00
 
-    defword "STATUS", STATUS, , USER_XT
+    defword "R0", RZ, , USER_XT
     .word 0x04
 
-    defword "TOS", TOS, , USER_XT
-    .word 0x08
-
-    defword "TID", TID, , USER_XT
-    .word 0x08
-
-    defword "RP", RP, , USER_XT
-    .word 0x08
-
-    defword "SP", SP, , USER_XT
-    .word 0x0c
-
-    defword "R0", RZ, , USER_XT
-    .word 0x10
-
     defword "S0", SZ, , USER_XT
-    .word 0x14
+    .word 0x08
 
     defword "RSTACK", RSTACK, , USER_XT
-    .word 0x18
+    .word 0x0c
 
     defword "STACK", STACK, , USER_XT
-    .word 0x98
+    .word 0x10
 
 @ ---------------------------------------------------------------------
 @ -- System variables -------------------------------------------------
@@ -1730,14 +1644,15 @@ print_xt_suffix:
 @ ---------------------------------------------------------------------
 @ -- Main task user variables -----------------------------------------
 
-    defvar "TASK0", TASKZ, 0
+    defvar "USER0", USER0, 4 * 7
+    defvar "TASK0TID", TASKZTID
+    defvar "TASK0UTOS", TASKZUTOS
     defvar "TASK0STATUS", TASKZSTATUS
+    defvar "TASK0", TASKZ, 0
     defvar "TASK0FOLLOWER", TASKZFOLLOWER
-    defvar "TASK0RP", TASKZRP
-    defvar "TASK0SP", TASKZSP
-    defvar "TASK0R0", TASKZRZ
-    defvar "TASK0S0", TASKZSZ
-    defvar "TASK0RTOS", RTOS, 0
+    defvar "TASK0RZ", TASKZRZ
+    defvar "TASK0SZ", TASKZSZ
+    defvar "TASK0RTOS", TASKZRTOS, 0
     defvar "TASK0RTACK", TASKZRSTACK, 128
     defvar "TASK0STACK", TASKZSTACK, 128
     defvar "TASK0TOS", TASKZTOS, 0

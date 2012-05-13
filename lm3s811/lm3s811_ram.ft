@@ -3,4 +3,102 @@ HEX
 0 SCR !
 -1 BLOCK# !
 
+: PAUSE             \ suspend task at current execution point and switch to follower
+    RP@             \ push current rp
+    SP@ TOS !       \ save sp to task's TOS
+    FOLLOWER @ >R   \ get follower's status and jump there
+;
+
+: 'S   FOLLOWER - + ;
+
+: (WAKE)
+    R> UP 2DUP !        \ take [rp] pointing to FOLLOWER and convert to TID
+    TOS @ SP!           \ restore sp for this task
+    RP!                 \ rp was on the stack, restore it as well
+;
+
+' (WAKE) CONSTANT WAKE
+
+: (PASS)
+    R> @ >R         \ take [rp] pointing to FOLLOWER and jump there
+;
+
+' (PASS) CONSTANT PASS
+
+: STOP   ( tid -- ) PASS STATUS ! PAUSE ;
+: SLEEP   ( tid -- ) PASS SWAP STATUS 'S !  ;
+: AWAKE   ( tid -- ) WAKE SWAP STATUS 'S !  ;
+
+: ACTIVATE   ( s: tid -- ) ( r: n' -- )
+     DUP S0 'S @ CELL - ( tid sp )      \ get sp and decrement before push
+     OVER R0 'S @       ( tid sp rp )
+     R> OVER !          ( tid sp rp )   \ save next word to rp
+     OVER !             ( tid sp )      \ save rp to sp
+     OVER TOS 'S !      ( tid )         \ save sp in tos
+     AWAKE              ( -- )
+;
+
+: ALSOTASK   ( tid -- )             \ link new task after current task
+     DUP SLEEP                      \ sleep new task
+     FOLLOWER @ OVER FOLLOWER 'S !  \ set new task's follower to this task's follower
+     STATUS 'S FOLLOWER !           \ set this task's follower to the new task's status
+;
+
+: ONLYTASK   ( tid -- )
+    DUP SLEEP
+    DUP STATUS 'S OVER FOLLOWER 'S !
+    DUP TID 'S !
+;
+
+: NEWTASK   ( u s+r "name" -- ) ( -- tid )
+    CREATE SWAP FOLLOWER TID - + CELL + HERE +  \ reserve user space and calculate TID
+    DUP , DUP ,                     \ save TID to pfa and TID field
+    OVER + ,                        \ save TOS to TOS field
+    HERE PASS , ,                   \ set STATUS to PASS and FOLLOWER to STATUS
+    HERE 2 CELLS + , DUP HERE + , ALLOT       \ set R0 and S0 and reserve stack space
+    DOES> @
+;
+
+: .TASK
+    CR
+    DUP TID 'S @        ." ID:       " DUP . CR
+    ANY>LINK LINK>NAME  ." Name:     " COUNT TYPE CR
+    DUP S0 'S @ OVER R0 'S @ ." Stacks:   " . . CR
+    DUP STATUS 'S @     ." Status:   " WAKE = IF ." WAKE" ELSE ." PASS" THEN CR
+    DUP FOLLOWER 'S @   ." Follower: " CELL + . CR
+        TOS 'S @        ." TOS:      " . CR
+;
+
+: .TASKS
+    UP@
+    BEGIN
+        DUP .TASK
+        FOLLOWER 'S @ CELL +
+        DUP UP@ =
+    UNTIL
+    DROP
+;
+
+0 100 NEWTASK T1
+0 100 NEWTASK T2
+
+TASK0 ONLYTASK
+T1 ALSOTASK
+T2 ALSOTASK
+
+TASK0 AWAKE
+
+: T1RUN
+    T1 ACTIVATE
+    BEGIN ." Task 1 " PAUSE AGAIN
+;
+
+: T2RUN
+    T2 ACTIVATE
+    BEGIN ." Task 2 " PAUSE AGAIN
+;
+
+T1RUN
+T2RUN
+
 ABORT
