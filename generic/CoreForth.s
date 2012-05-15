@@ -215,10 +215,6 @@ putnumber:
 
 puthexnumber:
     push {r4, r5, lr}
-    mov r4, r0
-    movs r0, #'$'
-    bl putchar
-    mov r0, r4
     movs r3, #0
     movs r5, #8
 puthexnumber_loop:
@@ -905,11 +901,15 @@ fill_done:
     NEXT
 
     defcode ".H", DOTH
+    mov r0, '$'
+    bl putchar
     pop {r0}
     bl putsignedhexnumber
     NEXT
 
     defcode ".UH", DOTUH
+    mov r0, '$'
+    bl putchar
     pop {r0}
     bl puthexnumber
     NEXT
@@ -917,6 +917,15 @@ fill_done:
     defcode ".D", DOTD
     pop {r0}
     bl putnumber
+    NEXT
+
+    defcode ".UX", DOTUX
+    mov r0, '0'
+    bl putchar
+    mov r0, 'x'
+    bl putchar
+    pop {r0}
+    bl puthexnumber
     NEXT
 
     defword ".", DOT
@@ -1470,7 +1479,7 @@ QUOTE_CHARS:
     .word LIT, ',', EMIT, SPACE, EXIT
 
     defword "(.WORD-FLAGS)", XWORD_FLAGS
-    .word TOFLAGS, FETCHBYTE, LIT, F_FLAGSMASK, AND, XCSPACE, DOTH, EXIT
+    .word TOFLAGS, FETCHBYTE, LIT, F_FLAGSMASK, AND, XCSPACE, DOTUX, EXIT
 
     defword "(.WORD-NAME)", XWORD_NAME
     .word LIT, '"', EMIT, TONAME, COUNT, LIT, 31, AND, TWODUP, TYPE_ESCAPED
@@ -1479,7 +1488,7 @@ QUOTE_CHARS:
 
     defword ".SQUOTE", DOTSQUOTE
     .word TONAME, COUNT, DOTQUOTED, XCSPACE, DROP, CELL, ADD, DUP, FETCHBYTE, CHAR, ADD, ALIGNED, DUP, ROTROT
-1:  .word SWAP, DUP, FETCH, DOTH, OVER, CELL, NEQU, QBRANCH, 2f - ., XCSPACE
+1:  .word SWAP, DUP, FETCH, DOTUX, OVER, CELL, NEQU, QBRANCH, 2f - ., XCSPACE
 2:  .word CELL, ADD, SWAP, CELL, SUB, DUP, ZEQU, QBRANCH, 1b - .
     .word TWODROP, CELL, ADD, EXIT
 
@@ -1492,11 +1501,11 @@ QUOTE_CHARS:
 1:  .ascii "\013\n    .word "
 
     defword ".DOVAR", DOTDOVAR
-    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, XCSPACE, TWODUP, SUB, CELL, SUB, DOTH, LF, EXIT
+    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, XCSPACE, TWODUP, SUB, CELL, SUB, DOTUX, LF, EXIT
 1:  .ascii "\014\n    defvar "
 
     defword ".DOCON", DOTDOCON
-    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, XCSPACE, DUP, CELL, ADD, FETCH, DOTH, LF, EXIT
+    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, XCSPACE, DUP, CELL, ADD, FETCH, DOTUX, LF, EXIT
 1:  .ascii "\016\n    defconst "
 
     defword ".DODATA", DOTDODATA
@@ -1523,7 +1532,7 @@ QUOTE_CHARS:
     .word DUP, FETCH, LIT, 0x47884900, NEQU, QBRANCH, print_dodoes - .
     .word DUP, XTQ, QBRANCH, 1f - .
     .word TONAME, COUNT, LIT, 31, AND, DOTQUOTED, TWODROP, CELL, EXIT
-1:  .word DOTUH, TWODROP, CELL, EXIT
+1:  .word DOTUX, TWODROP, CELL, EXIT
 print_code:
     .word DROP, LIT, print_label_code, COUNT, TYPE, DROP, CELL, EXIT
 print_docol:
@@ -1538,7 +1547,7 @@ print_xdoes:
     .word TONAME, COUNT, DOTQUOTED
     .word LIT, print_xdoes_xt, COUNT, TYPE, DUP, ANYTOLINK, LINKTONAME, COUNT, DOTQUOTED
     .word LIT, print_xt_suffix, COUNT, TYPE
-    .word CELL, ADD, FETCH, DOTH, XCSPACE, LIT, print_label_dodoes, COUNT, TYPE
+    .word CELL, ADD, FETCH, DOTUX, XCSPACE, LIT, print_label_dodoes, COUNT, TYPE
     .word DROP, LIT, 3, CELLS, EXIT
 print_xsquote:
     .word DOTSQUOTE, EXIT
@@ -1702,6 +1711,7 @@ print_xt_suffix:
     .set LBRAC, LBRACKET
     .set RBRAC, RBRACKET
     .set LINKGT, FROMLINK
+    .set ANYGTLINK, ANYTOLINK
     .set LINKGTNAME, LINKTONAME
     .set LINKGTFLAGS, LINKTOFLAGS
     .set SEMI, SEMICOLON
