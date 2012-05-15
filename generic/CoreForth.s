@@ -1505,8 +1505,14 @@ QUOTE_CHARS:
 1:  .ascii "\014\n    defvar "
 
     defword ".DOCON", DOTDOCON
-    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, XCSPACE, DUP, CELL, ADD, FETCH, DOTUX, LF, EXIT
+    .word LIT, 1f, COUNT, TYPE, XWORD_NAME, XCSPACE, DUP, CELL, ADD, FETCH
+    .word DOTLITORXT, LF, EXIT
 1:  .ascii "\016\n    defconst "
+
+    defword ".LIT-OR-XT", DOTLITORXT
+    .word DUP, XTQ, QBRANCH, 1f - .
+    .word TONAME, COUNT, LIT, 31, AND, DOTQUOTED, EXIT
+1:  .word DOTUX, EXIT
 
     defword ".DODATA", DOTDODATA
     .word LIT, 1f, COUNT, TYPE, XWORD_NAME, LIT, 2f, COUNT, TYPE, EXIT
@@ -1530,8 +1536,7 @@ QUOTE_CHARS:
     .word DUP, LIT, XDOES, NEQU, QBRANCH, print_xdoes - .
     .word DUP, LIT, XSQUOTE, NEQU, QBRANCH, print_xsquote - .
     .word DUP, FETCH, LIT, 0x47884900, NEQU, QBRANCH, print_dodoes - .
-    .word DUP, XTQ, QBRANCH, 1f - .
-    .word TONAME, COUNT, LIT, 31, AND, DOTQUOTED, TWODROP, CELL, EXIT
+    .word DOTLITORXT, TWODROP, CELL, EXIT
 1:  .word DOTUX, TWODROP, CELL, EXIT
 print_code:
     .word DROP, LIT, print_label_code, COUNT, TYPE, DROP, CELL, EXIT
@@ -1596,7 +1601,7 @@ print_xt_suffix:
     .word LATEST, FETCH, FROMLINK, SEE_RANGE, BYE
 
 @ ---------------------------------------------------------------------
-@ -- Multitasking  ----------------------------------------------------
+@ -- User variables  --------------------------------------------------
 
     defword "USER", USER
     .word CREATE, COMMA, XDOES
@@ -1611,29 +1616,11 @@ print_xt_suffix:
     defword "UP!", UPSTORE
     .word UP, STORE, EXIT
 
-    defword "TID", TID, , USER_XT
-    .word -0x0c
-
-    defword "TOS", TOS, , USER_XT
-    .word -0x08
-
-    defword "STATUS", STATUS, , USER_XT
-    .word -0x04
-
-    defword "FOLLOWER", FOLLOWER, , USER_XT
-    .word 0x00
-
     defword "R0", RZ, , USER_XT
     .word 0x04
 
     defword "S0", SZ, , USER_XT
     .word 0x08
-
-    defword "RSTACK", RSTACK, , USER_XT
-    .word 0x0c
-
-    defword "STACK", STACK, , USER_XT
-    .word 0x10
 
 @ ---------------------------------------------------------------------
 @ -- System variables -------------------------------------------------

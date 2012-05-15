@@ -8,6 +8,7 @@ precompile_words:
     .include "editor.gen.s"
     .include "blocks.gen.s"
     .include "protothreads.gen.s"
+    .include "multitasking.gen.s"
     .include "quit.gen.s"
     .word 0xffffffff
 
