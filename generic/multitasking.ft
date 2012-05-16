@@ -1,9 +1,8 @@
 HEX
 
-0      DUP   USER FOLLOWER
-CELL - DUP   USER STATUS
-CELL - DUP   USER TOS
-CELL -       USER TID
+0      DUP   USER FOLLOWER      \ points to the follower's STATUS variable
+CELL - DUP   USER STATUS        \ PASS or WAKE - this needs to be one cell before FOLLOWER!
+CELL -       USER TOS           \ task's top of stack when switching
 
 : PAUSE             \ suspend task at current execution point and switch to follower
     RP@             \ push current rp
@@ -47,14 +46,13 @@ CELL -       USER TID
 ;
 
 : ONLYTASK   ( tid -- )
-    DUP SLEEP
-    DUP STATUS 'S OVER FOLLOWER 'S !
-    DUP TID 'S !
+    DUP SLEEP                           \ sleep this task
+    DUP STATUS 'S SWAP FOLLOWER 'S !    \ set task's follower to own stats
 ;
 
 : NEWTASK   ( u s+r "name" -- ) ( -- tid )
-    CREATE SWAP FOLLOWER TID - + CELL + HERE +  \ reserve user space and calculate TID
-    DUP , DUP ,                     \ save TID to pfa and TID field
+    CREATE SWAP FOLLOWER TOS - + CELL + HERE +  \ reserve user space and calculate TID
+    DUP ,                           \ save TID to pfa
     OVER + ,                        \ save TOS to TOS field
     HERE PASS , ,                   \ set STATUS to PASS and FOLLOWER to STATUS
     HERE 2 CELLS + , DUP HERE + , ALLOT       \ set R0 and S0 and reserve stack space
@@ -63,7 +61,7 @@ CELL -       USER TID
 
 : .TASK
     CR
-    DUP TID 'S @        ." ID:       " DUP . CR
+    DUP                 ." ID:       " . CR
     ANY>LINK LINK>NAME  ." Name:     " COUNT TYPE CR
     DUP S0 'S @ OVER R0 'S @ ." Stacks:   " . . CR
     DUP STATUS 'S @     ." Status:   " WAKE = IF ." WAKE" ELSE ." PASS" THEN CR
@@ -80,5 +78,3 @@ CELL -       USER TID
     UNTIL
     DROP
 ;
-
-

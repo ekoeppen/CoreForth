@@ -1640,7 +1640,6 @@ print_xt_suffix:
 @ ---------------------------------------------------------------------
 @ -- Main task user variables -----------------------------------------
 
-    defvar "TASK0TID", TASKZTID
     defvar "TASK0UTOS", TASKZUTOS
     defvar "TASK0STATUS", TASKZSTATUS
     defvar "TASK0", TASKZ, 0
