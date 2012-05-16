@@ -62,8 +62,8 @@ CELL -       USER TOS           \ task's top of stack when switching
 : .TASK
     CR
     DUP                 ." ID:       " . CR
-    ANY>LINK LINK>NAME  ." Name:     " COUNT TYPE CR
-    DUP S0 'S @ OVER R0 'S @ ." Stacks:   " . . CR
+    DUP ANY>LINK LINK>NAME      ." Name:     " COUNT TYPE CR
+    DUP S0 'S @ OVER R0 'S @    ." Stacks:   " . . CR
     DUP STATUS 'S @     ." Status:   " WAKE = IF ." WAKE" ELSE ." PASS" THEN CR
     DUP FOLLOWER 'S @   ." Follower: " CELL + . CR
         TOS 'S @        ." TOS:      " . CR
