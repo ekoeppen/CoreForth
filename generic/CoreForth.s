@@ -1640,7 +1640,6 @@ print_xt_suffix:
 @ ---------------------------------------------------------------------
 @ -- Main task user variables -----------------------------------------
 
-    defvar "USER0", USER0, 4 * 7
     defvar "TASK0TID", TASKZTID
     defvar "TASK0UTOS", TASKZUTOS
     defvar "TASK0STATUS", TASKZSTATUS
@@ -1652,15 +1651,6 @@ print_xt_suffix:
     defvar "TASK0RTACK", TASKZRSTACK, 128
     defvar "TASK0STACK", TASKZSTACK, 128
     defvar "TASK0TOS", TASKZTOS, 0
-
-@ ---------------------------------------------------------------------
-@ -- Main task user variables -----------------------------------------
-
-    defvar "TASK0", TASKZ, 0
-    defvar "R0", RTOS, 0
-    defvar "RSTACK", RSTACK, 256
-    defvar "STACK", STACK, 256
-    defvar "S0", TOS, 0
 
     .ltorg
 
