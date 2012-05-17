@@ -1009,7 +1009,7 @@ tonumber_loop:
     .word DUP, QBRANCH, tonumber_done - .
     .word OVER, FETCHBYTE, ISDIGIT
     .word ZEQU, QBRANCH, tonumber_cont - .
-    .word DROP, EXIT
+    .word DROP, BRANCH, tonumber_done - .
 tonumber_cont:
     .word TOR, ROT, BASE, FETCH, MUL
     .word RFROM, ADD, ROT, ROT
@@ -1342,14 +1342,11 @@ interpret_eol:
     defword "EVALUATE", EVALUATE
     .word XSOURCE, STORE
     .word LIT, 0, STATE, STORE
-1:
-    .word XSOURCE, FETCH, DUP, FETCHBYTE, DUP, LIT, 255, NEQU, QBRANCH, 2f - .
+1:  .word XSOURCE, FETCH, DUP, FETCHBYTE, DUP, LIT, 255, NEQU, QBRANCH, 2f - .
     .word SOURCECOUNT, STORE, INCR, XSOURCE, STORE, LIT, 0, SOURCEINDEX, STORE, XINTERPRET, QBRANCH, 3f - ., DROP
     .word SOURCECOUNT, FETCH, XSOURCE, ADDSTORE, BRANCH, 1b - .
-2:
-    .word TWODROP, EXIT
-3:
-    .word DROP, DUP, DOT, SPACE, COUNT, TYPE, LIT, '?', EMIT, CR, EXIT
+2:  .word TWODROP, EXIT
+3:  .word DROP, DUP, DOT, SPACE, COUNT, TYPE, LIT, '?', EMIT, CR, EXIT
 
     defword "FORGET", FORGET
     .word BL, WORD, FIND, DROP, TOLINK, FETCH, LATEST, STORE, EXIT
