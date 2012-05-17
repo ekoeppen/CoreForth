@@ -396,6 +396,13 @@ uart0_key_handler:
     adds r3, #1
     ands r3, r1
     strb r3, [r2]
+    ldr r0, =addr_KEY_HANDLER
+    ldr r0, [r0]
+    cmp r0, #0
+    beq 2b
+    ldr r1, =LPARENWAKERPAREN
+    sub r0, #4
+    str r1, [r0]
     b 2b
 1:  bx lr
 
