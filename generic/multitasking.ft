@@ -26,9 +26,9 @@ CELL -       USER TOS           \ task's top of stack when switching
 
 ' (PASS) CONSTANT PASS
 
-: STOP   ( tid -- ) PASS STATUS ! PAUSE ;
-: SLEEP   ( tid -- ) PASS SWAP STATUS 'S !  ;
-: AWAKE   ( tid -- ) WAKE SWAP STATUS 'S !  ;
+: STOP   PASS STATUS ! PAUSE ;
+: SLEEP   ( tid -- ) PASS SWAP STATUS 'S ! ;
+: AWAKE   ( tid -- ) WAKE SWAP STATUS 'S ! ;
 
 : ACTIVATE   ( s: tid -- ) ( r: n' -- )
      DUP S0 'S @ CELL - ( tid sp )      \ get sp and decrement before push
