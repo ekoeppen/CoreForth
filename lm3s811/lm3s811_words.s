@@ -180,6 +180,6 @@
     defvar "SBUF-HEAD", SBUF_HEAD
     defvar "SBUF-TAIL", SBUF_TAIL
     defvar "IVT", IVT, 48 * 4
-    defvar "KEY-HANDLER", KEY_HANDLER
+    defvar "UART0-TASK", UART0_TASK
 
     .ltorg
