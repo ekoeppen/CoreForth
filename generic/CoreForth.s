@@ -1159,6 +1159,9 @@ is_positive:
     bl delay
     NEXT
 
+    defword "RECURSE", RECURSE, F_IMMED
+    .word LATEST, FETCH, FROMLINK, COMMAXT, EXIT
+
 @ ---------------------------------------------------------------------
 @ -- Compiler ands interpreter ----------------------------------------
 
