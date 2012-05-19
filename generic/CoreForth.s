@@ -1601,14 +1601,24 @@ print_xt_suffix:
     .word XSEE
 3:  .word EXIT
 
+    defword ">>PAD!", STORETOPAD
+    .word CELL, PAD, PLUSSTORE, PAD, FETCH, STORE, EXIT
+
     defword "SEE-RANGE", SEE_RANGE
-1:  .word DUP, XSEE, TOLINK, FETCH, FROMLINK, TWODUP, EQU, QBRANCH, 1b - ., TWODROP, EXIT
+    .word PAD, DUP, STORE
+1:  .word DUP, FROMLINK, STORETOPAD, TWODUP, NEQU, QBRANCH, 2f - .
+    .word FETCH, BRANCH, 1b - .
+2:  .word TWODROP
+    .word PAD, DUP, FETCH
+3:  .word TWODUP, NEQU, QBRANCH, 4f - .
+    .word DUP, FETCH, XSEE, CELL, SUB, BRANCH, 3b - .
+4:  .word TWODROP, EXIT
 
     defword "PRECOMP-BEGIN", PRECOMP_BEGIN
-    .word LATEST, FETCH, FROMLINK, EXIT
+    .word LATEST, FETCH, EXIT
 
     defword "PRECOMP-END", PRECOMP_END
-    .word LATEST, FETCH, FROMLINK, SEE_RANGE, BYE
+    .word LATEST, FETCH, SEE_RANGE, BYE
 
 @ ---------------------------------------------------------------------
 @ -- User variables  --------------------------------------------------
