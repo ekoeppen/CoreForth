@@ -39,10 +39,17 @@
     bx r1
     .endm
 
+    .macro checkdef name
+    .ifdef \name
+    .print "Redefining \name"
+    .endif
+    .endm
+
     .macro defword name, label, flags=0, xt=DOCOL
     .align 2, 0
+    checkdef \label
     .global name_\label
-name_\label :
+    .set name_\label , .
     .int link
     .set link, name_\label
     .byte \flags | F_MARKER
@@ -52,7 +59,7 @@ name_\label :
 99:
     .align  2, 0
     .global \label
-\label :
+    .set \label , .
     .int \xt
     @ parameter field follows
     .endm
@@ -60,7 +67,8 @@ name_\label :
     .macro defcode name, label, flags=0
     .align 2, 0
     .global name_\label
-name_\label :
+    checkdef \label
+    .set name_\label , .
     .int link
     .set link, name_\label
     .byte \flags | F_MARKER
@@ -70,17 +78,19 @@ name_\label :
 99:
     .align 2, 0
     .global \label
-\label :
+    checkdef \label
+    .set \label , .
     .int code_\label
     .global code_\label
-code_\label :
+    .set code_\label , .
     @ parameter field follows
     .endm
 
     .macro defconst name, label, value
     .align 2, 0
     .global name_\label
-name_\label :
+    checkdef \label
+    .set name_\label , .
     .int link
     .set link, name_\label
     .byte F_MARKER
@@ -90,9 +100,9 @@ name_\label :
 99:
     .align 2, 0
     .global \label
-\label :
+    .set \label , .
     .int DOCON
-constaddr_\label :
+    .set constaddr_\label , .
     .word \value
     .endm
 
