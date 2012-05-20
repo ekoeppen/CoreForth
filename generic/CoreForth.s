@@ -7,6 +7,7 @@
 
     .set F_IMMED,           0x01
     .set F_HIDDEN,          0x20
+    .set F_NODISASM,        0x40
     .set F_LENMASK,         0x1f
     .set F_MARKER,          0x80
     .set F_FLAGSMASK,       0x7f
@@ -1163,7 +1164,7 @@ is_positive:
     .word LATEST, FETCH, FROMLINK, COMMAXT, EXIT
 
 @ ---------------------------------------------------------------------
-@ -- Compiler ands interpreter ----------------------------------------
+@ -- Compiler and interpreter ----------------------------------------
 
     defcode "BYE", BYE
     movs r0, #0x18
@@ -1261,6 +1262,9 @@ is_positive:
 
     defword "IS", IS
     .word TICK, GTBODY, STORE, EXIT
+
+    defword "DECLARE", DECLARE
+    .word CREATE, LATEST, FETCH, LINKTOFLAGS, DUP, FETCH, LIT, F_NODISASM, OR, SWAP, STORE, EXIT
 
     defword ">UPPER", GTUPPER, 0x0
     .word OVER, PLUS, SWAP, LPARENDORPAREN, I, CFETCH, UPPERCASE, I, CSTORE, LPARENLOOPRPAREN, QBRANCH, 0xffffffe4, EXIT
@@ -1606,7 +1610,9 @@ print_xt_suffix:
 
     defword "SEE-RANGE", SEE_RANGE
     .word PAD, DUP, STORE
-1:  .word DUP, FROMLINK, STORETOPAD, TWODUP, NEQU, QBRANCH, 2f - .
+1:  .word DUP, LINKTOFLAGS, FETCH, LIT, F_NODISASM, AND, ZEQU, QBRANCH, 5f - .
+    .word DUP, FROMLINK, STORETOPAD
+5:  .word TWODUP, NEQU, QBRANCH, 2f - .
     .word FETCH, BRANCH, 1b - .
 2:  .word TWODROP
     .word PAD, DUP, FETCH
