@@ -271,7 +271,7 @@ init_board:
     .align 2, 0
     .ltorg
 
-read_key:
+readkey:
     push {r1, r2, r3, lr}
 2:  ldr r1, =addr_SBUF_TAIL
     ldrb r3, [r1]

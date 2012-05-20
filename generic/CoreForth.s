@@ -270,7 +270,7 @@ readline:
     movs r3, r1
     beq readline_end
 readline_loop:
-    bl read_key
+    bl readkey
     cmp r0, #13
     beq readline_end
     cmp r0, #127
@@ -306,13 +306,13 @@ readline_end:
  */
 read_widekey:
     push {r4, r5, lr}
-    bl read_key
+    bl readkey
     cmp r0, #27
     bne 1f
-    bl read_key
+    bl readkey
     cmp r0, '['
     bne 1f
-    bl read_key
+    bl readkey
     cmp r0, 'A'
     blt 3f
     cmp r0, 'Z'
@@ -330,7 +330,7 @@ read_widekey:
     subs r0, '0'
     muls r4, r4, r5
     adds r4, r0
-    bl read_key
+    bl readkey
     b 2b
 4:  movs r0, #0
     subs r0, r4
@@ -942,15 +942,18 @@ fill_done:
     defword ".", DOT
     .word DOTH, SPACE, EXIT
 
-    defcode "(KEY)", XKEY
-    bl read_key
+    defcode "READKEY", READKEY
+    bl readkey
     push {r0}
     NEXT
 
-    defcode "KEY", KEY
+    defcode "READWKEY", READWKEY
     bl read_widekey
     push {r0}
     NEXT
+
+    defword "KEY", KEY, , DEFER_XT
+    .word READWKEY
 
     defcode "READLINE", READLINE
     pop {r1}
@@ -958,6 +961,9 @@ fill_done:
     bl readline
     push {r0}
     NEXT
+
+    defword "ACCEPT", ACCEPT, , DEFER_XT
+    .word READLINE
 
     defword "DUMP", DUMP
     .word QDUP, QBRANCH, dump_end - .

@@ -148,10 +148,10 @@ init_board:
     .align 2, 0
     .ltorg
 
-read_key_interrupt:
+readkey_interrupt:
     mov pc, lr
 
-read_key_polled:
+readkey_polled:
     push {r1, r2, r3, lr}
     ldr r1, =UART2
     mov r2, #32
@@ -163,9 +163,9 @@ read_key_polled:
     pop {r1, r2, r3, pc}
 
 .ifdef UART_USE_INTERRUPTS
-    .set read_key, read_key_interrupt
+    .set readkey, readkey_interrupt
 .else
-    .set read_key, read_key_polled
+    .set readkey, readkey_polled
 .endif
 
 putchar:
