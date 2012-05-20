@@ -1621,7 +1621,7 @@ print_xt_suffix:
 4:  .word TWODROP, EXIT
 
     defword "PRECOMP-BEGIN", PRECOMP_BEGIN
-    .word LATEST, FETCH, EXIT
+    .word HERE, EXIT
 
     defword "PRECOMP-END", PRECOMP_END
     .word LATEST, FETCH, SEE_RANGE, BYE

@@ -1,7 +1,4 @@
 
-    defconst "UART0-TASK", UARTZ_TASK, 0x20000298
-
-
     defword "REGISTER", REGISTER, 0x0
     .word CREATE, COMMA, LPARENDOESGTRPAREN
     .set REGISTER_XT, .
