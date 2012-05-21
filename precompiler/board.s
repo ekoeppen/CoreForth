@@ -82,7 +82,7 @@ _start:
 init_board:
     mov pc, lr
 
-read_key:
+readkey:
     b .
 
 putchar:

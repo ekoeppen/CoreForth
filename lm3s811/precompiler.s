@@ -2,6 +2,7 @@
     .include "lm3s811_words.s"
 
 precompile_words:
+    .include "deferred.gen.s"
     .include "lm3s811.gen.s"
     .include "ansi.gen.s"
     .include "accept.gen.s"

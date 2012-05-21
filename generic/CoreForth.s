@@ -301,41 +301,6 @@ readline_end:
     subs r0, r5, r4
     pop {r3, r4, r5, pc}
 
-/* read keys including escape sequences. Reading escape itself is
- * not supported yet. Escape sequences return negative numbers
- */
-read_widekey:
-    push {r4, r5, lr}
-    bl readkey
-    cmp r0, #27
-    bne 1f
-    bl readkey
-    cmp r0, '['
-    bne 1f
-    bl readkey
-    cmp r0, 'A'
-    blt 3f
-    cmp r0, 'Z'
-    bgt 3f
-    subs r4, r0, '@'
-    b 4f
-3:  movs r4, #10
-    movs r5, #10
-2:  cmp r0, '~'
-    beq 4f
-    cmp r0, '0'
-    blt 1f
-    cmp r0, '9'
-    bgt 1f
-    subs r0, '0'
-    muls r4, r4, r5
-    adds r4, r0
-    bl readkey
-    b 2b
-4:  movs r0, #0
-    subs r0, r4
-1:  pop {r4, r5, pc}
-
 printrstack:
     push {r4, lr}
     ldr r4, =addr_TASKZRTOS
@@ -947,23 +912,12 @@ fill_done:
     push {r0}
     NEXT
 
-    defcode "READWKEY", READWKEY
-    bl read_widekey
-    push {r0}
-    NEXT
-
-    defword "KEY", KEY, , DEFER_XT
-    .word READWKEY
-
     defcode "READLINE", READLINE
     pop {r1}
     pop {r0}
     bl readline
     push {r0}
     NEXT
-
-    defword "ACCEPT", ACCEPT, , DEFER_XT
-    .word READLINE
 
     defword "DUMP", DUMP
     .word QDUP, QBRANCH, dump_end - .

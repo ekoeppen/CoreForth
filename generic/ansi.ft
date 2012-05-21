@@ -24,3 +24,23 @@ DECIMAL
 -105 CONSTANT KEY-PGUP
 -106 CONSTANT KEY-PGDOWN
 127 CONSTANT KEY-BACKSPACE
+
+: ROTKEY   ( current rot-count key -- current' rot-count' )
+    OVER ROTATE ROT OR SWAP 8 -
+;
+    
+: READWKEY
+     READKEY   DUP #27 = IF
+        DROP 0 #24 READKEY   DUP #91 = IF
+            ROTKEY
+            BEGIN
+                READKEY DUP >R ROTKEY R>
+                DUP #65 #91 WITHIN SWAP #126 = OR
+            UNTIL DROP
+        THEN
+    THEN
+;
+
+' READWKEY IS KEY
+' READLINE IS ACCEPT
+' PUTCHAR IS EMIT
