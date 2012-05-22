@@ -1,4 +1,4 @@
-GEN = ../generic/deferred.gen.s ../generic/ansi.gen.s ../generic/accept.gen.s \
+GEN = ../generic/ansi.gen.s \
       ../generic/editor.gen.s ../generic/protothreads.gen.s \
       ../generic/find.gen.s ../generic/strings.gen.s ../generic/multitasking.gen.s \
       ../generic/blocks.gen.s ../generic/quit.gen.s

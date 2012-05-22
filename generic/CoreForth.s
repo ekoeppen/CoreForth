@@ -132,6 +132,9 @@ cold_start:
     .word LIT, 10, BASE, STORE
     .word LIT, data_start, DP, STORE
     .word LIT, last_word, LATEST, STORE
+    .word LIT, READKEY, TICKKEY, STORE
+    .word LIT, READLINE, TICKACCEPT, STORE
+    .word LIT, PUTCHAR, TICKEMIT, STORE
     .word COLD
 
     .ltorg
@@ -854,7 +857,7 @@ fill_done:
     bl printrstack
     NEXT
 
-    defcode "EMIT", EMIT
+    defcode "PUTCHAR", PUTCHAR
     pop {r0}
     bl putchar
     NEXT
@@ -918,6 +921,15 @@ fill_done:
     bl readline
     push {r0}
     NEXT
+
+    defword "KEY", KEY
+    .word TICKKEY, FETCH, EXECUTE, EXIT
+
+    defword "ACCEPT", ACCEPT
+    .word TICKACCEPT, FETCH, EXECUTE, EXIT
+
+    defword "EMIT", EMIT
+    .word TICKEMIT, FETCH, EXECUTE, EXIT
 
     defword "DUMP", DUMP
     .word QDUP, QBRANCH, dump_end - .
@@ -1622,6 +1634,11 @@ print_xt_suffix:
     defvar "SOURCE#", SOURCECOUNT
     defvar ">SOURCE", SOURCEINDEX
     defvar "UP", UP
+    defvar "\047KEY", TICKKEY
+    defvar "\047ACCEPT", TICKACCEPT
+    defvar "\047EMIT", TICKEMIT
+test:
+    .ascii "'abc"
 
 @ ---------------------------------------------------------------------
 @ -- Main task user variables -----------------------------------------
@@ -1677,6 +1694,9 @@ print_xt_suffix:
     .set LINKGTNAME, LINKTONAME
     .set LINKGTFLAGS, LINKTOFLAGS
     .set SEMI, SEMICOLON
+    .set MULKEY, TICKKEY
+    .set MULACCEPT, TICKACCEPT
+    .set MULEMIT, TICKEMIT
 
 @ ---------------------------------------------------------------------
 
