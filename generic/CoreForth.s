@@ -1368,6 +1368,9 @@ words_loop:
     .word FETCH, QDUP, ZEQU, QBRANCH, words_loop - .
     .word EXIT
 
+    defword "DEFINED?", DEFINEDQ
+    .word BL, WORD, FIND, NIP, EXIT
+
 @ ---------------------------------------------------------------------
 @ -- Disassembler -----------------------------------------------------
 

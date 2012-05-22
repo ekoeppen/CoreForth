@@ -28,17 +28,23 @@ $5B367E00 CONSTANT KEY-PGDOWN
 : ROTKEY   ( current rot-count key -- current' rot-count' )
     OVER ROTATE ROT OR SWAP 8 -
 ;
-    
+
+DEFINED? NEWTASK IF
+: WAIT-KEY   BEGIN KEY? 0= WHILE STOP REPEAT ;
+ELSE
+: WAIT-KEY ;
+THEN  
+
 : READWKEY
-     READKEY   DUP #27 = IF
-        DROP 0 #24 READKEY   DUP #91 = IF
+     WAIT-KEY READKEY   DUP #27 = IF
+        DROP 0 #24 WAIT-KEY READKEY   DUP #91 = IF
             ROTKEY
             BEGIN
-                READKEY DUP >R ROTKEY R>
+                WAIT-KEY READKEY DUP >R ROTKEY R>
                 DUP #65 #91 WITHIN SWAP #126 = OR
             UNTIL DROP
         ELSE DUP #79 = IF
-                ROTKEY READKEY ROTKEY DROP
+                ROTKEY WAIT-KEY READKEY ROTKEY DROP
             THEN
         THEN
     THEN
