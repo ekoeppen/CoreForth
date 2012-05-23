@@ -132,6 +132,7 @@ cold_start:
     .word LIT, 10, BASE, STORE
     .word LIT, data_start, DP, STORE
     .word LIT, last_word, LATEST, STORE
+    .word LIT, NOOP, DUP, TICKWAITDASHKEY, STORE, TICKFINISHDASHOUTPUT, STORE
     .word LIT, READKEY, TICKKEY, STORE
     .word LIT, READLINE, TICKACCEPT, STORE
     .word LIT, PUTCHAR, TICKEMIT, STORE
@@ -923,13 +924,13 @@ fill_done:
     NEXT
 
     defword "KEY", KEY
-    .word TICKKEY, FETCH, EXECUTE, EXIT
+    .word TICKWAITDASHKEY, FETCH, EXECUTE, TICKKEY, FETCH, EXECUTE, EXIT
 
     defword "ACCEPT", ACCEPT
     .word TICKACCEPT, FETCH, EXECUTE, EXIT
 
     defword "EMIT", EMIT
-    .word TICKEMIT, FETCH, EXECUTE, EXIT
+    .word TICKFINISHDASHOUTPUT, FETCH, EXECUTE, TICKEMIT, FETCH, EXECUTE, EXIT
 
     defword "DUMP", DUMP
     .word QDUP, QBRANCH, dump_end - .
@@ -1026,6 +1027,9 @@ is_positive:
 
 @ ---------------------------------------------------------------------
 @ -- Control flow -----------------------------------------------------
+
+    defcode "NOOP", NOOP
+    NEXT
 
     defcode "BRANCH", BRANCH
     ldr r0, [r7]
@@ -1640,8 +1644,8 @@ print_xt_suffix:
     defvar "\047KEY", TICKKEY
     defvar "\047ACCEPT", TICKACCEPT
     defvar "\047EMIT", TICKEMIT
-test:
-    .ascii "'abc"
+    defvar "\047WAIT-KEY", TICKWAITDASHKEY
+    defvar "\047FINISH-OUTPUT", TICKFINISHDASHOUTPUT
 
 @ ---------------------------------------------------------------------
 @ -- Main task user variables -----------------------------------------
@@ -1697,9 +1701,6 @@ test:
     .set LINKGTNAME, LINKTONAME
     .set LINKGTFLAGS, LINKTOFLAGS
     .set SEMI, SEMICOLON
-    .set MULKEY, TICKKEY
-    .set MULACCEPT, TICKACCEPT
-    .set MULEMIT, TICKEMIT
 
 @ ---------------------------------------------------------------------
 
