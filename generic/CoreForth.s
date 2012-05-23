@@ -132,7 +132,7 @@ cold_start:
     .word LIT, 10, BASE, STORE
     .word LIT, data_start, DP, STORE
     .word LIT, last_word, LATEST, STORE
-    .word LIT, NOOP, DUP, TICKWAITDASHKEY, STORE, TICKFINISHDASHOUTPUT, STORE
+    .word LIT, NOOP, DUP, TICKWAIT_KEY, STORE, TICKFINISH_OUTPUT, STORE
     .word LIT, READKEY, TICKKEY, STORE
     .word LIT, READLINE, TICKACCEPT, STORE
     .word LIT, PUTCHAR, TICKEMIT, STORE
@@ -924,13 +924,13 @@ fill_done:
     NEXT
 
     defword "KEY", KEY
-    .word TICKWAITDASHKEY, FETCH, EXECUTE, TICKKEY, FETCH, EXECUTE, EXIT
+    .word TICKWAIT_KEY, FETCH, EXECUTE, TICKKEY, FETCH, EXECUTE, EXIT
 
     defword "ACCEPT", ACCEPT
     .word TICKACCEPT, FETCH, EXECUTE, EXIT
 
     defword "EMIT", EMIT
-    .word TICKFINISHDASHOUTPUT, FETCH, EXECUTE, TICKEMIT, FETCH, EXECUTE, EXIT
+    .word TICKFINISH_OUTPUT, FETCH, EXECUTE, TICKEMIT, FETCH, EXECUTE, EXIT
 
     defword "DUMP", DUMP
     .word QDUP, QBRANCH, dump_end - .
@@ -1644,8 +1644,8 @@ print_xt_suffix:
     defvar "\047KEY", TICKKEY
     defvar "\047ACCEPT", TICKACCEPT
     defvar "\047EMIT", TICKEMIT
-    defvar "\047WAIT-KEY", TICKWAITDASHKEY
-    defvar "\047FINISH-OUTPUT", TICKFINISHDASHOUTPUT
+    defvar "\047WAIT-KEY", TICKWAIT_KEY
+    defvar "\047FINISH-OUTPUT", TICKFINISH_OUTPUT
 
 @ ---------------------------------------------------------------------
 @ -- Main task user variables -----------------------------------------
