@@ -78,3 +78,12 @@ CELL -       USER TOS           \ task's top of stack when switching
     UNTIL
     DROP
 ;
+
+: STOP-FOR-KEY
+    BEGIN KEY? 0= WHILE STOP REPEAT
+;
+
+: MULTITASKING-KEY
+    UP@ UART0-TASK !
+    ['] STOP-FOR-KEY 'WAIT-KEY !
+;
