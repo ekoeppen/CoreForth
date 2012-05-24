@@ -133,9 +133,9 @@ cold_start:
     .word LIT, data_start, DP, STORE
     .word LIT, last_word, LATEST, STORE
     .word LIT, NOOP, DUP, TICKWAIT_KEY, STORE, TICKFINISH_OUTPUT, STORE
-    .word LIT, READ_KEY, TICKKEY, STORE
+    .word LIT, XKEY, TICKKEY, STORE
+    .word LIT, XEMIT, TICKEMIT, STORE
     .word LIT, READ_LINE, TICKACCEPT, STORE
-    .word LIT, PUTCHAR, TICKEMIT, STORE
     .word COLD
 
     .ltorg
@@ -931,14 +931,20 @@ fill_done:
     defword "FINISH-OUTPUT", FINISH_OUTPUT
     .word TICKFINISH_OUTPUT, FETCH, EXECUTE, EXIT
 
+    defword "(KEY)", XKEY
+    .word WAIT_KEY, READ_KEY, EXIT
+
     defword "KEY", KEY
-    .word WAIT_KEY, TICKKEY, FETCH, EXECUTE, EXIT
+    .word TICKKEY, FETCH, EXECUTE, EXIT
+
+    defword "(EMIT)", XEMIT
+    .word FINISH_OUTPUT, PUTCHAR, EXIT
 
     defword "ACCEPT", ACCEPT
     .word TICKACCEPT, FETCH, EXECUTE, EXIT
 
     defword "EMIT", EMIT
-    .word FINISH_OUTPUT, TICKEMIT, FETCH, EXECUTE, EXIT
+    .word TICKEMIT, FETCH, EXECUTE, EXIT
 
     defword "DUMP", DUMP
     .word QDUP, QBRANCH, dump_end - .
