@@ -133,8 +133,8 @@ cold_start:
     .word LIT, data_start, DP, STORE
     .word LIT, last_word, LATEST, STORE
     .word LIT, NOOP, DUP, TICKWAIT_KEY, STORE, TICKFINISH_OUTPUT, STORE
-    .word LIT, READKEY, TICKKEY, STORE
-    .word LIT, READLINE, TICKACCEPT, STORE
+    .word LIT, READ_KEY, TICKKEY, STORE
+    .word LIT, READ_LINE, TICKACCEPT, STORE
     .word LIT, PUTCHAR, TICKEMIT, STORE
     .word COLD
 
@@ -911,14 +911,16 @@ fill_done:
     defword ".", DOT
     .word DOTH, SPACE, EXIT
 
-    defcode "READKEY", READKEY
+    defcode "READ-KEY", READ_KEY
     bl readkey
     push {r0}
     NEXT
 
-    defcode "READLINE", READLINE
-    pop {r1}
-    pop {r0}
+    defcode "READ-LINE", READ_LINE
+    ldr r0, =constaddr_TIB
+    ldr r0, [r0]
+    ldr r1, =constaddr_TIBSIZE
+    ldr r1, [r1]
     bl readline
     push {r0}
     NEXT

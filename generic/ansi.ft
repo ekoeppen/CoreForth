@@ -30,15 +30,15 @@ $5B367E00 CONSTANT KEY-PGDOWN
 ;
 
 : READWKEY
-     READKEY   DUP #27 = IF
-        DROP 0 #24 READKEY   DUP #91 = IF
+     WAIT-KEY READ-KEY   DUP #27 = IF
+        DROP 0 #24 WAIT-KEY READ-KEY   DUP #91 = IF
             ROTKEY
             BEGIN
-                READKEY DUP >R ROTKEY R>
+                WAIT-KEY READ-KEY DUP >R ROTKEY R>
                 DUP #65 #91 WITHIN SWAP #126 = OR
             UNTIL DROP
         ELSE DUP #79 = IF
-                ROTKEY READKEY ROTKEY DROP
+                ROTKEY WAIT-KEY READ-KEY ROTKEY DROP
             THEN
         THEN
     THEN
