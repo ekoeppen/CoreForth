@@ -1458,7 +1458,7 @@ QUOTE_CHARS:
 4:  .word TWODROP, EXIT
 
     defword "VALID-ADDR?", ISVALIDADDR
-    .word DUP, LIT, 0x400, LIT, last_word, WITHIN, QDUP, QBRANCH, 1f - .
+    .word DUP, LIT, 0x400, LIT, last_word, FROMLINK, CELL, ADD, WITHIN, QDUP, QBRANCH, 1f - .
     .word NIP, EXIT
 1:  .word LIT, ram_start, LIT, ram_top, WITHIN, EXIT
 
