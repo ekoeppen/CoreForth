@@ -4,7 +4,6 @@
 precompile_words:
     .include "lm3s811.gen.s"
     .include "ansi.gen.s"
-    .include "accept.gen.s"
     .include "editor.gen.s"
     .include "blocks.gen.s"
     .include "protothreads.gen.s"

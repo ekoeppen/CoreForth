@@ -132,6 +132,10 @@ cold_start:
     .word LIT, 10, BASE, STORE
     .word LIT, data_start, DP, STORE
     .word LIT, last_word, LATEST, STORE
+    .word LIT, NOOP, DUP, TICKWAIT_KEY, STORE, TICKFINISH_OUTPUT, STORE
+    .word LIT, XKEY, TICKKEY, STORE
+    .word LIT, XEMIT, TICKEMIT, STORE
+    .word LIT, READ_LINE, TICKACCEPT, STORE
     .word COLD
 
     .ltorg
@@ -270,7 +274,7 @@ readline:
     movs r3, r1
     beq readline_end
 readline_loop:
-    bl read_key
+    bl readkey
     cmp r0, #13
     beq readline_end
     cmp r0, #127
@@ -300,41 +304,6 @@ readline_addchar:
 readline_end:
     subs r0, r5, r4
     pop {r3, r4, r5, pc}
-
-/* read keys including escape sequences. Reading escape itself is
- * not supported yet. Escape sequences return negative numbers
- */
-read_widekey:
-    push {r4, r5, lr}
-    bl read_key
-    cmp r0, #27
-    bne 1f
-    bl read_key
-    cmp r0, '['
-    bne 1f
-    bl read_key
-    cmp r0, 'A'
-    blt 3f
-    cmp r0, 'Z'
-    bgt 3f
-    subs r4, r0, '@'
-    b 4f
-3:  movs r4, #10
-    movs r5, #10
-2:  cmp r0, '~'
-    beq 4f
-    cmp r0, '0'
-    blt 1f
-    cmp r0, '9'
-    bgt 1f
-    subs r0, '0'
-    muls r4, r4, r5
-    adds r4, r0
-    bl read_key
-    b 2b
-4:  movs r0, #0
-    subs r0, r4
-1:  pop {r4, r5, pc}
 
 printrstack:
     push {r4, lr}
@@ -889,7 +858,7 @@ fill_done:
     bl printrstack
     NEXT
 
-    defcode "EMIT", EMIT
+    defcode "PUTCHAR", PUTCHAR
     pop {r0}
     bl putchar
     NEXT
@@ -942,22 +911,40 @@ fill_done:
     defword ".", DOT
     .word DOTH, SPACE, EXIT
 
-    defcode "(KEY)", XKEY
-    bl read_key
+    defcode "READ-KEY", READ_KEY
+    bl readkey
     push {r0}
     NEXT
 
-    defcode "KEY", KEY
-    bl read_widekey
-    push {r0}
-    NEXT
-
-    defcode "READLINE", READLINE
-    pop {r1}
-    pop {r0}
+    defcode "READ-LINE", READ_LINE
+    ldr r0, =constaddr_TIB
+    ldr r0, [r0]
+    ldr r1, =constaddr_TIBSIZE
+    ldr r1, [r1]
     bl readline
     push {r0}
     NEXT
+
+    defword "WAIT-KEY", WAIT_KEY
+    .word TICKWAIT_KEY, FETCH, EXECUTE, EXIT
+
+    defword "FINISH-OUTPUT", FINISH_OUTPUT
+    .word TICKFINISH_OUTPUT, FETCH, EXECUTE, EXIT
+
+    defword "(KEY)", XKEY
+    .word WAIT_KEY, READ_KEY, EXIT
+
+    defword "KEY", KEY
+    .word TICKKEY, FETCH, EXECUTE, EXIT
+
+    defword "(EMIT)", XEMIT
+    .word FINISH_OUTPUT, PUTCHAR, EXIT
+
+    defword "ACCEPT", ACCEPT
+    .word TICKACCEPT, FETCH, EXECUTE, EXIT
+
+    defword "EMIT", EMIT
+    .word TICKEMIT, FETCH, EXECUTE, EXIT
 
     defword "DUMP", DUMP
     .word QDUP, QBRANCH, dump_end - .
@@ -1054,6 +1041,9 @@ is_positive:
 
 @ ---------------------------------------------------------------------
 @ -- Control flow -----------------------------------------------------
+
+    defcode "NOOP", NOOP
+    NEXT
 
     defcode "BRANCH", BRANCH
     ldr r0, [r7]
@@ -1396,6 +1386,9 @@ words_loop:
     .word FETCH, QDUP, ZEQU, QBRANCH, words_loop - .
     .word EXIT
 
+    defword "DEFINED?", DEFINEDQ
+    .word BL, WORD, FIND, NIP, EXIT
+
 @ ---------------------------------------------------------------------
 @ -- Disassembler -----------------------------------------------------
 
@@ -1465,7 +1458,7 @@ QUOTE_CHARS:
 4:  .word TWODROP, EXIT
 
     defword "VALID-ADDR?", ISVALIDADDR
-    .word DUP, LIT, 0x400, LIT, last_word, WITHIN, QDUP, QBRANCH, 1f - .
+    .word DUP, LIT, 0x400, LIT, last_word, FROMLINK, CELL, ADD, WITHIN, QDUP, QBRANCH, 1f - .
     .word NIP, EXIT
 1:  .word LIT, ram_start, LIT, ram_top, WITHIN, EXIT
 
@@ -1662,6 +1655,11 @@ print_xt_suffix:
     defvar "SOURCE#", SOURCECOUNT
     defvar ">SOURCE", SOURCEINDEX
     defvar "UP", UP
+    defvar "\047KEY", TICKKEY
+    defvar "\047ACCEPT", TICKACCEPT
+    defvar "\047EMIT", TICKEMIT
+    defvar "\047WAIT-KEY", TICKWAIT_KEY
+    defvar "\047FINISH-OUTPUT", TICKFINISH_OUTPUT
 
 @ ---------------------------------------------------------------------
 @ -- Main task user variables -----------------------------------------
