@@ -2,7 +2,10 @@ HEX
 
 0      DUP   USER FOLLOWER      \ points to the follower's STATUS variable
 CELL - DUP   USER STATUS        \ PASS or WAKE - this needs to be one cell before FOLLOWER!
-CELL -       USER TOS           \ task's top of stack when switching
+CELL - DUP   USER TOS           \ task's top of stack when switching
+CELL - DUP   USER WAKE-AT       \ ticks when to wake the task regardless
+CELL - DUP   USER WAKE-REASON   \ reason for last wake
+NEGATE CONSTANT USER#           \ save amount of allocated user variable space
 
 : PAUSE             \ suspend task at current execution point and switch to follower
     RP@             \ push current rp
@@ -51,11 +54,11 @@ CELL -       USER TOS           \ task's top of stack when switching
 ;
 
 : NEWTASK   ( u s+r "name" -- ) ( -- tid )
-    CREATE SWAP FOLLOWER TOS - + CELL + HERE +  \ reserve user space and calculate TID
-    DUP ,                           \ save TID to pfa
-    OVER + ,                        \ save TOS to TOS field
-    HERE PASS , ,                   \ set STATUS to PASS and FOLLOWER to STATUS
-    HERE 2 CELLS + , DUP HERE + , ALLOT       \ set R0 and S0 and reserve stack space
+    CREATE SWAP USER# + CELL + HERE +   \ reserve user space and calculate TID
+    DUP ,                               \ save TID to pfa
+    OVER + ,                            \ save TOS to TOS field
+    HERE PASS , ,                       \ set STATUS to PASS and FOLLOWER to STATUS
+    HERE 2 CELLS + , DUP HERE + , ALLOT \ set R0 and S0 and reserve stack space
     DOES> @
 ;
 
