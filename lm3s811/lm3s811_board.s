@@ -352,8 +352,6 @@ pendsv_handler:
     b .
 
 systick_handler:
-    b .
-
 gpioa_handler:
 gpiob_handler:
 gpioc_handler:
