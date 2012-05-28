@@ -1,4 +1,4 @@
-GEN = ../generic/ansi.gen.s \
+GEN = ../generic/ansi.gen.s ../generic/systick.gen.s \
       ../generic/editor.gen.s ../generic/protothreads.gen.s \
       ../generic/find.gen.s ../generic/strings.gen.s ../generic/multitasking.gen.s \
       ../generic/blocks.gen.s ../generic/quit.gen.s
