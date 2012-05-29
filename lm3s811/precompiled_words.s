@@ -759,11 +759,17 @@
     defword "WAKE-AT", WAKE_AT, 0x0, USER_XT
     .word 0xFFFFFFF4
 
-    defword "WAKE-REASON", WAKE_REASON, 0x0, USER_XT
-    .word 0xFFFFFFF0
+    defconst "USER#", USERNUM, 0xC
 
-    defconst "USER#", USERNUM, 0x10
 
+    defword "TIMEOUT!", TIMEOUTSTORE, 0x0
+    .word TICKS, FETCH, PLUS, WAKE_AT, STORE, EXIT
+
+    defword "TIMEOUT@", TIMEOUTFETCH, 0x0
+    .word TICKS, FETCH, WAKE_AT, FETCH, MINUS, EXIT
+
+    defword "TIMEOUT?", TIMEOUTQ, 0x0
+    .word TIMEOUTFETCH, ZGT, DUP, QBRANCH, 0x14, LIT, 0x0, WAKE_AT, STORE, EXIT
 
     defword "PAUSE", PAUSE, 0x0
     .word RPFETCH, SPFETCH, TOS, STORE, FOLLOWER, FETCH, GTR, EXIT

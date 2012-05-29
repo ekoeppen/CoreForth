@@ -6,6 +6,10 @@ CELL - DUP   USER TOS           \ task's top of stack when switching
 CELL - DUP   USER WAKE-AT       \ ticks when to wake the task regardless
 NEGATE CONSTANT USER#           \ save amount of allocated user variable space
 
+: TIMEOUT!   TICKS @ + WAKE-AT ! ;
+: TIMEOUT@   TICKS @ WAKE-AT @ - ;
+: TIMEOUT?   TIMEOUT@ 0>  DUP IF 0 WAKE-AT ! THEN ;
+
 : PAUSE             \ suspend task at current execution point and switch to follower
     RP@             \ push current rp
     SP@ TOS !       \ save sp to task's TOS
@@ -89,7 +93,3 @@ NEGATE CONSTANT USER#           \ save amount of allocated user variable space
     UP@ UART0-TASK !
     ['] STOP-FOR-KEY 'WAIT-KEY !
 ;
-
-: TIMEOUT!   TICKS @ + WAKE-AT ! ;
-: TIMEOUT@   TICKS @ WAKE-AT @ - ;
-: TIMEOUT?   TIMEOUT@ 0>   0 WAKE-AT ! ;
