@@ -10,6 +10,8 @@ NEGATE CONSTANT USER#           \ save amount of allocated user variable space
 : TIMEOUT@   TICKS @ WAKE-AT @ - ;
 : TIMEOUT?   TIMEOUT@ 0>  DUP IF 0 WAKE-AT ! THEN ;
 
+VARIABLE LAST-AWAKE
+
 : PAUSE             \ suspend task at current execution point and switch to follower
     RP@             \ push current rp
     SP@ TOS !       \ save sp to task's TOS
@@ -20,6 +22,7 @@ NEGATE CONSTANT USER#           \ save amount of allocated user variable space
 
 : (WAKE)
     R> UP 2DUP !        \ take [rp] pointing to FOLLOWER and convert to TID
+    OVER LAST-AWAKE !   \ update last awake
     TOS @ SP!           \ restore sp for this task
     RP!                 \ rp was on the stack, restore it as well
 ;
@@ -27,7 +30,8 @@ NEGATE CONSTANT USER#           \ save amount of allocated user variable space
 ' (WAKE) CONSTANT WAKE
 
 : (PASS)
-    R> @ >R         \ take [rp] pointing to FOLLOWER and jump there
+    R> DUP LAST-AWAKE @ = IF WFI THEN   \ sleep the system if no task is awake
+    @ >R                \ take [rp] pointing to FOLLOWER and jump there
 ;
 
 ' (PASS) CONSTANT PASS
