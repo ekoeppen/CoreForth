@@ -30,7 +30,12 @@ VARIABLE LAST-AWAKE
 ' (WAKE) CONSTANT WAKE
 
 : (PASS)
-    R> DUP LAST-AWAKE @ = IF WFI THEN   \ sleep the system if no task is awake
+    R>
+\    DUP WAKE-AT 'S @ ?DUP IF
+\        TICKS @ > IF
+\        THEN
+\    THEN
+    DUP LAST-AWAKE @ = IF WFI THEN   \ sleep the system if no task is awake
     @ >R                \ take [rp] pointing to FOLLOWER and jump there
 ;
 
@@ -62,7 +67,8 @@ VARIABLE LAST-AWAKE
 
 : NEWTASK   ( u s+r "name" -- ) ( -- tid )
     CREATE SWAP USER# + CELL + HERE +   \ reserve user space and calculate TID
-    DUP ,                               \ save TID to pfa
+    DUP ,                               \ save TID
+    0 ,                                 \ clear WAKE-AT
     OVER + ,                            \ save TOS to TOS field
     HERE PASS , ,                       \ set STATUS to PASS and FOLLOWER to STATUS
     HERE 2 CELLS + , DUP HERE + , ALLOT \ set R0 and S0 and reserve stack space
@@ -76,6 +82,7 @@ VARIABLE LAST-AWAKE
     DUP S0 'S @ OVER R0 'S @    ." Stacks:   " . . CR
     DUP STATUS 'S @     ." Status:   " WAKE = IF ." WAKE" ELSE ." PASS" THEN CR
     DUP FOLLOWER 'S @   ." Follower: " CELL + . CR
+    DUP WAKE-AT 'S @    ." Wake at:  " . CR
         TOS 'S @        ." TOS:      " . CR
 ;
 
