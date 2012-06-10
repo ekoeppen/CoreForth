@@ -29,12 +29,15 @@ VARIABLE LAST-AWAKE
 
 ' (WAKE) CONSTANT WAKE
 
+: AWAKE   ( tid -- ) WAKE SWAP STATUS 'S ! ;
+
 : (PASS)
     R>
-\    DUP WAKE-AT 'S @ ?DUP IF
-\        TICKS @ > IF
-\        THEN
-\    THEN
+    DUP WAKE-AT 'S @ ?DUP IF
+        $200006BC @ < IF
+            DUP AWAKE
+        THEN
+    THEN
     DUP LAST-AWAKE @ = IF WFI THEN   \ sleep the system if no task is awake
     @ >R                \ take [rp] pointing to FOLLOWER and jump there
 ;
@@ -43,7 +46,6 @@ VARIABLE LAST-AWAKE
 
 : STOP   PASS STATUS ! PAUSE ;
 : SLEEP   ( tid -- ) PASS SWAP STATUS 'S ! ;
-: AWAKE   ( tid -- ) WAKE SWAP STATUS 'S ! ;
 
 : ACTIVATE   ( s: tid -- ) ( r: n' -- )
      DUP S0 'S @ CELL - ( tid sp )      \ get sp and decrement before push
