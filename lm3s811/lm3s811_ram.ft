@@ -31,7 +31,7 @@ T1RUN
 
 : TIMEOUT-TEST
     T1 SLEEP
-    TICKS @ #1000 + T1 WAKE-AT 'S !
+    TICKS @ #1000 + T1 WAKE-AT 'U !
     STOP
 ;
 
