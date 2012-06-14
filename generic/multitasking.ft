@@ -29,7 +29,7 @@ VARIABLE LAST-AWAKE
 
 ' (WAKE) CONSTANT WAKE
 
-: AWAKE   ( tid -- ) WAKE SWAP STATUS 'U ! ;
+: AWAKE   ( tid -- ) DUP LAST-AWAKE !   WAKE SWAP STATUS 'U ! ;
 
 : (PASS)
     R>
