@@ -53,6 +53,7 @@
     .set PMC_PCR,         0x010C
 
     .set PIOA,        0x400E0E00
+    .set PIOB,        0x400E1000
     .set PIO_PER,         0x0000
     .set PIO_PDR,         0x0004
     .set PIO_PSR,         0x0008
@@ -172,6 +173,15 @@ init_board:
     str r1, [r0, #PIO_OER]
     ldr r1, =0x00000100
     str r1, [r0, #PIO_PUER]
+
+    @ enable LED pin on PIOB
+    ldr r0, =PIOB
+    ldr r1, =0x8000000
+    str r1, [r0, #PIO_PER]
+    str r1, [r0, #PIO_OER]
+    str r1, [r0, #PIO_OWDR]
+    str r1, [r0, #PIO_PUDR]
+    str r1, [r0, #PIO_SODR]
 
     mov r0, #32
     bl delay
@@ -331,8 +341,6 @@ adcomp_handler:
 @ -- Board specific words ---------------------------------------------
 
     .include "arduino_due_words.s"
-    .ltorg
-    .include "precompiled_words.s"
     .ltorg
 
     defword "COLD", COLD
