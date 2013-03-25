@@ -122,6 +122,7 @@
 
 reset_handler:
     bl init_board
+    mov r0, 64
     ldr r6, =addr_TASKZRTOS
     ldr r7, =cold_start
     NEXT
@@ -137,7 +138,6 @@ cold_start:
     .word LIT, XEMIT, TICKEMIT, STORE
     .word LIT, READ_LINE, TICKACCEPT, STORE
     .word COLD
-
     .ltorg
 
 @ ---------------------------------------------------------------------

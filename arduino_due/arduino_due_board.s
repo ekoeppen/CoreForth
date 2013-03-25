@@ -127,11 +127,6 @@ _start:
 init_board:
     push {lr}
 
-    @ safety delay of 3x8000000 ticks (~ 3 seconds)
-    ldr r0, =8000000
-    bl delay
-    b 4f
-
     @ reset the interrupt vector table
     ldr r0, =addr_IVT
     mov r1, #0
@@ -152,51 +147,12 @@ init_board:
 .endif
     str r1, [r0]
 
-4:
     @ enable clocks on all peripherals
-    ldr r0, =(PMC + PMC_PCER0)
+    ldr r0, =PMC
     ldr r1, =0xfffffffd
-    str r1, [r0]
-    ldr r0, =(PMC + PMC_PCER1)
+    str r1, [r0, #PMC_PCER0]
     ldr r1, =0x00001fff
-    str r1, [r0]
-
-    mov r0, #32
-    bl delay
-
-    @ enable UART pins on PIOA
-    ldr r0, =PIOA
-    ldr r1, =0x00000300
-    str r1, [r0, #PIO_PER]
-    str r1, [r0, #PIO_ABSR]
-    ldr r1, =0x00000200
-    str r1, [r0, #PIO_OER]
-    ldr r1, =0x00000100
-    str r1, [r0, #PIO_PUER]
-
-    @ enable LED pin on PIOB
-    ldr r0, =PIOB
-    ldr r1, =0x8000000
-    str r1, [r0, #PIO_PER]
-    str r1, [r0, #PIO_OER]
-    str r1, [r0, #PIO_OWDR]
-    str r1, [r0, #PIO_PUDR]
-    str r1, [r0, #PIO_SODR]
-
-    mov r0, #32
-    bl delay
-
-    @ enable UART
-    ldr r0, =UART
-    ldr r1, =0x0000015c
-    str r1, [r0, #UART_CR]
-    ldr r1, =0x00000800
-    str r1, [r0, #UART_MR]
-
-    @ set UART baud rate
-    ldr r0, =(UART + UART_BRGR)
-    ldr r1, =(4000000 / 115200 / 16)
-    str r1, [r0, #UART_BRGR]
+    str r1, [r0, #PMC_PCER1]
 
     @ enable SYSTICK
     ldr r0, =STRELOAD
@@ -206,13 +162,37 @@ init_board:
     mov r1, #5
     @ str r1, [r0]
 
-6:
-    mov r1, #64
+    @ enable UART pins on PIOA
+    ldr r0, =PIOA
+    ldr r1, =0x00000300
+    str r1, [r0, #PIO_PDR]
+    str r1, [r0, #PIO_PUER]
+    ldr r1, =0x00000200
+    ldr r1, =0x00000100
+    mov r0, #0
+    str r1, [r0, #PIO_ABSR]
+
+    @ enable LED pin on PIOB
+    ldr r0, =PIOB
+    ldr r1, =0x8000000
+    str r1, [r0, #PIO_PER]
+    str r1, [r0, #PIO_OER]
+    str r1, [r0, #PIO_OWDR]
+    str r1, [r0, #PIO_PUER]
+    str r1, [r0, #PIO_MDDR]
+    str r1, [r0, #PIO_CODR]
+
+    @ enable UART
+    ldr r0, =UART
+    ldr r1, =0x00000150
+    str r1, [r0, #UART_CR]
+    ldr r1, =0x00000800
+    str r1, [r0, #UART_MR]
+
+    @ set UART baud rate
     ldr r2, =UART
-    str r1, [r2, #UART_THR]
-    mov r0, #64
-    bl delay
-    b 6b
+    ldr r1, =(4000000 / 9600 / 16)
+    str r1, [r2, #UART_BRGR]
 
     pop {pc}
     .align 2, 0
@@ -224,11 +204,10 @@ readkey_interrupt:
 readkey_polled:
     push {r1, r2, r3, lr}
     ldr r1, =UART
-    mov r2, #32
+    mov r2, #0x1
 1:  ldr r3, [r1, #UART_SR]
-    and r3, r2
-    cmp r3, r2
-    bne 1b
+    ands r3, r2
+    beq 1b
     ldrb r0, [r1, #UART_RHR]
     pop {r1, r2, r3, pc}
 
@@ -240,12 +219,11 @@ readkey_polled:
 
 putchar:
     push {r1, r2, r3, lr}
-    mov r2, #0x80
+    mov r2, #0x2
     ldr r3, =UART
 1:  ldr r1, [r3, #UART_SR]
-    and r1, r2
-    cmp r1, r2
-    bne 1b
+    ands r1, r2
+    beq 1b
     str r0, [r3, #UART_THR]
     pop {r1, r2, r3, pc}
 
@@ -341,6 +319,8 @@ adcomp_handler:
 @ -- Board specific words ---------------------------------------------
 
     .include "arduino_due_words.s"
+    .ltorg
+    .include "precompiled_words.s"
     .ltorg
 
     defword "COLD", COLD
