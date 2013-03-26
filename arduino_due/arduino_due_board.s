@@ -98,6 +98,18 @@
     .set PIO_WPMR,        0x00E4
     .set PIO_WPSR,        0x00E8
 
+    .set EEFC0,       0x400E0A00
+    .set EEFC1,       0x400E0C00
+    .set EEFC_FMR,          0x00
+    .set EEFC_FCR,          0x04
+    .set EEFC_FSR,          0x08
+    .set EEFC_FRR,          0x0c
+
+    .set WDT,         0x400E1A50
+    .set WDT_CR,            0x00
+    .set WDT_MR,            0x04
+    .set WDT_SR,            0x08
+
 @ ---------------------------------------------------------------------
 @ -- Interrupt vectors ------------------------------------------------
 
@@ -126,6 +138,57 @@ _start:
 
 init_board:
     push {lr}
+
+    @ disable watchdog
+    ldr r0, =WDT
+    ldr r1, =0x00008000
+    str r1, [r0, #WDT_MR]
+
+    @ initialize flash waitstates
+    ldr r0, =EEFC0
+    ldr r1, =0x00000400
+    str r1, [r0, #EEFC_FMR]
+    ldr r0, =EEFC1
+    str r1, [r0, #EEFC_FMR]
+
+    @ initialize clock to 84MHz
+    ldr r0, =PMC
+    ldr r1, =0x00370809
+    str r1, [r0, #CKGR_MOR]
+2:  ldr r1, [r0, #PMC_SR]
+    ands r1, #1
+    beq 2b
+
+    @ enable main oscillator
+    ldr r1, =0x01370809
+    str r1, [r0, #CKGR_MOR]
+    ldr r2, =0x00010000
+3:  ldr r1, [r0, #PMC_SR]
+    ands r1, r2
+    beq 3b
+
+    @ enable PLLA
+    ldr r1, =0x200d3f01
+    str r1, [r0, #CKGR_PLLAR]
+5:  ldr r1, [r0, #PMC_SR]
+    ands r1, #2
+    beq 5b
+
+    @ set prescaler, then clock source
+    ldr r1, [r0, #PMC_MCKR]
+    ldr r2, =0xfffffffc
+    ands r2, r1
+    mov r3, r2
+    orrs r2, #0x11
+    orrs r3, #0x12
+    str r2, [r0, #PMC_MCKR]
+6:  ldr r1, [r0, #PMC_SR]
+    ands r1, #8
+    beq 6b
+    str r3, [r0, #PMC_MCKR]
+7:  ldr r1, [r0, #PMC_SR]
+    ands r1, #8
+    beq 7b
 
     @ reset the interrupt vector table
     ldr r0, =addr_IVT
@@ -191,7 +254,7 @@ init_board:
 
     @ set UART baud rate
     ldr r2, =UART
-    ldr r1, =(4000000 / 9600 / 16)
+    ldr r1, =(84000000 / 115200 / 16)
     str r1, [r2, #UART_BRGR]
 
     pop {pc}
