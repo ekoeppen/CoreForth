@@ -119,17 +119,67 @@
     .global _start
     .global reset_handler
 _start:
-    .long addr_TASKZTOS               /* Top of Stack                 */
-    .long reset_handler + 1           /* Reset Handler                */
-    .long nmi_handler + 1             /* NMI Handler                  */
-    .long hardfault_handler + 1       /* Hard Fault Handler           */
-    .long memmanage_handler + 1       /* MPU Fault Handler            */
-    .long busfault_handler + 1        /* Bus Fault Handler            */
-    .long usagefault_handler + 1      /* Usage Fault Handler          */
-    .long 0                           /* Reserved                     */
-    .long 0                           /* Reserved                     */
-    .long 0                           /* Reserved                     */
-    .long 0                           /* Reserved                     */
+     .long addr_TASKZTOS               /* Top of Stack                 */
+     .long reset_handler + 1           /* Reset Handler                */
+    .long nmi_handler + 1              /* NMI Handler                  */
+    .long hardfault_handler + 1        /* Hard Fault Handler           */
+    .long memmanage_handler + 1        /* MPU Fault Handler            */
+    .long busfault_handler + 1         /* Bus Fault Handler            */
+    .long usagefault_handler + 1       /* Usage Fault Handler          */
+    .long 0                            /* Reserved                     */
+    .long 0                            /* Reserved                     */
+    .long 0                            /* Reserved                     */
+    .long 0                            /* Reserved                     */
+    .long svc_handler + 1              /* SVCall Handler               */
+    .long debugmon_handler + 1         /* Debug Monitor Handler        */
+    .long 0                            /* Reserved                     */
+    .long pendsv_handler + 1           /* PendSV Handler               */
+    .long systick_handler + 1          /* SysTick Handler              */
+    .long supc_handler + 1             /*  0  Supply Controller */
+    .long rstc_handler + 1             /*  1  Reset Controller */
+    .long rtc_handler + 1              /*  2  Real Time Clock */
+    .long rtt_handler + 1              /*  3  Real Time Timer */
+    .long wdt_handler + 1              /*  4  Watchdog Timer */
+    .long pmc_handler + 1              /*  5  PMC */
+    .long efc0_handler + 1             /*  6  EFC 0 */
+    .long efc1_handler + 1             /*  7  EFC 1 */
+    .long uart_handler + 1             /*  8  UART */
+    .long smc_handler + 1              /*  9  SMC */
+    .long 0                            /* 10 Reserved */
+    .long pioa_handler + 1             /* 11 Parallel IO Controller A */
+    .long piob_handler + 1             /* 12 Parallel IO Controller B */
+    .long pioc_handler + 1             /* 13 Parallel IO Controller C */
+    .long piod_handler + 1             /* 14 Parallel IO Controller D */
+    .long 0                            /* 15 Reserved */
+    .long 0                            /* 16 Reserved */
+    .long usart0_handler + 1           /* 17 USART 0 */
+    .long usart1_handler + 1           /* 18 USART 1 */
+    .long usart2_handler + 1           /* 19 USART 2 */
+    .long usart3_handler + 1           /* 20 USART 3 */
+    .long hsmci_handler + 1            /* 21 MCI */
+    .long twi0_handler + 1             /* 22 TWI 0 */
+    .long twi1_handler + 1             /* 23 TWI 1 */
+    .long spi0_handler + 1             /* 24 SPI 0 */
+    .long 0                            /* 25 Reserved */
+    .long ssc_handler + 1              /* 26 SSC */
+    .long tc0_handler + 1              /* 27 Timer Counter 0 */
+    .long tc1_handler + 1              /* 28 Timer Counter 1 */
+    .long tc2_handler + 1              /* 29 Timer Counter 2 */
+    .long tc3_handler + 1              /* 30 Timer Counter 3 */
+    .long tc4_handler + 1              /* 31 Timer Counter 4 */
+    .long tc5_handler + 1              /* 32 Timer Counter 5 */
+    .long tc6_handler + 1              /* 33 Timer Counter 6 */
+    .long tc7_handler + 1              /* 34 Timer Counter 7 */
+    .long tc8_handler + 1              /* 35 Timer Counter 8 */
+    .long pwm_handler + 1              /* 36 PWM */
+    .long adc_handler + 1              /* 37 ADC controller */
+    .long dacc_handler + 1             /* 38 DAC controller */
+    .long dmac_handler + 1             /* 39 DMA Controller */
+    .long uotghs_handler + 1           /* 40 USB OTG High Speed */
+    .long trng_handler + 1             /* 41 True Random Number Generator */
+    .long emac_handler + 1             /* 42 Ethernet MAC */
+    .long can0_handler + 1             /* 43 CAN Controller 0 */
+    .long can1_handler + 1             /* 44 CAN Controller 1 */
 
     .org 0x150
 
@@ -345,31 +395,72 @@ pendsv_handler:
 systick_handler:
     b .
 
-gpioa_handler:
-gpiob_handler:
-gpioc_handler:
-gpiod_handler:
-gpioe_handler:
-uart0_handler:
-uart1_handler:
-ssi_handler:
-i2c_handler:
-pwm0_handler:
-pwm1_handler:
-pwm2_handler:
-adcseq0_handler:
-adcseq1_handler:
-adcseq2_handler:
-adcseq3_handler:
-watchdog_handler:
-timer0a_handler:
-timer0b_handler:
-timer1a_handler:
-timer1b_handler:
-timer2a_handler:
-timer2b_handler:
-adcomp_handler:
+supc_handler:
+rstc_handler:
+rtc_handler:
+rtt_handler:
+wdt_handler:
+pmc_handler:
+efc0_handler:
+efc1_handler:
+uart_handler:
+smc_handler:
+pioa_handler:
+piob_handler:
+pioc_handler:
+piod_handler:
+usart0_handler:
+usart1_handler:
+usart2_handler:
+usart3_handler:
+hsmci_handler:
+twi0_handler:
+twi1_handler:
+spi0_handler:
+ssc_handler:
+tc0_handler:
+tc1_handler:
+tc2_handler:
+tc3_handler:
+tc4_handler:
+tc5_handler:
+tc6_handler:
+tc7_handler:
+tc8_handler:
+pwm_handler:
+adc_handler:
+dacc_handler:
+dmac_handler:
+uotghs_handler:
+trng_handler:
+emac_handler:
+can0_handler:
+can1_handler:
     b generic_forth_handler
+
+uart_key_handler:
+2:  ldr r0, =UART
+    ldr r1, [r0, #UART_SR]
+    ands r1, #1
+    bne 1f
+    ldrb r1, [r0, #UART_RHR]
+    ldr r0, =addr_SBUF
+    ldr r2, =addr_SBUF_HEAD
+    ldrb r3, [r2]
+    strb r1, [r0, r3]
+    movs r1, #0x0f
+    adds r3, #1
+    ands r3, r1
+    strb r3, [r2]
+    ldr r0, =addr_UARTZ_TASK
+    ldr r0, [r0]
+    cmp r0, #0
+    beq 2b
+    ldr r1, =LPARENWAKERPAREN
+    sub r0, #4
+    str r1, [r0]
+    b 2b
+1:  bx lr
 
 @ ---------------------------------------------------------------------
 @ -- CoreForth starts here --------------------------------------------
