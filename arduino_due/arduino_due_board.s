@@ -14,7 +14,7 @@
     .set UART_THR,          0x1c
     .set UART_BRGR,         0x20
 
-    .set _NVIC,       0xe000e000
+    .set NVIC,        0xe000e000
     .set NVIC_SETENA_BASE, 0x100
     .set NVIC_ACTIVE_BASE, 0x300
 
@@ -253,12 +253,9 @@ init_board:
     msr primask, r0
     mov r0, #0
     msr basepri, r0
-    ldr r0, =(_NVIC + NVIC_SETENA_BASE)
-    mov r1, #0
-.ifdef UART_USE_INTERRUPTS
-    orr r1, #0x20
-.endif
-    str r1, [r0]
+    ldr r0, =NVIC
+    mov r1, #0x100
+    str r1, [r0, #NVIC_SETENA_BASE]
 
     @ enable clocks on all peripherals
     ldr r0, =PMC
@@ -303,32 +300,50 @@ init_board:
     str r1, [r0, #UART_MR]
 
     @ set UART baud rate
-    ldr r2, =UART
     ldr r1, =(84000000 / 115200 / 16)
-    str r1, [r2, #UART_BRGR]
+    str r1, [r0, #UART_BRGR]
+
+    @ enable UART interrupts
+    mvn r1, #1
+    str r1, [r0, #UART_IDR]
+    movs r1, #1
+    str r1, [r0, #UART_IER]
+    movs r1, #0
+    ldr r2, =addr_SBUF_HEAD
+    str r1, [r2]
+    ldr r2, =addr_SBUF_TAIL
+    str r1, [r2]
 
     pop {pc}
     .align 2, 0
     .ltorg
 
+readkey:
 readkey_interrupt:
-    mov pc, lr
-
-readkey_polled:
     push {r1, r2, r3, lr}
-    ldr r1, =UART
-    mov r2, #0x1
-1:  ldr r3, [r1, #UART_SR]
-    ands r3, r2
-    beq 1b
-    ldrb r0, [r1, #UART_RHR]
+2:  ldr r1, =addr_SBUF_TAIL
+    ldrb r3, [r1]
+    ldr r2, =addr_SBUF_HEAD
+    ldrb r2, [r2]
+    cmp r2, r3
+    bne 1f
+    wfi
+    b 2b
+1:  ldr r0, =addr_SBUF
+    ldrb r0, [r0, r3]
+    adds r3, #1
+    ands r3, #0x0f
+    strb r3, [r1]
     pop {r1, r2, r3, pc}
 
-.ifdef UART_USE_INTERRUPTS
-    .set readkey, readkey_interrupt
-.else
-    .set readkey, readkey_polled
-.endif
+readkey_polled:
+    push {r1, r2, lr}
+    ldr r1, =UART
+1:  ldr r2, [r1, #UART_SR]
+    ands r2, #0x1
+    beq 1b
+    ldrb r0, [r1, #UART_RHR]
+    pop {r1, r2, pc}
 
 putchar:
     push {r1, r2, r3, lr}
@@ -403,7 +418,6 @@ wdt_handler:
 pmc_handler:
 efc0_handler:
 efc1_handler:
-uart_handler:
 smc_handler:
 pioa_handler:
 piob_handler:
@@ -438,11 +452,11 @@ can0_handler:
 can1_handler:
     b generic_forth_handler
 
-uart_key_handler:
+uart_handler:
 2:  ldr r0, =UART
     ldr r1, [r0, #UART_SR]
     ands r1, #1
-    bne 1f
+    beq 1f
     ldrb r1, [r0, #UART_RHR]
     ldr r0, =addr_SBUF
     ldr r2, =addr_SBUF_HEAD
