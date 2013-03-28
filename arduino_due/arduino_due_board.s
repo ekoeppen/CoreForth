@@ -119,8 +119,8 @@
     .global _start
     .global reset_handler
 _start:
-     .long addr_TASKZTOS               /* Top of Stack                 */
-     .long reset_handler + 1           /* Reset Handler                */
+    .long addr_TASKZTOS                /* Top of Stack                 */
+    .long reset_handler + 1            /* Reset Handler                */
     .long nmi_handler + 1              /* NMI Handler                  */
     .long hardfault_handler + 1        /* Hard Fault Handler           */
     .long memmanage_handler + 1        /* MPU Fault Handler            */
