@@ -467,7 +467,7 @@ uart_handler:
     ands r3, r1
     strb r3, [r2]
 /*
-    ldr r0, =addr_UART_TASK
+    ldr r0, =addr_UARTZ_TASK
     ldr r0, [r0]
     cmp r0, #0
     beq 2b

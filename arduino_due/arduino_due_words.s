@@ -24,4 +24,4 @@
     defvar "SBUF-HEAD", SBUF_HEAD
     defvar "SBUF-TAIL", SBUF_TAIL
     defvar "IVT", IVT, 48 * 4
-    defvar "UART-TASK", UART_TASK
+    defvar "UART0-TASK", UARTZ_TASK
