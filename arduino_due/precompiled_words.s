@@ -157,6 +157,180 @@
     defword "UART_BRGR", UART_BRGR, 0x0, REGISTER_XT
     .word 0x20
 
+    defconst "PIOA", PIOA, 0x400E0E00
+
+
+    defconst "PIOB", PIOB, 0x400E1000
+
+
+    defconst "PIOC", PIOC, 0x400E1200
+
+
+    defconst "PIOD", PIOD, 0x400E1400
+
+
+    defconst "PIOE", PIOE, 0x400E1600
+
+
+    defword "PIO_PER", PIO_PER, 0x0, REGISTER_XT
+    .word 0x0
+
+    defword "PIO_PDR", PIO_PDR, 0x0, REGISTER_XT
+    .word 0x4
+
+    defword "PIO_PSR", PIO_PSR, 0x0, REGISTER_XT
+    .word 0x8
+
+    defword "PIO_OER", PIO_OER, 0x0, REGISTER_XT
+    .word 0x10
+
+    defword "PIO_ODR", PIO_ODR, 0x0, REGISTER_XT
+    .word 0x14
+
+    defword "PIO_OSR", PIO_OSR, 0x0, REGISTER_XT
+    .word 0x18
+
+    defword "PIO_IFER", PIO_IFER, 0x0, REGISTER_XT
+    .word 0x20
+
+    defword "PIO_IFDR", PIO_IFDR, 0x0, REGISTER_XT
+    .word 0x24
+
+    defword "PIO_IFSR", PIO_IFSR, 0x0, REGISTER_XT
+    .word 0x28
+
+    defword "PIO_SODR", PIO_SODR, 0x0, REGISTER_XT
+    .word 0x30
+
+    defword "PIO_CODR", PIO_CODR, 0x0, REGISTER_XT
+    .word 0x34
+
+    defword "PIO_ODSR", PIO_ODSR, 0x0, REGISTER_XT
+    .word 0x38
+
+    defword "PIO_PDSR", PIO_PDSR, 0x0, REGISTER_XT
+    .word 0x3C
+
+    defword "PIO_IER", PIO_IER, 0x0, REGISTER_XT
+    .word 0x40
+
+    defword "PIO_IDR", PIO_IDR, 0x0, REGISTER_XT
+    .word 0x44
+
+    defword "PIO_IMR", PIO_IMR, 0x0, REGISTER_XT
+    .word 0x48
+
+    defword "PIO_ISR", PIO_ISR, 0x0, REGISTER_XT
+    .word 0x4C
+
+    defword "PIO_MDER", PIO_MDER, 0x0, REGISTER_XT
+    .word 0x50
+
+    defword "PIO_MDDR", PIO_MDDR, 0x0, REGISTER_XT
+    .word 0x54
+
+    defword "PIO_MDSR", PIO_MDSR, 0x0, REGISTER_XT
+    .word 0x58
+
+    defword "PIO_PUDR", PIO_PUDR, 0x0, REGISTER_XT
+    .word 0x60
+
+    defword "PIO_PUER", PIO_PUER, 0x0, REGISTER_XT
+    .word 0x64
+
+    defword "PIO_PUSR", PIO_PUSR, 0x0, REGISTER_XT
+    .word 0x68
+
+    defword "PIO_ABSR", PIO_ABSR, 0x0, REGISTER_XT
+    .word 0x70
+
+    defword "PIO_SCIFSR", PIO_SCIFSR, 0x0, REGISTER_XT
+    .word 0x80
+
+    defword "PIO_DIFSR", PIO_DIFSR, 0x0, REGISTER_XT
+    .word 0x84
+
+    defword "PIO_IFDGSR", PIO_IFDGSR, 0x0, REGISTER_XT
+    .word 0x88
+
+    defword "PIO_SCDR", PIO_SCDR, 0x0, REGISTER_XT
+    .word 0x8C
+
+    defword "PIO_OWER", PIO_OWER, 0x0, REGISTER_XT
+    .word 0xA0
+
+    defword "PIO_OWDR", PIO_OWDR, 0x0, REGISTER_XT
+    .word 0xA4
+
+    defword "PIO_OWSR", PIO_OWSR, 0x0, REGISTER_XT
+    .word 0xA8
+
+    defword "PIO_AIMER", PIO_AIMER, 0x0, REGISTER_XT
+    .word 0xB0
+
+    defword "PIO_AIMDR", PIO_AIMDR, 0x0, REGISTER_XT
+    .word 0xB4
+
+    defword "PIO_AIMMR", PIO_AIMMR, 0x0, REGISTER_XT
+    .word 0xB8
+
+    defword "PIO_ESR", PIO_ESR, 0x0, REGISTER_XT
+    .word 0xC0
+
+    defword "PIO_LSR", PIO_LSR, 0x0, REGISTER_XT
+    .word 0xC4
+
+    defword "PIO_ELSR", PIO_ELSR, 0x0, REGISTER_XT
+    .word 0xC8
+
+    defword "PIO_FELLSR", PIO_FELLSR, 0x0, REGISTER_XT
+    .word 0xD0
+
+    defword "PIO_REHLSR", PIO_REHLSR, 0x0, REGISTER_XT
+    .word 0xD4
+
+    defword "PIO_FRLHSR", PIO_FRLHSR, 0x0, REGISTER_XT
+    .word 0xD8
+
+    defword "PIO_LOCKSR", PIO_LOCKSR, 0x0, REGISTER_XT
+    .word 0xE0
+
+    defword "PIO_WPMR", PIO_WPMR, 0x0, REGISTER_XT
+    .word 0xE4
+
+    defword "PIO_WPSR", PIO_WPSR, 0x0, REGISTER_XT
+    .word 0xE8
+
+    defconst "EEFC0", EEFCZ, 0x400E0A00
+
+
+    defconst "EEFC1", EEFCONE, 0x400E0C00
+
+
+    defword "EEFC_FMR", EEFC_FMR, 0x0, REGISTER_XT
+    .word 0x0
+
+    defword "EEFC_FCR", EEFC_FCR, 0x0, REGISTER_XT
+    .word 0x4
+
+    defword "EEFC_FSR", EEFC_FSR, 0x0, REGISTER_XT
+    .word 0x8
+
+    defword "EEFC_FRR", EEFC_FRR, 0x0, REGISTER_XT
+    .word 0xC
+
+    defconst "WDT", WDT, 0x400E1A50
+
+
+    defword "WDT_CR", WDT_CR, 0x0, REGISTER_XT
+    .word 0x0
+
+    defword "WDT_MR", WDT_MR, 0x0, REGISTER_XT
+    .word 0x4
+
+    defword "WDT_SR", WDT_SR, 0x0, REGISTER_XT
+    .word 0x8
+
     defvar "((BLOCK))", LPARENLPARENBLOCKRPARENRPAREN, 0x400
 
 
