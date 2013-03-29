@@ -282,16 +282,6 @@ init_board:
     mov r0, #0
     str r1, [r0, #PIO_ABSR]
 
-    @ enable LED pin on PIOB
-    ldr r0, =PIOB
-    ldr r1, =0x8000000
-    str r1, [r0, #PIO_PER]
-    str r1, [r0, #PIO_OER]
-    str r1, [r0, #PIO_OWDR]
-    str r1, [r0, #PIO_PUER]
-    str r1, [r0, #PIO_MDDR]
-    str r1, [r0, #PIO_CODR]
-
     @ enable UART
     ldr r0, =UART
     ldr r1, =0x00000150

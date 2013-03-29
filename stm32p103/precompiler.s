@@ -3,9 +3,10 @@
 
 precompile_words:
     .include "stm32p103.gen.s"
+    .include "systick.gen.s"
     .include "ansi.gen.s"
-    .include "accept.gen.s"
     .include "editor.gen.s"
+    .include "blocks.gen.s"
     .include "protothreads.gen.s"
     .include "multitasking.gen.s"
     .include "quit.gen.s"
