@@ -128,17 +128,25 @@ E000E018 CONSTANT STCURRENT
     PIO_CODR SET-BITS ;
 : LED0!   5 ROR PIOB PIO_ODSR ! ;
 
+100 CONSTANT C/PAGE
+80 CONSTANT FIRST-PAGE
+80000 CONSTANT FLASH-START
+: PAGE>FLASH ( page# -- fl-addr )   C/PAGE * FLASH-START + ;
+
+: XMOVE ." Move count, to, from " . . . CR ;
+: XFLASH-PAGE ." Flashing page " . CR ;
+
 CREATE ((BLOCK)) C/BLK ALLOT
-: (BLOCK) ( addr blk# -- )   C/BLK * 88000 + SWAP C/BLK CMOVE ; 
-: (UPDATE-PAGE) ( page mem addr )
-    2DUP SWAP 100 CMOVE      ( page mem addr )
-    ROT DUP FLASH-PAGE       ( mem addr page )
-    1+ ROT 100 + ROT 100 +   ( page+1 mem+100 addr+100)
+: (BLOCK) ( addr blk# -- )
+    C/BLK * FLASH-START +
+    C/PAGE FIRST-PAGE * + SWAP C/BLK CMOVE ; 
+: (UPDATE-PAGE) ( addr page# -- page#+1 addr+c/page )
+    2DUP PAGE>FLASH C/PAGE CMOVE    ( addr page# )
+    DUP FLASH-PAGE                  ( addr page# )
+    1+ SWAP C/PAGE + SWAP           ( page#+1 addr+100)
     ;
 : (UPDATE) ( addr blk# -- )
-    DUP 2* 2* 80 +           ( addr blk# page )
-    SWAP C/BLK * 88000 +     ( addr page mem )
-    ROT                      ( page mem addr )
+    2* 2* FIRST-PAGE +           ( addr page# )
     (UPDATE-PAGE) (UPDATE-PAGE) (UPDATE-PAGE) (UPDATE-PAGE)
-    2DROP DROP
+    2DROP
     ;

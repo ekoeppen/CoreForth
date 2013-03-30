@@ -19,15 +19,18 @@
     NEXT
 
     defcode "FLASH-PAGE", FLASH_PAGE
-    pop {r2}
     ldr r0, =EEFC0
+    pop {r2}
+1:  ldr r1, [r0, #EEFC_FSR]
+    ands r1, #1
+    beq 1b
     ldr r1, =0x5A000003
     lsl r2, #8
     orrs r1, r2
     str r1, [r0, #EEFC_FCR]
-1:  ldr r1, [r0, #EEFC_FSR]
+2:  ldr r1, [r0, #EEFC_FSR]
     ands r1, #1
-    beq 1b
+    beq 2b
     NEXT
 
     defvar "SBUF", SBUF, 16
