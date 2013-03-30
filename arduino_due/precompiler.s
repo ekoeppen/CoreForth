@@ -1,4 +1,5 @@
     .include "../precompiler/board.s"
+    .include "arduino_due_definitions.s"
     .include "arduino_due_words.s"
 
 precompile_words:

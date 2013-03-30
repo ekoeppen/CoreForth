@@ -18,10 +18,22 @@
 1:  push {r0}
     NEXT
 
-    .ltorg
+    defcode "FLASH-PAGE", FLASH_PAGE
+    pop {r2}
+    ldr r0, =EEFC0
+    ldr r1, =0x5A000003
+    lsl r2, #8
+    orrs r1, r2
+    str r1, [r0, #EEFC_FCR]
+1:  ldr r1, [r0, #EEFC_FSR]
+    ands r1, #1
+    beq 1b
+    NEXT
 
     defvar "SBUF", SBUF, 16
     defvar "SBUF-HEAD", SBUF_HEAD
     defvar "SBUF-TAIL", SBUF_TAIL
     defvar "IVT", IVT, 48 * 4
     defvar "UART0-TASK", UARTZ_TASK
+
+    .ltorg
