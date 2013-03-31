@@ -547,23 +547,27 @@ fill_done:
     pop {r0}
     pop {r1}
     pop {r2}
-2:  cmp r0, #4
+2:  subs r0, r0, #1
+    cmp r0, #0
     blt 1f
-    ldr r3, [r2]
-    str r3, [r1]
-    adds r1, #4
-    adds r2, #4
-    subs r0, r0, #4
-    b 2b
-1:  cmp r0, #0
-    ble 3f
-    subs r0, r0, #1
     ldrb r3, [r2]
     strb r3, [r1]
     adds r1, #1
     adds r2, #1
-    b 1b
-3:  NEXT
+    b 2b
+1:  NEXT
+
+    defcode "ALIGNED-MOVE>", ALIGNED_MOVEGT
+    pop {r0}
+    pop {r1}
+    pop {r2}
+2:  subs r0, r0, #4
+    cmp r0, #0
+    blt 1f
+    ldr r3, [r2, r0]
+    str r3, [r1, r0]
+    b 2b
+1:  NEXT
 
     defcode "S=", SEQU
     pop {r2}
