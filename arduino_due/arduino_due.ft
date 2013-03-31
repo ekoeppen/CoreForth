@@ -133,9 +133,6 @@ E000E018 CONSTANT STCURRENT
 80000 CONSTANT FLASH-START
 : PAGE>FLASH ( page# -- fl-addr )   C/PAGE * FLASH-START + ;
 
-: XMOVE ." Move count, to, from " . . . CR ;
-: XFLASH-PAGE ." Flashing page " . CR ;
-
 CREATE ((BLOCK)) C/BLK ALLOT
 : (BLOCK) ( addr blk# -- )
     C/BLK * FLASH-START +
