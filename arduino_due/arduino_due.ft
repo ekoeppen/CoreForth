@@ -140,10 +140,10 @@ CREATE ((BLOCK)) C/BLK ALLOT
 : (BLOCK) ( addr blk# -- )
     C/BLK * FLASH-START +
     C/PAGE FIRST-PAGE * + SWAP C/BLK CMOVE ; 
-: (UPDATE-PAGE) ( addr page# -- page#+1 addr+c/page )
-    2DUP PAGE>FLASH C/PAGE CMOVE    ( addr page# )
-    DUP FLASH-PAGE                  ( addr page# )
-    1+ SWAP C/PAGE + SWAP           ( page#+1 addr+100)
+: (UPDATE-PAGE) ( addr page# -- addr+c/page page#+1 )
+    2DUP PAGE>FLASH C/PAGE CMOVE
+    DUP FLASH-PAGE
+    1+ SWAP C/PAGE + SWAP
     ;
 : (UPDATE) ( addr blk# -- )
     2* 2* FIRST-PAGE +           ( addr page# )

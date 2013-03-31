@@ -27,10 +27,13 @@
     ldr r1, =0x5A000003
     lsl r2, #8
     orrs r1, r2
-    str r1, [r0, #EEFC_FCR]
-2:  ldr r1, [r0, #EEFC_FSR]
-    ands r1, #1
-    beq 2b
+    mov r0, #0
+    ldr r2, =0x00100008
+    ldr r2, [r2]
+    adds r2, #1
+    ldr lr, =(cont + 1)
+    mov pc, r2
+cont:
     NEXT
 
     defvar "SBUF", SBUF, 16
