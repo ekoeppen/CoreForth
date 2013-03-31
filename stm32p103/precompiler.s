@@ -1,4 +1,5 @@
     .include "../precompiler/board.s"
+    .include "stm32p103_definitions.s"
     .include "stm32p103_words.s"
 
 precompile_words:
