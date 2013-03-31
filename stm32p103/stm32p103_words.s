@@ -105,4 +105,13 @@
 
     defvar "IVT", IVT, 75 * 4
 
+    defcode "KEY?", KEYQ
+    mov r2, #0
+    ldr r0, =UART2
+    ldr r1, [r0, #UART_SR]
+    ands r3, #32
+    beq 1f
+    mvn r2, #1
+1:  push {r2}
+    NEXT
 

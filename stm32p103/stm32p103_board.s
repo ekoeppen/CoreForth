@@ -53,9 +53,6 @@ init_board:
     msr basepri, r0
     ldr r0, =(_NVIC + NVIC_SETENA_BASE)
     mov r1, #0
-.ifdef UART_USE_INTERRUPTS
-    orr r1, #0x20
-.endif
     str r1, [r0]
 
     @ enable clocks on all timers, UARTS, ADC, PWM, SSI and I2C and _GPIO ports
@@ -102,10 +99,7 @@ init_board:
     .align 2, 0
     .ltorg
 
-readkey_interrupt:
-    mov pc, lr
-
-readkey_polled:
+readkey:
     push {r1, r2, r3, lr}
     ldr r1, =UART2
     mov r2, #32
@@ -115,12 +109,6 @@ readkey_polled:
     bne 1b
     ldrb r0, [r1, #UART_DR]
     pop {r1, r2, r3, pc}
-
-.ifdef UART_USE_INTERRUPTS
-    .set readkey, readkey_interrupt
-.else
-    .set readkey, readkey_polled
-.endif
 
 putchar:
     push {r1, r2, r3, lr}
