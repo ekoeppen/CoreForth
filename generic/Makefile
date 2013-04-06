@@ -10,7 +10,7 @@ GEN = ../generic/ansi.gen.s ../generic/systick.gen.s \
 	arm-none-eabi-objdump -D $< >$@
 
 %.gen.s: %.ft
-	awk '{ print ".byte ", length($$0); gsub(/\\/, "\\\\"); gsub(/"/, "\\\""); print ".ascii \"" $$0 "\""} END{print ".align 2, 0"}' < $< > $@
+	awk '{ print ".byte ", length($$0); gsub(/\\/, "\\\\\\"); gsub(/"/, "\\\""); print ".ascii \"" $$0 "\""} END{print ".align 2, 0"}' < $< > $@
 
 .s.o:
 	arm-none-eabi-as -mcpu=cortex-m3 -I../generic/ -o $@ $< 
