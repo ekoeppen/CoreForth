@@ -6,6 +6,9 @@ GEN = ../generic/ansi.gen.s ../generic/systick.gen.s \
 %.bin: %.elf
 	arm-none-eabi-objcopy -Obinary $< $@
 
+%.lst: %.elf
+	arm-none-eabi-objdump -D $< >$@
+
 %.gen.s: %.ft
 	awk '{ print ".byte ", length($$0); gsub(/\\/, "\\\\"); gsub(/"/, "\\\""); print ".ascii \"" $$0 "\""} END{print ".align 2, 0"}' < $< > $@
 
@@ -13,6 +16,8 @@ GEN = ../generic/ansi.gen.s ../generic/systick.gen.s \
 	arm-none-eabi-as -mcpu=cortex-m3 -I../generic/ -o $@ $< 
 
 all: coreforth.bin
+
+listing: coreforth.lst
 
 coreforth.bin: coreforth.elf
 

@@ -4,4 +4,6 @@
 *.swp
 *.swo
 *.gen.s
+*.log
+*.lst
 setenv.sh
