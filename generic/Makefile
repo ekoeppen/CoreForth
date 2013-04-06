@@ -22,7 +22,7 @@ listing: coreforth.lst
 coreforth.bin: coreforth.elf
 
 clean:
-	rm -f *.elf *.bin *.o *.gen.s
+	rm -f *.elf *.bin *.o *.gen.s *.log *.lst
 
 run: coreforth.elf
 	qemu-system-arm -M lm3s811evb -serial stdio -kernel coreforth.elf -semihosting; stty sane
