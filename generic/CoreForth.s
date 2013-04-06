@@ -275,6 +275,8 @@ readline:
     beq readline_end
 readline_loop:
     bl readkey
+    cmp r0, #10
+    beq readline_end
     cmp r0, #13
     beq readline_end
     cmp r0, #127
