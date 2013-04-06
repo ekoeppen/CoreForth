@@ -331,6 +331,78 @@
     defword "WDT_SR", WDT_SR, 0x0, REGISTER_XT
     .word 0x8
 
+    defconst "ADC", ADC, 0x400C0000
+
+
+    defword "ADC_CR", ADC_CR, 0x0, REGISTER_XT
+    .word 0x0
+
+    defword "ADC_MR", ADC_MR, 0x0, REGISTER_XT
+    .word 0x4
+
+    defword "ADC_SEQR1", ADC_SEQRONE, 0x0, REGISTER_XT
+    .word 0x8
+
+    defword "ADC_SEQR2", ADC_SEQRTWO, 0x0, REGISTER_XT
+    .word 0xC
+
+    defword "ADC_CHER", ADC_CHER, 0x0, REGISTER_XT
+    .word 0x10
+
+    defword "ADC_CHDR", ADC_CHDR, 0x0, REGISTER_XT
+    .word 0x14
+
+    defword "ADC_CHSR", ADC_CHSR, 0x0, REGISTER_XT
+    .word 0x18
+
+    defword "ADC_LCDR", ADC_LCDR, 0x0, REGISTER_XT
+    .word 0x20
+
+    defword "ADC_IER", ADC_IER, 0x0, REGISTER_XT
+    .word 0x24
+
+    defword "ADC_IDR", ADC_IDR, 0x0, REGISTER_XT
+    .word 0x28
+
+    defword "ADC_IMR", ADC_IMR, 0x0, REGISTER_XT
+    .word 0x2C
+
+    defword "ADC_ISR", ADC_ISR, 0x0, REGISTER_XT
+    .word 0x30
+
+    defword "ADC_OVER", ADC_OVER, 0x0, REGISTER_XT
+    .word 0x3C
+
+    defword "ADC_EMR", ADC_EMR, 0x0, REGISTER_XT
+    .word 0x40
+
+    defword "ADC_CWR", ADC_CWR, 0x0, REGISTER_XT
+    .word 0x44
+
+    defword "ADC_CGR", ADC_CGR, 0x0, REGISTER_XT
+    .word 0x48
+
+    defword "ADC_COR", ADC_COR, 0x0, REGISTER_XT
+    .word 0x4C
+
+    defword "ADC_CDR0", ADC_CDRZ, 0x0, REGISTER_XT
+    .word 0x50
+
+    defword "ADC_CDR1", ADC_CDRONE, 0x0, REGISTER_XT
+    .word 0x54
+
+    defword "ADC_CDR15", ADC_CDRONE5, 0x0, REGISTER_XT
+    .word 0x8C
+
+    defword "ADC_ACR", ADC_ACR, 0x0, REGISTER_XT
+    .word 0x94
+
+    defword "ADC_WPMR", ADC_WPMR, 0x0, REGISTER_XT
+    .word 0xE4
+
+    defword "ADC_WPSR", ADC_WPSR, 0x0, REGISTER_XT
+    .word 0xE8
+
     defword "LED0-ENABLE", LEDZ_ENABLE, 0x0
     .word LIT, 0x8000000, PIOB, TWODUP, PIO_PER, SET_BITS, TWODUP, PIO_OER, SET_BITS, TWODUP, PIO_PUER, SET_BITS, TWODUP, PIO_MDDR, SET_BITS, TWODUP, PIO_OWER, SET_BITS, PIO_CODR, SET_BITS, EXIT
 
