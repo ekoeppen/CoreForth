@@ -3,7 +3,10 @@ GEN = ../generic/ansi.gen.s ../generic/systick.gen.s \
       ../generic/find.gen.s ../generic/strings.gen.s ../generic/multitasking.gen.s \
       ../generic/blocks.gen.s ../generic/quit.gen.s
 
+REVISION:=$(shell git log -1 --abbrev=8 --pretty=format:%h)
+
 %.bin: %.elf
+	LC_CTYPE=C && LANG=C && sed -i "" -e "s/revision NNNNNNNN/revision $(REVISION)/" $<
 	arm-none-eabi-objcopy -Obinary $< $@
 
 %.lst: %.elf
