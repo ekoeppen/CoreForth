@@ -137,7 +137,7 @@ E000E018 CONSTANT STCURRENT
     0FF SPI-DR!@ 1F AND 5 =                     \ Get result
     0FF BEGIN DUP DUP SPI-DR!@ = UNTIL DROP ;   \ Loop until idle
 
-: ((BLOCK)) PAD ;
+CREATE ((BLOCK)) C/BLK ALLOT
 : (BLOCK)
     2* 2DUP MMC-READ-BLK DROP
     1+ SWAP 200 + SWAP MMC-READ-BLK DROP ;

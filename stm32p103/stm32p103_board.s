@@ -51,23 +51,23 @@ init_board:
     msr primask, r0
     mov r0, #0
     msr basepri, r0
-    ldr r0, =(_NVIC + NVIC_SETENA_BASE)
+    ldr r0, =(NVIC + NVIC_SETENA_BASE)
     mov r1, #0
     str r1, [r0]
 
-    @ enable clocks on all timers, UARTS, ADC, PWM, SSI and I2C and _GPIO ports
+    @ enable clocks on all timers, UARTS, ADC, PWM, SSI and I2C and GPIO ports
     ldr r0, =RCC_APB2ENR
-    ldr r1, =0x4
+    ldr r1, =0xffffffff
     str r1, [r0]
     ldr r0, =RCC_APB1ENR
-    ldr r1, =0x20000
+    ldr r1, =0xffffffff
     str r1, [r0]
 
     mov r0, #32
     bl delay
 
-    @ enable pins on _GPIOA
-    ldr r0, =(_GPIOA + _GPIO_CRL)
+    @ enable pins on GPIOA
+    ldr r0, =(GPIOA + GPIO_CRL)
     ldr r1, =0x44444b44
     str r1, [r0]
 
