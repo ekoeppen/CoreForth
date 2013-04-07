@@ -21,20 +21,33 @@
     defcode "ERASE-PAGE", ERASE_PAGE
     pop {r1}
     ldr r0, =FPEC
-1:  ldr r2, [r0, #FLASH_SR]
-    ands r2, #0x1
-    bne 1b
-    ldr r2, [r0, #FLASH_CR]
-    orrs r2, #0x2
+    mov r2, #0x2
     str r2, [r0, #FLASH_CR]
     str r1, [r0, #FLASH_AR]
     ldr r2, [r0, #FLASH_CR]
     orrs r2, #0x40
     str r2, [r0, #FLASH_CR]
-2:  ldr r2, [r0, #FLASH_SR]
+1:  ldr r2, [r0, #FLASH_SR]
     ands r2, #0x1
+    bne 1b
+    NEXT
+
+    defcode "FLASH-PAGE", FLASH_PAGE
+    pop {r2}
+    pop {r3}
+    mov r4, #0x400
+    ldr r0, =FPEC
+1:  mov r1, #0x1
+    str r1, [r0, #FLASH_CR]
+    ldrh r1, [r3]
+    strh r1, [r2]
+2:  ldr r1, [r0, #FLASH_SR]
+    ands r1, #0x1
     bne 2b
-    push {r2}
+    adds r2, #2
+    adds r3, #2
+    subs r4, #2
+    bne 1b
     NEXT
 
     defvar "SBUF", SBUF, 16
