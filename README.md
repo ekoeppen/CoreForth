@@ -2,7 +2,7 @@ Overview
 ========
 
 This is a simple Forth for the ARM Cortex M3. It can currently run on the [Stellaris LM3S811 evaluation
-kit](http://www.ti.com/tool/ek-lm3s811), or qemu. Other targets like STM32 based boards should be easy to add.
+kit](http://www.ti.com/tool/ek-lm3s811), the Arduino Due, the Olimex STM32-P103 and the Olimexino STM32/LeafLabs Maple or qemu. Other targets like STM32 based boards should be easy to add.
 
 CoreForth started based on [JonesForth](http://rwmj.wordpress.com/2010/08/07/jonesforth-git-repository/), but evolved to be closer
 to Forth-79. Some words and ideas were taken also directly from [CamelForth](http://www.camelforth.com/) and the [excellent article
