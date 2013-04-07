@@ -46,3 +46,12 @@
     .set STRELOAD,    0xe000e014
     .set STCURRENT,   0xe000e018
 
+    .set FPEC,          0x40022000
+    .set FLASH_ACR,           0x00
+    .set FLASH_KEYR,          0x04
+    .set FLASH_OPTKEYR,       0x08
+    .set FLASH_SR,            0x0C
+    .set FLASH_CR,            0x10
+    .set FLASH_AR,            0x14
+    .set FLASH_OBR,           0x1C
+    .set FLASH_WRPR,          0x20

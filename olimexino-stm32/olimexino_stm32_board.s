@@ -92,6 +92,13 @@ init_board:
     mov r1, #5
     str r1, [r0]
 
+    @ unlock flash controller
+    ldr r0, =FPEC
+    ldr r1, =0x45670123
+    str r1, [r0, #FLASH_KEYR]
+    ldr r1, =0xcdef89ab
+    str r1, [r0, #FLASH_KEYR]
+
     mov r0, #32
     bl delay
 
