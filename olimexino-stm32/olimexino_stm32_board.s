@@ -119,22 +119,24 @@ init_board:
     .ltorg
 
 readkey:
-    push {r1, r2, lr}
+    push {r1, r2}
     ldr r1, =UART1
 1:  ldr r2, [r1, #UART_SR]
     ands r2, #32
     beq 1b
     ldrb r0, [r1, #UART_DR]
-    pop {r1, r2, pc}
+    pop {r1, r2}
+    bx lr
 
 putchar:
-    push {r1, r2, lr}
+    push {r1, r2}
     ldr r1, =UART1
 1:  ldr r2, [r1, #UART_SR]
     ands r2, #0x80
     beq 1b
     str r0, [r1, #UART_DR]
-    pop {r1, r2, pc}
+    pop {r1, r2}
+    bx lr
 
 @ ---------------------------------------------------------------------
 @ -- IRQ handlers -----------------------------------------------------
