@@ -34,6 +34,35 @@ _start:
 init_board:
     push {lr}
 
+    @ switch to 72MHz clock
+    ldr r0, =FPEC
+    mov r1, #0x32
+    str r1, [r0, #FLASH_ACR]
+    ldr r0, =RCC
+    ldr r1, [r0, #RCC_CFGR]
+    ldr r2, =0xffc2ffff
+    ands r1, r2
+    ldr r2, =0x001d0000
+    orrs r1, r2
+    str r1, [r0, #RCC_CFGR]
+    ldr r1, =0x00010000
+    str r1, [r0, #RCC_CR]
+    ldr r2, =0x00020000
+1:  ldr r1, [r0, #RCC_CR]
+    ands r1, r2
+    beq 1b
+    ldr r1, =0x01010000
+    str r1, [r0, #RCC_CR]
+    ldr r2, =0x02000000
+2:  ldr r1, [r0, #RCC_CR]
+    ands r1, r2
+    beq 2b
+    ldr r1, [r0, #RCC_CFGR]
+    ldr r2, =0xfffffffc
+    ands r1, r2
+    orrs r1, #0x2
+    str r1, [r0, #RCC_CFGR]
+
     @ reset the interrupt vector table
     ldr r0, =addr_IVT
     mov r1, #0
@@ -77,7 +106,7 @@ init_board:
 
     @ set UART baud rate
     ldr r0, =(UART1 + UART_BRR)
-    ldr r1, =(8000000 / 115200)
+    ldr r1, =(72000000 / 115200)
     str r1, [r0]
 
     @ enable SYSTICK
