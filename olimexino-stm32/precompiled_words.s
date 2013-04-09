@@ -247,6 +247,36 @@
     defconst "USB-BTABLE", USB_BTABLE, 0x40005C50
 
 
+    defconst "UART1", UARTONE, 0x40013800
+
+
+    defconst "UART2", UARTTWO, 0x40004400
+
+
+    defconst "UART3", UART3, 0x40004800
+
+
+    defword "UART-SR", UART_SR, 0x0, REGISTER_XT
+    .word 0x0
+
+    defword "UART-DR", UART_DR, 0x0, REGISTER_XT
+    .word 0x4
+
+    defword "UART-BRR", UART_BRR, 0x0, REGISTER_XT
+    .word 0x8
+
+    defword "UART-CR1", UART_CRONE, 0x0, REGISTER_XT
+    .word 0xC
+
+    defword "UART-CR2", UART_CRTWO, 0x0, REGISTER_XT
+    .word 0x10
+
+    defword "UART-CR3", UART_CR3, 0x0, REGISTER_XT
+    .word 0x14
+
+    defword "UART-GPTR", UART_GPTR, 0x0, REGISTER_XT
+    .word 0x18
+
     defword "LED-GREEN-ENABLE", LED_GREEN_ENABLE, 0x0
     .word GPIOA, GPIO_CRL, DUP, FETCH, LIT, 0xFF0FFFFF, AND, LIT, 0x100000, OR, SWAP, STORE, EXIT
 
