@@ -40,9 +40,9 @@ init_board:
     str r1, [r0, #FLASH_ACR]
     ldr r0, =RCC
     ldr r1, [r0, #RCC_CFGR]
-    ldr r2, =0xffc2ffff
+    ldr r2, =0xffc238ff
     ands r1, r2
-    ldr r2, =0x001d0000
+    ldr r2, =0x001d8400
     orrs r1, r2
     str r1, [r0, #RCC_CFGR]
     ldr r1, =0x00010000

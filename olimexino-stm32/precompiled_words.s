@@ -184,32 +184,68 @@
     defword "SPI-I2SPR", SPI_ITWOSPR, 0x0, REGISTER_XT
     .word 0x20
 
-    defconst "FPEC", FPEC, 0x40022000
+    defconst "FLASH-ACR", FLASH_ACR, 0x40022000
 
 
-    defword "FLASH-ACR", FLASH_ACR, 0x0, REGISTER_XT
-    .word 0x0
+    defconst "FLASH-KEYR", FLASH_KEYR, 0x40022004
 
-    defword "FLASH-KEYR", FLASH_KEYR, 0x0, REGISTER_XT
-    .word 0x4
 
-    defword "FLASH-OPTKEYR", FLASH_OPTKEYR, 0x0, REGISTER_XT
-    .word 0x8
+    defconst "FLASH-OPTKEYR", FLASH_OPTKEYR, 0x40022008
 
-    defword "FLASH-SR", FLASH_SR, 0x0, REGISTER_XT
-    .word 0xC
 
-    defword "FLASH-CR", FLASH_CR, 0x0, REGISTER_XT
-    .word 0x10
+    defconst "FLASH-SR", FLASH_SR, 0x4002200C
 
-    defword "FLASH-AR", FLASH_AR, 0x0, REGISTER_XT
-    .word 0x14
 
-    defword "FLASH-OBR", FLASH_OBR, 0x0, REGISTER_XT
-    .word 0x1C
+    defconst "FLASH-CR", FLASH_CR, 0x40022010
 
-    defword "FLASH-WRPR", FLASH_WRPR, 0x0, REGISTER_XT
-    .word 0x20
+
+    defconst "FLASH-AR", FLASH_AR, 0x40022014
+
+
+    defconst "FLASH-OBR", FLASH_OBR, 0x4002201C
+
+
+    defconst "FLASH-WRPR", FLASH_WRPR, 0x40022020
+
+
+    defconst "USB-EP0R", USB_EPZR, 0x40005C00
+
+
+    defconst "USB-EP1R", USB_EPONER, 0x40005C04
+
+
+    defconst "USB-EP2R", USB_EPTWOR, 0x40005C08
+
+
+    defconst "USB-EP3R", USB_EP3R, 0x40005C0C
+
+
+    defconst "USB-EP4R", USB_EP4R, 0x40005C10
+
+
+    defconst "USB-EP5R", USB_EP5R, 0x40005C14
+
+
+    defconst "USB-EP6R", USB_EP6R, 0x40005C18
+
+
+    defconst "USB-EP7R", USB_EP7R, 0x40005C1C
+
+
+    defconst "USB-CNTR", USB_CNTR, 0x40005C40
+
+
+    defconst "USB-ISTR", USB_ISTR, 0x40005C44
+
+
+    defconst "USB-FNR", USB_FNR, 0x40005C48
+
+
+    defconst "USB-DADDR", USB_DADDR, 0x40005C4C
+
+
+    defconst "USB-BTABLE", USB_BTABLE, 0x40005C50
+
 
     defword "LED-GREEN-ENABLE", LED_GREEN_ENABLE, 0x0
     .word GPIOA, GPIO_CRL, DUP, FETCH, LIT, 0xFF0FFFFF, AND, LIT, 0x100000, OR, SWAP, STORE, EXIT
