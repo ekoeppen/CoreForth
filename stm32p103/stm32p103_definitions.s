@@ -10,18 +10,18 @@
     .set UART_GPTR,           0x18
 
     .set RCC,           0x40021000
-    .set RCC_CR,        0x40021000
-    .set RCC_CFGR,      0x40021004
-    .set RCC_CIR,       0x40021008
-    .set RCC_APB2RSTR,  0x4002100c
-    .set RCC_APB1RSTR,  0x40021010
-    .set RCC_AHBENR,    0x40021014
-    .set RCC_APB2ENR,   0x40021018
-    .set RCC_APB1ENR,   0x4002101c
-    .set RCC_BDCR,      0x40021020
-    .set RCC_CSR,       0x40021024
-    .set RCC_AHBRSTR,   0x40021028
-    .set RCC_CFGR2,     0x4002102c
+    .set RCC_CR,              0x00
+    .set RCC_CFGR,            0x04
+    .set RCC_CIR,             0x08
+    .set RCC_APB2RSTR,        0x0c
+    .set RCC_APB1RSTR,        0x10
+    .set RCC_AHBENR,          0x14
+    .set RCC_APB2ENR,         0x18
+    .set RCC_APB1ENR,         0x1c
+    .set RCC_BDCR,            0x20
+    .set RCC_CSR,             0x24
+    .set RCC_AHBRSTR,         0x28
+    .set RCC_CFGR2,           0x2c
 
     .set NVIC,          0xe000e000
     .set NVIC_SETENA_BASE,   0x100
