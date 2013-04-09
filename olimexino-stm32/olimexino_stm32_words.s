@@ -1,5 +1,34 @@
     .ltorg
 
+sysclock:
+    push {r4, r5}
+    ldr r0, =8000000
+    ldr r4, =RCC
+    ldr r4, [r4, #RCC_CFGR]
+    mov r5, r4
+    ands r5, #0x0c
+    beq 1f
+    cmp r5, #0x04
+    beq 1f
+    lsrs r4, #16
+    ands r4, #0x3f
+    mov r5, r4
+    ands r5, #0x01
+    beq 2f
+    ands r5, #0x02
+    beq 3f
+2:  lsrs r0, #1
+3:  lsrs r4, #2
+    adds r4, #2
+    mul r0, r0, r4
+1:  pop {r4, r5}
+    bx lr
+
+    defcode "SYSCLOCK", SYSCLOCK
+    bl sysclock
+    push {r0}
+    NEXT
+
     defcode "RETI", RETI
     pop {r4 - r12, pc}
 
