@@ -22,6 +22,8 @@ all: coreforth.bin
 
 listing: coreforth.lst
 
+coreforth.elf: $(GEN) precompiled_words.s Makefile ../generic/Makefile
+
 coreforth.bin: coreforth.elf
 
 clean:
