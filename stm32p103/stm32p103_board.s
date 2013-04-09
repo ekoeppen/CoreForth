@@ -56,33 +56,24 @@ init_board:
     str r1, [r0]
 
     @ enable clocks on all timers, UARTS, ADC, PWM, SSI and I2C and GPIO ports
-    ldr r0, =RCC_APB2ENR
+    ldr r0, =RCC
     ldr r1, =0xffffffff
-    str r1, [r0]
-    ldr r0, =RCC_APB1ENR
-    ldr r1, =0xffffffff
-    str r1, [r0]
-
-    mov r0, #32
-    bl delay
+    str r1, [r0, #RCC_APB1ENR]
+    str r1, [r0, #RCC_APB2ENR]
 
     @ enable pins on GPIOA
     ldr r0, =(GPIOA + GPIO_CRL)
     ldr r1, =0x44444b44
     str r1, [r0]
 
-    mov r0, #32
-    bl delay
-
     @ enable UART
-    ldr r0, =(UART2 + UART_CR1)
+    ldr r0, =UART1
     ldr r1, =0x200c
-    str r1, [r0]
+    str r1, [r0, #UART_CR1]
 
     @ set UART baud rate
-    ldr r0, =(UART2 + UART_BRR)
     ldr r1, =(8000000 / 115200)
-    str r1, [r0]
+    str r1, [r0, #UART_BRR]
 
     @ enable SYSTICK
     ldr r0, =STRELOAD
@@ -92,11 +83,14 @@ init_board:
     mov r1, #5
     str r1, [r0]
 
-    mov r0, #32
-    bl delay
+    @ unlock flash controller
+    ldr r0, =FPEC
+    ldr r1, =0x45670123
+    str r1, [r0, #FLASH_KEYR]
+    ldr r1, =0xcdef89ab
+    str r1, [r0, #FLASH_KEYR]
 
     pop {pc}
-    .align 2, 0
     .ltorg
 
 readkey:

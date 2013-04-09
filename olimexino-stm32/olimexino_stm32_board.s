@@ -34,6 +34,35 @@ _start:
 init_board:
     push {lr}
 
+    @ switch to 72MHz clock
+    ldr r0, =FPEC
+    mov r1, #0x32
+    str r1, [r0, #FLASH_ACR]
+    ldr r0, =RCC
+    ldr r1, [r0, #RCC_CFGR]
+    ldr r2, =0xffc2ffff
+    ands r1, r2
+    ldr r2, =0x001d0000
+    orrs r1, r2
+    str r1, [r0, #RCC_CFGR]
+    ldr r1, =0x00010000
+    str r1, [r0, #RCC_CR]
+    ldr r2, =0x00020000
+1:  ldr r1, [r0, #RCC_CR]
+    ands r1, r2
+    beq 1b
+    ldr r1, =0x01010000
+    str r1, [r0, #RCC_CR]
+    ldr r2, =0x02000000
+2:  ldr r1, [r0, #RCC_CR]
+    ands r1, r2
+    beq 2b
+    ldr r1, [r0, #RCC_CFGR]
+    ldr r2, =0xfffffffc
+    ands r1, r2
+    orrs r1, #0x2
+    str r1, [r0, #RCC_CFGR]
+
     @ reset the interrupt vector table
     ldr r0, =addr_IVT
     mov r1, #0
@@ -52,33 +81,24 @@ init_board:
     str r1, [r0]
 
     @ enable clocks on all timers, UARTS, ADC, PWM, SSI and I2C and GPIO ports
-    ldr r0, =RCC_APB2ENR
+    ldr r0, =RCC
     ldr r1, =0xffffffff
-    str r1, [r0]
-    ldr r0, =RCC_APB1ENR
-    ldr r1, =0xffffffff
-    str r1, [r0]
-
-    mov r0, #32
-    bl delay
+    str r1, [r0, #RCC_APB1ENR]
+    str r1, [r0, #RCC_APB2ENR]
 
     @ enable pins on GPIOA
-    ldr r0, =(GPIOA + GPIO_CRH)
+    ldr r0, =GPIOA
     ldr r1, =0x444444b4
-    str r1, [r0]
-
-    mov r0, #32
-    bl delay
+    str r1, [r0, #GPIO_CRH]
 
     @ enable UART
-    ldr r0, =(UART1 + UART_CR1)
+    ldr r0, =UART1
     ldr r1, =0x200c
-    str r1, [r0]
+    str r1, [r0, #UART_CR1]
 
     @ set UART baud rate
-    ldr r0, =(UART1 + UART_BRR)
-    ldr r1, =(8000000 / 115200)
-    str r1, [r0]
+    ldr r1, =(72000000 / 115200)
+    str r1, [r0, #UART_BRR]
 
     @ enable SYSTICK
     ldr r0, =STRELOAD
@@ -95,11 +115,7 @@ init_board:
     ldr r1, =0xcdef89ab
     str r1, [r0, #FLASH_KEYR]
 
-    mov r0, #32
-    bl delay
-
     pop {pc}
-    .align 2, 0
     .ltorg
 
 readkey:
