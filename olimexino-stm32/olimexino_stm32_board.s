@@ -25,6 +25,11 @@ _start:
     .long 0                           /* Reserved                     */
     .long 0                           /* Reserved                     */
     .long 0                           /* Reserved                     */
+    .long svc_handler + 1             /* SVCall Handler               */
+    .long debugmon_handler + 1        /* Debug Monitor Handler        */
+    .long 0                           /* Reserved                     */
+    .long pendsv_handler + 1          /* PendSV Handler               */
+    .long systick_handler + 1         /* SysTick Handler              */
 
     .org 0x150
 
@@ -191,32 +196,6 @@ pendsv_handler:
     b .
 
 systick_handler:
-    b .
-
-gpioa_handler:
-gpiob_handler:
-gpioc_handler:
-gpiod_handler:
-gpioe_handler:
-uart0_handler:
-uart1_handler:
-ssi_handler:
-i2c_handler:
-pwm0_handler:
-pwm1_handler:
-pwm2_handler:
-adcseq0_handler:
-adcseq1_handler:
-adcseq2_handler:
-adcseq3_handler:
-watchdog_handler:
-timer0a_handler:
-timer0b_handler:
-timer1a_handler:
-timer1b_handler:
-timer2a_handler:
-timer2b_handler:
-adcomp_handler:
     b generic_forth_handler
 
 @ ---------------------------------------------------------------------
