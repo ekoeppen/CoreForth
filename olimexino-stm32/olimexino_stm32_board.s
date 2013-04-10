@@ -30,6 +30,67 @@ _start:
     .long 0                           /* Reserved                     */
     .long pendsv_handler + 1          /* PendSV Handler               */
     .long systick_handler + 1         /* SysTick Handler              */
+    .long wwdg_handler + 1
+    .long pvd_handler + 1
+    .long tamper_handler + 1
+    .long rtc_handler + 1
+    .long flash_handler + 1
+    .long rcc_handler + 1
+    .long exti0_handler + 1
+    .long exti1_handler + 1
+    .long exti2_handler + 1
+    .long exti3_handler + 1
+    .long exti4_handler + 1
+    .long dma1_channel1_handler + 1
+    .long dma1_channel2_handler + 1
+    .long dma1_channel3_handler + 1
+    .long dma1_channel4_handler + 1
+    .long dma1_channel5_handler + 1
+    .long dma1_channel6_handler + 1
+    .long dma1_channel7_handler + 1
+    .long adc1_2_handler + 1
+    .long usb_hp_can_tx_handler + 1
+    .long usb_lp_can_rx_handler + 1
+    .long can_rx1_handler + 1
+    .long can_sce_handler + 1
+    .long exti9_5_handler + 1
+    .long tim1_brk_handler + 1
+    .long tim1_up_handler + 1
+    .long tim1_trg_com_handler + 1
+    .long tim1_cc_handler + 1
+    .long tim2_handler + 1
+    .long tim3_handler + 1
+    .long tim4_handler + 1
+    .long i2c1_ev_handler + 1
+    .long i2c1_er_handler + 1
+    .long i2c2_ev_handler + 1
+    .long i2c2_er_handler + 1
+    .long spi1_handler + 1
+    .long spi2_handler + 1
+    .long usart1_handler + 1
+    .long usart2_handler + 1
+    .long usart3_handler + 1
+    .long exti15_10_handler + 1
+    .long rtcalarm_handler + 1
+    .long usbwakeup_handler + 1
+    .long tim8_brk_handler + 1
+    .long tim8_up_handler + 1
+    .long tim8_trg_com_handler + 1
+    .long tim8_cc_handler + 1
+    .long adc3_handler + 1
+    .long fsmc_handler + 1
+    .long sdio_handler + 1
+    .long tim5_handler + 1
+    .long spi3_handler + 1
+    .long uart4_handler + 1
+    .long uart5_handler + 1
+    .long tim6_handler + 1
+    .long tim7_handler + 1
+    .long dma2_channel1_handler + 1
+    .long dma2_channel2_handler + 1
+    .long dma2_channel3_handler + 1
+    .long dma2_channel4_5_handler + 1
+end_of_irq:
 
     .org 0x150
 
@@ -71,7 +132,7 @@ init_board:
     @ reset the interrupt vector table
     ldr r0, =addr_IVT
     mov r1, #0
-    mov r2, 48
+    mov r2, #(end_of_irq - _start) / 4
 1:  str r1, [r0], #4
     subs r2, r2, #1
     bgt 1b
@@ -196,6 +257,66 @@ pendsv_handler:
     b .
 
 systick_handler:
+adc1_2_handler:
+adc3_handler:
+can_rx1_handler:
+can_sce_handler:
+dma1_channel1_handler:
+dma1_channel2_handler:
+dma1_channel3_handler:
+dma1_channel4_handler:
+dma1_channel5_handler:
+dma1_channel6_handler:
+dma1_channel7_handler:
+dma2_channel1_handler:
+dma2_channel2_handler:
+dma2_channel3_handler:
+dma2_channel4_5_handler:
+exti0_handler:
+exti15_10_handler:
+exti1_handler:
+exti2_handler:
+exti3_handler:
+exti4_handler:
+exti9_5_handler:
+flash_handler:
+fsmc_handler:
+i2c1_er_handler:
+i2c1_ev_handler:
+i2c2_er_handler:
+i2c2_ev_handler:
+pvd_handler:
+rcc_handler:
+rtc_handler:
+rtcalarm_handler:
+sdio_handler:
+spi1_handler:
+spi2_handler:
+spi3_handler:
+tamper_handler:
+tim1_brk_handler:
+tim1_cc_handler:
+tim1_trg_com_handler:
+tim1_up_handler:
+tim2_handler:
+tim3_handler:
+tim4_handler:
+tim5_handler:
+tim6_handler:
+tim7_handler:
+tim8_brk_handler:
+tim8_cc_handler:
+tim8_trg_com_handler:
+tim8_up_handler:
+uart4_handler:
+uart5_handler:
+usart1_handler:
+usart2_handler:
+usart3_handler:
+usb_hp_can_tx_handler:
+usb_lp_can_rx_handler:
+usbwakeup_handler:
+wwdg_handler:
     b generic_forth_handler
 
 @ ---------------------------------------------------------------------

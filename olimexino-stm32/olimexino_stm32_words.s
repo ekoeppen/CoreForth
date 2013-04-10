@@ -35,7 +35,7 @@ sysclock:
     defword ";I", SEMICOLONI, F_IMMED
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    defvar "IVT", IVT, 75 * 4
+    defvar "IVT", IVT, (end_of_irq - _start) / 4
 
     defcode "KEY?", KEYQ
     mov r2, #0
@@ -82,7 +82,6 @@ sysclock:
     defvar "SBUF", SBUF, 16
     defvar "SBUF-HEAD", SBUF_HEAD
     defvar "SBUF-TAIL", SBUF_TAIL
-    defvar "IVT", IVT, 48 * 4
     defvar "UART0-TASK", UARTZ_TASK
 
     .ltorg
