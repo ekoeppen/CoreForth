@@ -6,7 +6,7 @@ GEN = ../generic/ansi.gen.s ../generic/systick.gen.s \
 REVISION:=$(shell git log -1 --abbrev=8 --pretty=format:%h)
 
 %.bin: %.elf
-	LC_CTYPE=C && LANG=C && sed -i '' -e "s/revision NNNNNNNN/revision $(REVISION)/" $<
+	LC_CTYPE=C && LANG=C && sed -e "s/revision NNNNNNNN/revision $(REVISION)/" < $< > $<.bak && mv $<.bak $<
 	arm-none-eabi-objcopy -Obinary $< $@
 
 %.lst: %.elf
