@@ -12,8 +12,8 @@ HEX
 0 CONSTANT OFF
 
 E000E000 CONSTANT NVIC
-100 REGISTER NVIC_SETENA_BASE
-300 REGISTER NVIC_ACTIVE_BASE
+E000E100 CONSTANT NVIC_SETENA_BASE
+E000E300 CONSTANT NVIC_ACTIVE_BASE
 
 40021000 CONSTANT RCC
 40021000 CONSTANT RCC-CR
@@ -180,17 +180,17 @@ CREATE ((BLOCK)) C/BLK ALLOT
 : (UPDATE) ( addr blk# -- )
     BLOCK>FLASH DUP ERASE-PAGE  FLASH-PAGE ;
 
-variable usb-istr-shadow
-: usb-disc-config  gpioc gpio-crh dup @ $FFF0FFFF and $FFF3FFFF or swap ! ;
-: usb-disc!
-   cells gpioc gpio-brr swap - $00001000 swap ! ;
-: usb-irq
-   0 usb-istr dup @ . ! ;i
-: usb-irq-1
-   0 usb-istr dup @ usb-istr-shadow ! ! ;i
-: usb-irq-enable
-   ['] usb-irq dup $22 + cells ivt + !
-                   $23 + cells ivt + ! ;
-: usb-enable
-   0 usb-istr-shadow !
-   usb-irq-enable   $0000FF10 usb-cntr ! ;
+VARIABLE USB-ISTR-SHADOW
+
+: USB-DISC-CONFIG  GPIOC GPIO-CRH DUP @ $FFF0FFFF AND $FFF3FFFF OR SWAP ! ;
+: USB-DISC!
+    CELLS GPIOC GPIO-BRR SWAP - $00001000 SWAP ! ;
+: USB-IRQ
+    0 USB-ISTR DUP @ DUP . USB-ISTR-SHADOW ! ! ;I
+: USB-IRQ-ENABLE
+    ['] USB-IRQ DUP $22 + CELLS IVT + !
+                    $23 + CELLS IVT + !
+    00180000 NVIC_SETENA_BASE ! ;
+: USB-ENABLE
+    0 USB-ISTR-SHADOW !
+    USB-IRQ-ENABLE   $0000FE10 USB-CNTR ! ;
