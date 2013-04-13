@@ -481,6 +481,18 @@ delay:
     strb r0, [r1]
     NEXT
 
+    defcode "H@", HFETCH
+    pop {r0}
+    ldrh r1, [r0]
+    push {r1}
+    NEXT
+
+    defcode "H!", HSTORE
+    pop {r1}
+    pop {r0}
+    strh r0, [r1]
+    NEXT
+
     defcode "@", FETCH
     pop {r0}
     ldr r1, [r0]
