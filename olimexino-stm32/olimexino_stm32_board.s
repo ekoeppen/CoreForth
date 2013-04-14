@@ -181,10 +181,6 @@ init_board:
     ldr r1, =0xcdef89ab
     str r1, [r0, #FLASH_KEYR]
 
-    ldr r0, =0x40006000
-    ldr r1, =0x9090
-    strh r1, [r0, #0]
-
     pop {pc}
     .ltorg
 
