@@ -976,14 +976,27 @@ fill_done:
     .word QDUP, QBRANCH, dump_end - .
     .word SWAP
 dump_start_line:
-    .word CR, DUP, DOT, LIT, 58, EMIT, BL, EMIT
+    .word CR, DUP, DOTUH, LIT, 58, EMIT, SPACE
 dump_line:
-    .word DUP, FETCHBYTE, DOT, INCR
+    .word DUP, FETCHBYTE, DOTUH, SPACE, INCR
     .word SWAP, DECR, QDUP, QBRANCH, dump_end - .
     .word SWAP, DUP, LIT, 7, AND, QBRANCH, dump_start_line - .
     .word BRANCH, dump_line - .
 dump_end:
     .word DROP, EXIT
+
+    defword "DUMPW", DUMPW
+    .word QDUP, QBRANCH, dumpw_end - .
+    .word SWAP
+dumpw_start_line:
+    .word CR, DUP, DOTUH, LIT, 58, EMIT, SPACE
+dumpw_line:
+    .word DUP, FETCH, DOTUH, SPACE, INCR4
+    .word SWAP, DECR4, DUP, ZGT, QBRANCH, dumpw_end - .
+    .word SWAP, DUP, LIT, 0x1f, AND, QBRANCH, dumpw_start_line - .
+    .word BRANCH, dumpw_line - .
+dumpw_end:
+    .word TWODROP, EXIT
 
     defword "SKIP", SKIP
     .word TOR
