@@ -146,11 +146,17 @@ init_board:
     mov r1, #0
     str r1, [r0]
 
-    @ enable clocks on all timers, UARTS, ADC, PWM, SSI and I2C and GPIO ports
+    @ enable clocks
     ldr r0, =RCC
-    ldr r1, =0xffffffff
+
+    @ SPI2 PWR BKP WWD USB I2C2 I2C1 USART USART TIM4 TIM3 TIM2
+    ldr r1, =0x18e64807
     str r1, [r0, #RCC_APB1ENR]
+
+    @ ADC3 SPI1 TIM1 ADC2 ADC1 IOPE IOPD IOPC IOPB IOPA AFIO TIM1
+    ldr r1, =0x00005e7d
     str r1, [r0, #RCC_APB2ENR]
+
 
     @ enable pins on GPIOA
     ldr r0, =GPIOA
