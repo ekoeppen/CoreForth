@@ -1451,6 +1451,7 @@ QUOTE_CHARS:
     .ascii "0\001Z"
     .ascii "1\003ONE"
     .ascii "2\003TWO"
+    .ascii "4\004FOUR"
     .ascii "`\010BACKTICK"
     .ascii "~\005TILDE"
     .ascii "!\005STORE"
@@ -1736,6 +1737,8 @@ print_xt_suffix:
     .set MINUSSTORE, SUBSTORE
     .set ONEPLUS, INCR
     .set ONEMINUS, DECR
+    .set FOURPLUS, INCR4
+    .set FOURMINUS, DECR4
     .set MINUSROT, ROTROT
     .set NUMTIB, TIBSIZE
     .set TIBNUM, TIBCOUNT
@@ -1755,6 +1758,7 @@ print_xt_suffix:
     .set LINKGTNAME, LINKTONAME
     .set LINKGTFLAGS, LINKTOFLAGS
     .set SEMI, SEMICOLON
+    .set SLASH, DIV
 
 @ ---------------------------------------------------------------------
 
