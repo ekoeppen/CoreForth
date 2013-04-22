@@ -234,18 +234,18 @@ CREATE USB-CTR-HANDLERS 8 CELLS ALLOT
 
 DATA USB-DEVICE-DESCRIPTOR
      12 C,  01 C,   00 C,  00 C,
-     10 C,  01 C,   00 C,  00 C,
+     00 C,  02 C,   00 C,  00 C,
      02 C,  00 C,   00 C,  00 C,
      00 C,  40 C,   00 C,  00 C,
     0AF C,  1E C,   00 C,  00 C,
      04 C,  00 C,   00 C,  00 C,
      00 C,  02 C,   00 C,  00 C,
      00 C,  00 C,   00 C,  00 C,
-     00 C,  00 C,   00 C,  00 C,
+     01 C,  00 C,   00 C,  00 C,
 
 : EP0-SETUP ( -- )
     8080 USB-EP0R CLEAR-BITS
-    CR ." SETUP: "
+    ." SETUP: "
     0 USB-BTABLE-RX @ 2* USB-PMA +
     DUP C@ . 1+ DUP C@ . 3 + DUP H@ . 4+ DUP H@ .
     4+ H@ . 
@@ -253,6 +253,20 @@ DATA USB-DEVICE-DESCRIPTOR
     USB-DEVICE-DESCRIPTOR   0 USB-BTABLE-TX @ 2* USB-PMA +   24 CMOVE
     USB-EP0R DUP @ 0CFCF AND 3030 OR SWAP !
     ;
+
+: EP0-HANDLE-IN
+    0080 USB-EP0R CLEAR-BITS
+    ." IN"
+    ;
+: EP0-HANDLE-OUT
+    8000 USB-EP0R CLEAR-BITS
+    ." OUT"
+    USB-EP0R DUP @ 0FFCF AND 0010 OR SWAP !
+    ;
+
 : EP0-HANDLER ( ep dir -- )
-    OVER CELLS USB-EP0R + @ 0800 AND
-    IF 2DROP EP0-SETUP ELSE USB-DEFAULT-CTR THEN ;
+    NIP USB-EP0R @ DUP . 0800 AND
+    IF DROP EP0-SETUP
+        ELSE IF EP0-HANDLE-OUT ELSE EP0-HANDLE-IN THEN
+    THEN CR
+    ;
