@@ -1759,6 +1759,7 @@ print_xt_suffix:
     .set LINKGTFLAGS, LINKTOFLAGS
     .set SEMI, SEMICOLON
     .set SLASH, DIV
+    .set LTEQU, LE
 
 @ ---------------------------------------------------------------------
 

@@ -281,18 +281,23 @@ DATA USB-DEVICE-DESCRIPTOR
 : BUF-PTR CREATE 2 CELLS ALLOT DOES> DUP CELL + ;
 : BUF-PTR! ( addr n addr' n' -- )  ROT SWAP ! ! ;
 : COPY-OUT ( addr' ep n' count -- )
-   0 ROT ! SWAP 2DUP USB-BTABLE-TX# !
-   ROT @ -ROT USB-BTABLE-TX SWAP CMOVE> ;
+    0 ROT ! SWAP 2DUP USB-BTABLE-TX# !
+    ROT @ -ROT USB-BTABLE-TX SWAP CMOVE> ;
 : BUF-PTR-OUT ( addr' n' ep max -- )
-   ROT TUCK @ OVER SWAP - \ addr' ep n' max reminder
-   DUP 0< IF DROP COPY-OUT ELSE ." SPACE" THEN
-   ;
+    ROT TUCK @ OVER SWAP - \ addr' ep n' max reminder
+    DUP 0< IF DROP COPY-OUT ELSE ." SPACE" THEN
+    ;
 
 SLICE EP0-PENDING
 : EP0-PENDING-REMAINDER ( max -- remainder )
     EP0-PENDING SLICE# - DUP 0> AND ;
-: EP0-SEND-ALL ." Sending all" ;
+: EP0-SEND-ALL ." Sending all"
+    EP0-PENDING SLICE@ R> 0 USB-BTABLE-TX R@ CMOVE
+    >R 0 USB-BTABLE-TX# !
+    0 EP0-PENDING SLICE#!
+    ;
 : EP0-SEND-PARTIAL ." Send partial up to " . ;
 : EP0-SEND-PENDING ( max -- )
     EP0-PENDING SLICE# OVER <=
-    IF DROP EP0-SEND-ALL ELSE EP0-SEND-PARTIAL THEN ;
+    IF DROP EP0-SEND-ALL ELSE EP0-SEND-PARTIAL THEN
+    ;
