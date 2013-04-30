@@ -16,7 +16,7 @@ REVISION:=$(shell git log -1 --abbrev=8 --pretty=format:%h)
 	awk '{ print ".byte ", length($$0); gsub(/\\/, "\\\\\\"); gsub(/"/, "\\\""); print ".ascii \"" $$0 "\""} END{print ".align 2, 0"}' < $< > $@
 
 .s.o:
-	arm-none-eabi-as -mcpu=cortex-m3 -I../generic/ -o $@ $< 
+	arm-none-eabi-as -gdwarf2 -mcpu=cortex-m3 -I../generic/ -o $@ $< 
 
 all: coreforth.bin
 
