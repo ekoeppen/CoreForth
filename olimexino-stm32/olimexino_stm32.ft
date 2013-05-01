@@ -236,7 +236,7 @@ CREATE USB-CTR-HANDLERS 8 CELLS ALLOT
 
 DATA USB-DEVICE-DESCRIPTOR
      12 C,  01 C,   00 C,  00 C,
-     00 C,  02 C,   00 C,  00 C,
+     01 C,  01 C,   00 C,  00 C,
      02 C,  00 C,   00 C,  00 C,
      00 C,  40 C,   00 C,  00 C,
     0AF C,  1E C,   00 C,  00 C,
