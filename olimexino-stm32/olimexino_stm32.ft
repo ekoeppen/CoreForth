@@ -243,7 +243,7 @@ DATA USB-DEVICE-DESCRIPTOR
      00 C,  00 C,   00 C,  00 C,
      00 C,  00 C,   00 C,  00 C,
      00 C,  00 C,   00 C,  00 C,
-     01 C,  00 C,   00 C,  00 C,
+     00 C,  01 C,   00 C,  00 C,
 
 : SLICE   CREATE 2 CELLS ALLOT ;
 : SLICE!   TUCK CELL + ! ! ;
@@ -292,7 +292,7 @@ VARIABLE EP0-REQ-LENGTH
 
 : EP0-SETUP ( -- )
     0 EP-CLEAR-CTR 2 0 2DUP EP-TX-STATE! EP-RX-STATE!
-    ." Setup: " USB-EP0R @ .
+    ." Setup: " USB-EP0R @ . 0 USB-BTABLE-RX 10 DUMP
     0 USB-BTABLE-RX DUP C@ EP0-REQ-TYPE ! 1+ DUP C@ EP0-REQ ! 3 + DUP H@ EP0-REQ-VALUE !
         4+ DUP H@ EP0-REQ-INDEX ! 4+ H@ EP0-REQ-LENGTH !
     EP0-REQ @ DUP .
