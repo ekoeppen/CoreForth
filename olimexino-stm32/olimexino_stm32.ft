@@ -250,10 +250,39 @@ DATA DEVICE$
 
 DATA CONFIG$
      09 C,  02 C,  00 C,  00 C,
-     80 C,  00 C,  00 C,  00 C,
+     43 C,  00 C,  00 C,  00 C,
      02 C,  01 C,  00 C,  00 C,
      00 C, 0C0 C,  00 C,  00 C,
-     80 C,  00 C,  00 C,  00 C,
+     80 C,  09 C,  00 C,  00 C,
+     04 C,  00 C,  00 C,  00 C,
+     00 C,  01 C,  00 C,  00 C,
+     02 C,  02 C,  00 C,  00 C,
+     01 C,  00 C,  00 C,  00 C,
+     05 C,  24 C,  00 C,  00 C,
+     00 C,  01 C,  00 C,  00 C,
+     10 C,  05 C,  00 C,  00 C,
+     24 C,  01 C,  00 C,  00 C,
+     03 C,  01 C,  00 C,  00 C,
+     04 C,  24 C,  00 C,  00 C,
+     02 C,  06 C,  00 C,  00 C,
+     05 C,  24 C,  00 C,  00 C,
+     06 C,  00 C,  00 C,  00 C,
+     01 C,  07 C,  00 C,  00 C,
+     05 C,  82 C,  00 C,  00 C,
+     03 C,  40 C,  00 C,  00 C,
+     00 C, 0FF C,  00 C,  00 C,
+     09 C,  04 C,  00 C,  00 C,
+     01 C,  00 C,  00 C,  00 C,
+     02 C,  0A C,  00 C,  00 C,
+     00 C,  00 C,  00 C,  00 C,
+     00 C,  07 C,  00 C,  00 C,
+     05 C,  03 C,  00 C,  00 C,
+     02 C,  40 C,  00 C,  00 C,
+     00 C,  00 C,  00 C,  00 C,
+     07 C,  05 C,  00 C,  00 C,
+     81 C,  02 C,  00 C,  00 C,
+     40 C,  00 C,  00 C,  00 C,
+     00 C,  00 C,  00 C,  00 C,
 
 DATA MANUFACTURER$
      0E C,  03 C,  00 C,  00 C,
@@ -315,18 +344,18 @@ VARIABLE EP0-REQ-LENGTH
     EP0-PENDING DUP CELL + @ 2/ ROT MIN
     DUP 0 USB-BTABLE-TX# !
     2* >R
-    DUP @ 0 USB-BTABLE-TX R@ ALIGNED-MOVE>
+    DUP @ 0 USB-BTABLE-TX R@ ALIGNED ALIGNED-MOVE>
     R> SWAP /SLICE
     ;
 
 : EP0-SEND-DESCRIPTOR
     EP0-REQ-VALUE1 @ CASE
-        1 OF DEVICE$ ELSE
-        2 OF CONFIG$ ELSE
-        3 OF EP0-REQ-VALUE0 @ STRING$ ELSE
+        1 OF DEVICE$ DUP C@ 2* ELSE
+        2 OF CONFIG$ DUP CELL + H@ 2* ELSE
+        3 OF EP0-REQ-VALUE0 @ STRING$ DUP C@ 2* ELSE
         NULL$
     ENDCASE
-    DUP C@ 2* EP0-PENDING SLICE!   EP0-PENDING SLICE@ DUMP EP0-REQ-LENGTH @ EP0-SEND-PENDING
+    EP0-PENDING SLICE!  EP0-REQ-LENGTH @ EP0-SEND-PENDING
     3 0 2DUP EP-TX-STATE! EP-RX-STATE!
     ;
 
