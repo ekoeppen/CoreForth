@@ -250,8 +250,7 @@ DATA DEVICE$
 
 DATA CONFIG$
      09 C,  02 C,  00 C,  00 C,
-\     43 C,  00 C,  00 C,  00 C,
-     39 C,  00 C,  00 C,  00 C,
+     43 C,  00 C,  00 C,  00 C,
      02 C,  01 C,  00 C,  00 C,
      00 C, 0C0 C,  00 C,  00 C,
      80 C,  09 C,  00 C,  00 C,
@@ -259,11 +258,11 @@ DATA CONFIG$
      00 C,  01 C,  00 C,  00 C,
      02 C,  02 C,  00 C,  00 C,
      01 C,  00 C,  00 C,  00 C,
-\     05 C,  24 C,  00 C,  00 C,
-\     00 C,  01 C,  00 C,  00 C,
-\     10 C,  05 C,  00 C,  00 C,
-\     24 C,  01 C,  00 C,  00 C,
-\     03 C,  01 C,  00 C,  00 C,
+     05 C,  24 C,  00 C,  00 C,
+     00 C,  01 C,  00 C,  00 C,
+     10 C,  05 C,  00 C,  00 C,
+     24 C,  01 C,  00 C,  00 C,
+     03 C,  01 C,  00 C,  00 C,
      04 C,  24 C,  00 C,  00 C,
      02 C,  06 C,  00 C,  00 C,
      05 C,  24 C,  00 C,  00 C,
@@ -339,7 +338,7 @@ VARIABLE EP0-REQ-LENGTH
 : EP-CLEAR-CTR-RX ( ep -- )   00F8F EP-CLEAR-CTR ;
 
 : EP0-SEND-PENDING ( max -- )
-    EP0-PENDING DUP CELL + @ 2/ ROT MIN
+    EP0-PENDING DUP CELL + @ 2/ ROT MIN 40 MIN
     DUP 0 USB-BTABLE-TX# !
     2* >R
     DUP @ 0 USB-BTABLE-TX R@ ALIGNED ALIGNED-MOVE>
