@@ -250,7 +250,8 @@ DATA DEVICE$
 
 DATA CONFIG$
      09 C,  02 C,  00 C,  00 C,
-     43 C,  00 C,  00 C,  00 C,
+\     43 C,  00 C,  00 C,  00 C,
+     39 C,  00 C,  00 C,  00 C,
      02 C,  01 C,  00 C,  00 C,
      00 C, 0C0 C,  00 C,  00 C,
      80 C,  09 C,  00 C,  00 C,
@@ -258,11 +259,11 @@ DATA CONFIG$
      00 C,  01 C,  00 C,  00 C,
      02 C,  02 C,  00 C,  00 C,
      01 C,  00 C,  00 C,  00 C,
-     05 C,  24 C,  00 C,  00 C,
-     00 C,  01 C,  00 C,  00 C,
-     10 C,  05 C,  00 C,  00 C,
-     24 C,  01 C,  00 C,  00 C,
-     03 C,  01 C,  00 C,  00 C,
+\     05 C,  24 C,  00 C,  00 C,
+\     00 C,  01 C,  00 C,  00 C,
+\     10 C,  05 C,  00 C,  00 C,
+\     24 C,  01 C,  00 C,  00 C,
+\     03 C,  01 C,  00 C,  00 C,
      04 C,  24 C,  00 C,  00 C,
      02 C,  06 C,  00 C,  00 C,
      05 C,  24 C,  00 C,  00 C,
@@ -333,12 +334,9 @@ VARIABLE EP0-REQ-LENGTH
 : EP-RX-STATE! ( state ep -- )
     CELLS USB-EP0R + DUP @ 0BF8F AND 8080 OR ROT 0C ROTATE XOR SWAP ! ;
 
-: EP-CLEAR-CTR-TX ( ep -- )
-    CELLS USB-EP0R + DUP @ 08F0F AND SWAP ! ;
-: EP-CLEAR-CTR-RX ( ep -- )
-    CELLS USB-EP0R + DUP @ 00F8F AND SWAP ! ;
-: EP-CLEAR-CTR ( ep -- )
-    CELLS USB-EP0R + DUP @ 00F0F AND SWAP ! ;
+: EP-CLEAR-CTR ( mask ep -- )   SWAP CELLS USB-EP0R + DUP @ ROT AND SWAP ! ;
+: EP-CLEAR-CTR-TX ( ep -- )   08F0F EP-CLEAR-CTR ;
+: EP-CLEAR-CTR-RX ( ep -- )   00F8F EP-CLEAR-CTR ;
 
 : EP0-SEND-PENDING ( max -- )
     EP0-PENDING DUP CELL + @ 2/ ROT MIN
@@ -364,6 +362,9 @@ VARIABLE EP0-REQ-LENGTH
     3 0 2DUP EP-TX-STATE! EP-RX-STATE!
     ;
 
+: EP0-SET-ADDRESS-START   EP0-SEND-0LENGTH-DATA ;
+: EP0-SET-CONFIGURATION   EP0-SEND-0LENGTH-DATA ;
+
 : EP0-SETUP ( -- )
     0 EP-CLEAR-CTR-RX 2 0 2DUP EP-TX-STATE! EP-RX-STATE!
     0 USB-BTABLE-RX
@@ -371,9 +372,11 @@ VARIABLE EP0-REQ-LENGTH
     DUP C@ EP0-REQ-VALUE0 ! 1+ DUP C@ EP0-REQ-VALUE1 ! 3 +
     DUP H@ EP0-REQ-INDEX !  4+
         H@ EP0-REQ-LENGTH !
-    EP0-REQ @
-    DUP 6 = IF EP0-SEND-DESCRIPTOR THEN
-    5 = IF EP0-SEND-0LENGTH-DATA THEN
+    EP0-REQ @ CASE
+        5 OF EP0-SET-ADDRESS-START ELSE
+        6 OF EP0-SEND-DESCRIPTOR ELSE
+        9 OF EP0-SET-CONFIGURATION ELSE
+    ENDCASE
     ;
 
 : EP0-HANDLE-IN
