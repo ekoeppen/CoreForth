@@ -417,6 +417,10 @@ VARIABLE EP0-REQ-LENGTH
     0 DO OVER C@ OVER C!  1+ SWAP   1+ I 1- 1 AND 0= IF 2 + THEN SWAP   LOOP 2DROP
     ;
 
+: >PMA ( buffer pma c -- )
+    0 DO OVER C@ OVER C!  1+ I 1- 1 AND 0= IF 2 + THEN SWAP   1+ SWAP   LOOP 2DROP
+    ;
+
 : OUT-HANDLER ( ep dir -- )
     2DROP
     3 EP-CLEAR-CTR-RX
@@ -424,9 +428,18 @@ VARIABLE EP0-REQ-LENGTH
     3 3 EP-RX-STATE!
     ;
 
+: IN-HANDLER ( ep dir -- ) DROP EP-CLEAR-CTR-TX ;
+
+: USB-TX ( c-addr n -- )
+    DUP 1 USB-BTABLE-TX# !
+    1 USB-BTABLE-TX SWAP >PMA
+    3 1 EP-TX-STATE!
+    ;
+
 : USB
     1 USB-DISC! USB-INIT
     ['] EP0-HANDLER USB-CTR-HANDLERS !
+    ['] IN-HANDLER USB-CTR-HANDLERS 1 CELLS + !
     ['] OUT-HANDLER USB-CTR-HANDLERS 3 CELLS + !
     USB-ENABLE
     ;
