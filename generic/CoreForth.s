@@ -1760,6 +1760,7 @@ print_xt_suffix:
     .set SEMI, SEMICOLON
     .set SLASH, DIV
     .set LTEQU, LE
+    .set ZLTGT, ZNEQU
 
 @ ---------------------------------------------------------------------
 

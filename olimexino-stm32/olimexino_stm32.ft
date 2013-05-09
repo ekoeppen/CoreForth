@@ -413,10 +413,14 @@ VARIABLE EP0-REQ-LENGTH
     THEN
     ;
 
+: PMA> ( pma buffer c -- )
+    0 DO OVER C@ OVER C!  1+ SWAP   1+ I 1- 1 AND 0= IF 2 + THEN SWAP   LOOP 2DROP
+    ;
+
 : OUT-HANDLER ( ep dir -- )
     2DROP
     3 EP-CLEAR-CTR-RX
-    3 USB-BTABLE-RX 3 USB-BTABLE-RX# H@ 3FF AND 2* TYPE
+    3 USB-BTABLE-RX PAD 1+ 3 USB-BTABLE-RX# H@ 3FF AND DUP PAD C! PMA>
     3 3 EP-RX-STATE!
     ;
 
