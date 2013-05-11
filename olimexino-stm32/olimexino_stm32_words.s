@@ -79,9 +79,12 @@ sysclock:
     bne 1b
     NEXT
 
-    defvar "SBUF", SBUF, 16
-    defvar "SBUF-HEAD", SBUF_HEAD
-    defvar "SBUF-TAIL", SBUF_TAIL
+    defvar "CON-RX", CON_RX, 64
+    defvar "CON-RX-HEAD", CON_RX_HEAD
+    defvar "CON-RX-TAIL", CON_RX_TAIL
+    defvar "CON-TX", CON_TX, 64
+    defvar "CON-TX-HEAD", CON_TX_HEAD
+    defvar "CON-TX-TAIL", CON_TX_TAIL
     defvar "UART0-TASK", UARTZ_TASK
 
     .ltorg

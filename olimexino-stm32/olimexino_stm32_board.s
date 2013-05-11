@@ -187,6 +187,17 @@ init_board:
     ldr r1, =0xcdef89ab
     str r1, [r0, #FLASH_KEYR]
 
+    @ reset console buffers
+    movs r1, #0
+    ldr r2, =addr_CON_RX_HEAD
+    str r1, [r2]
+    ldr r2, =addr_CON_RX_TAIL
+    str r1, [r2]
+    ldr r2, =addr_CON_TX_HEAD
+    str r1, [r2]
+    ldr r2, =addr_CON_TX_TAIL
+    str r1, [r2]
+
     pop {pc}
     .ltorg
 
@@ -209,6 +220,42 @@ putchar:
     str r0, [r1, #UART_DR]
     pop {r1, r2}
     bx lr
+
+con_readkey:
+    push {r1, r2, r3, lr}
+2:  ldr r1, =addr_CON_RX_TAIL
+    ldrb r3, [r1]
+    ldr r2, =addr_CON_RX_HEAD
+    ldrb r2, [r2]
+    cmp r2, r3
+    bne 1f
+    wfi
+    b 2b
+1:  ldr r0, =addr_CON_RX
+    ldrb r0, [r0, r3]
+    adds r3, #1
+    movs r2, #0x3f
+    ands r3, r2
+    strb r3, [r1]
+    pop {r1, r2, r3, pc}
+
+con_putchar:
+    push {r1, r2, r3, lr}
+2:  ldr r3, =addr_CON_TX_TAIL
+    ldrb r3, [r3]
+    ldr r1, =addr_CON_TX_HEAD
+    ldrb r2, [r1]
+    subs r3, r2, r3
+    bgt 1f
+    wfi
+    b 2b
+1:  ldr r3, =addr_CON_TX
+    strb r0, [r3, r2]
+    adds r2, #1
+    movs r3, #0x3f
+    ands r2, r3
+    strb r2, [r1]
+    pop {r1, r2, r3, pc}
 
 @ ---------------------------------------------------------------------
 @ -- IRQ handlers -----------------------------------------------------
