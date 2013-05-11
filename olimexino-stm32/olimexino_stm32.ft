@@ -192,6 +192,13 @@ CREATE USB-CTR-HANDLERS 8 CELLS ALLOT
 : (USB-BTABLE-RX)  ( ep -- rx-offset ) 8 * 4 + USB-BTABLE-PTR ;
 : USB-BTABLE-RX  ( ep -- rx-addr ) (USB-BTABLE-RX) @ USB-PMA-PTR ;
 : USB-BTABLE-RX#  ( ep -- rx#-addr ) 8 * 6 + USB-BTABLE-PTR ;
+: PMA> ( pma buffer c -- )   0 DO OVER C@ OVER C!  1+ SWAP   1+ I 1- 1 AND 0= IF 2 + THEN SWAP   LOOP 2DROP ;
+: >PMA ( buffer pma c -- )
+    DUP 1 AND >R
+    2/ 0 DO OVER H@ OVER H! CELL + SWAP 2 + SWAP LOOP
+    R> IF SWAP C@ SWAP C! ELSE 2DROP THEN
+    ;
+
 : USB-DISC-CONFIG  GPIOC GPIO-CRH DUP @ $FFF0FFFF AND $FFF3FFFF OR SWAP ! ;
 : USB-DISC!
     CELLS GPIOC GPIO-BRR SWAP - $00001000 SWAP ! ;
@@ -238,85 +245,85 @@ DATA NULL$
      00 C,
 
 DATA DEVICE$
-     12 C,  01 C,  00 C,  00 C,
-     01 C,  01 C,  00 C,  00 C,
-     02 C,  00 C,  00 C,  00 C,
-     00 C,  40 C,  00 C,  00 C,
-    0BA C,  15 C,  00 C,  00 C,
-     4E C, 0C0 C,  00 C,  00 C,
-     00 C,  00 C,  00 C,  00 C,
-     01 C,  02 C,  00 C,  00 C,
-     00 C,  01 C,  00 C,  00 C,
+     12 C,  01 C,
+     01 C,  01 C,
+     02 C,  00 C,
+     00 C,  40 C,
+    0BA C,  15 C,
+     4E C, 0C0 C,
+     00 C,  00 C,
+     01 C,  02 C,
+     00 C,  01 C,
 
 DATA CONFIG$
-     09 C,  02 C,  00 C,  00 C,
-\     43 C,  00 C,  00 C,  00 C,
-     39 C,  00 C,  00 C,  00 C,
-     02 C,  01 C,  00 C,  00 C,
-     00 C, 0C0 C,  00 C,  00 C,
-     80 C,  09 C,  00 C,  00 C,
-     04 C,  00 C,  00 C,  00 C,
-     00 C,  01 C,  00 C,  00 C,
-     02 C,  02 C,  00 C,  00 C,
-     01 C,  00 C,  00 C,  00 C,
-\     05 C,  24 C,  00 C,  00 C,
-\     00 C,  01 C,  00 C,  00 C,
-\     10 C,  05 C,  00 C,  00 C,
-\     24 C,  01 C,  00 C,  00 C,
-\     03 C,  01 C,  00 C,  00 C,
-     04 C,  24 C,  00 C,  00 C,
-     02 C,  06 C,  00 C,  00 C,
-     05 C,  24 C,  00 C,  00 C,
-     06 C,  00 C,  00 C,  00 C,
-     01 C,  07 C,  00 C,  00 C,
-     05 C,  82 C,  00 C,  00 C,
-     03 C,  40 C,  00 C,  00 C,
-     00 C, 0FF C,  00 C,  00 C,
-     09 C,  04 C,  00 C,  00 C,
-     01 C,  00 C,  00 C,  00 C,
-     02 C,  0A C,  00 C,  00 C,
-     00 C,  00 C,  00 C,  00 C,
-     00 C,  07 C,  00 C,  00 C,
-     05 C,  03 C,  00 C,  00 C,
-     02 C,  40 C,  00 C,  00 C,
-     00 C,  00 C,  00 C,  00 C,
-     07 C,  05 C,  00 C,  00 C,
-     81 C,  02 C,  00 C,  00 C,
-     40 C,  00 C,  00 C,  00 C,
-     00 C,  00 C,  00 C,  00 C,
+     09 C,  02 C,
+\     43 C,  00 C,
+     39 C,  00 C,
+     02 C,  01 C,
+     00 C, 0C0 C,
+     80 C,  09 C,
+     04 C,  00 C,
+     00 C,  01 C,
+     02 C,  02 C,
+     01 C,  00 C,
+\     05 C,  24 C,
+\     00 C,  01 C,
+\     10 C,  05 C,
+\     24 C,  01 C,
+\     03 C,  01 C,
+     04 C,  24 C,
+     02 C,  06 C,
+     05 C,  24 C,
+     06 C,  00 C,
+     01 C,  07 C,
+     05 C,  82 C,
+     03 C,  40 C,
+     00 C, 0FF C,
+     09 C,  04 C,
+     01 C,  00 C,
+     02 C,  0A C,
+     00 C,  00 C,
+     00 C,  07 C,
+     05 C,  03 C,
+     02 C,  40 C,
+     00 C,  00 C,
+     07 C,  05 C,
+     81 C,  02 C,
+     40 C,  00 C,
+     00 C,  00 C,
 
 DATA MANUFACTURER$
-     0E C,  03 C,  00 C,  00 C,
-     4F C,  00 C,  00 C,  00 C,
-     6C C,  00 C,  00 C,  00 C,
-     69 C,  00 C,  00 C,  00 C,
-     6D C,  00 C,  00 C,  00 C,
-     65 C,  00 C,  00 C,  00 C,
-     78 C,  00 C,  00 C,  00 C,
+     0E C,  03 C,
+     4F C,  00 C,
+     6C C,  00 C,
+     69 C,  00 C,
+     6D C,  00 C,
+     65 C,  00 C,
+     78 C,  00 C,
 
 DATA PRODUCT$
-     20 C,  03 C,  00 C,  00 C,
-     4F C,  00 C,  00 C,  00 C,
-     6C C,  00 C,  00 C,  00 C,
-     69 C,  00 C,  00 C,  00 C,
-     6D C,  00 C,  00 C,  00 C,
-     65 C,  00 C,  00 C,  00 C,
-     78 C,  00 C,  00 C,  00 C,
-     69 C,  00 C,  00 C,  00 C,
-     6E C,  00 C,  00 C,  00 C,
-     6F C,  00 C,  00 C,  00 C,
-     2D C,  00 C,  00 C,  00 C,
-     53 C,  00 C,  00 C,  00 C,
-     54 C,  00 C,  00 C,  00 C,
-     4D C,  00 C,  00 C,  00 C,
-     33 C,  00 C,  00 C,  00 C,
-     32 C,  00 C,  00 C,  00 C,
+     20 C,  03 C,
+     4F C,  00 C,
+     6C C,  00 C,
+     69 C,  00 C,
+     6D C,  00 C,
+     65 C,  00 C,
+     78 C,  00 C,
+     69 C,  00 C,
+     6E C,  00 C,
+     6F C,  00 C,
+     2D C,  00 C,
+     53 C,  00 C,
+     54 C,  00 C,
+     4D C,  00 C,
+     33 C,  00 C,
+     32 C,  00 C,
 
 DATA LINE-CODING$
-     00 C, 0C2 C,  00 C,  00 C,
-     01 C,  00 C,  00 C,  00 C,
-     01 C,  00 C,  00 C,  00 C,
-     08 C,  00 C,  00 C,  00 C,
+     00 C, 0C2 C,
+     01 C,  00 C,
+     01 C,  00 C,
+     08 C,  00 C,
 
 : STRING$   1 = IF MANUFACTURER$ ELSE PRODUCT$ THEN ;
 
@@ -346,18 +353,18 @@ VARIABLE EP0-REQ-LENGTH
 : EP-SET-ADDRESS ( addr ep -- )   CELLS USB-EP0R + TUCK @ 0F00 AND 8080 OR OR SWAP ! ;
 
 : EP0-SEND-PENDING ( max -- )
-    EP0-PENDING DUP CELL + @ 2/ ROT MIN 40 MIN
+    EP0-PENDING DUP CELL + @ ROT MIN 40 MIN
     DUP 0 USB-BTABLE-TX# !
-    2* >R
-    DUP @ 0 USB-BTABLE-TX R@ ALIGNED ALIGNED-MOVE>
+    >R
+    DUP @ 0 USB-BTABLE-TX R@ >PMA
     R> SWAP /SLICE
     ;
 
 : EP0-SEND-DESCRIPTOR
     EP0-REQ-VALUE1 @ CASE
-        1 OF DEVICE$ DUP C@ 2* ELSE
-        2 OF CONFIG$ DUP CELL + H@ 2* ELSE
-        3 OF EP0-REQ-VALUE0 @ STRING$ DUP C@ 2* ELSE
+        1 OF DEVICE$ DUP C@ ELSE
+        2 OF CONFIG$ DUP 2 + H@ ELSE
+        3 OF EP0-REQ-VALUE0 @ STRING$ DUP C@ ELSE
         NULL$
     ENDCASE
     EP0-PENDING SLICE!  EP0-REQ-LENGTH @ EP0-SEND-PENDING
@@ -411,14 +418,6 @@ VARIABLE EP0-REQ-LENGTH
     NIP IF USB-EP0R @ 0800 AND IF EP0-SETUP ELSE EP0-HANDLE-OUT THEN
     ELSE EP0-HANDLE-IN
     THEN
-    ;
-
-: PMA> ( pma buffer c -- )
-    0 DO OVER C@ OVER C!  1+ SWAP   1+ I 1- 1 AND 0= IF 2 + THEN SWAP   LOOP 2DROP
-    ;
-
-: >PMA ( buffer pma c -- )
-    0 DO OVER C@ OVER C!  1+ I 1- 1 AND 0= IF 2 + THEN SWAP   1+ SWAP   LOOP 2DROP
     ;
 
 : OUT-HANDLER ( ep dir -- )
