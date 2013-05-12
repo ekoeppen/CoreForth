@@ -164,8 +164,11 @@ init_board:
     str r1, [r0, #GPIO_CRH]
 
     @ enable UART
+    ldr r0, =(NVIC + NVIC_SETENA_BASE)
+    mov r1, #0x20
+    str r1, [r0, #4]
     ldr r0, =UART1
-    ldr r1, =0x200c
+    ldr r1, =0x20ac
     str r1, [r0, #UART_CR1]
 
     @ set UART baud rate
@@ -189,19 +192,19 @@ init_board:
 
     @ reset console buffers
     movs r1, #0
-    ldr r2, =addr_CON_RX_HEAD
-    str r1, [r2]
     ldr r2, =addr_CON_RX_TAIL
     str r1, [r2]
-    ldr r2, =addr_CON_TX_HEAD
+    ldr r2, =addr_CON_RX_HEAD
     str r1, [r2]
     ldr r2, =addr_CON_TX_TAIL
+    str r1, [r2]
+    ldr r2, =addr_CON_TX_HEAD
     str r1, [r2]
 
     pop {pc}
     .ltorg
 
-readkey:
+readkey_polled:
     push {r1, r2}
     ldr r1, =UART1
 1:  ldr r2, [r1, #UART_SR]
@@ -211,7 +214,7 @@ readkey:
     pop {r1, r2}
     bx lr
 
-putchar:
+putchar_polled:
     push {r1, r2}
     ldr r1, =UART1
 1:  ldr r2, [r1, #UART_SR]
@@ -221,11 +224,12 @@ putchar:
     pop {r1, r2}
     bx lr
 
-con_readkey:
+readkey:
+readkey_int:
     push {r1, r2, r3, lr}
-2:  ldr r1, =addr_CON_RX_TAIL
+    ldr r1, =addr_CON_RX_TAIL
     ldrb r3, [r1]
-    ldr r2, =addr_CON_RX_HEAD
+2:  ldr r2, =addr_CON_RX_HEAD
     ldrb r2, [r2]
     cmp r2, r3
     bne 1f
@@ -234,28 +238,34 @@ con_readkey:
 1:  ldr r0, =addr_CON_RX
     ldrb r0, [r0, r3]
     adds r3, #1
-    movs r2, #0x3f
-    ands r3, r2
+    ands r3, #0x3f
     strb r3, [r1]
     pop {r1, r2, r3, pc}
 
-con_putchar:
+putchar:
+putchar_int:
     push {r1, r2, r3, lr}
-2:  ldr r3, =addr_CON_TX_TAIL
-    ldrb r3, [r3]
     ldr r1, =addr_CON_TX_HEAD
     ldrb r2, [r1]
-    subs r3, r2, r3
-    bgt 1f
+    ldr r3, =addr_CON_TX_TAIL
+    ldrb r3, [r3]
+    cmp r2, r3
+    bne 3f
+    ldr r1, =(UART1 + UART_DR)
+    strb r0, [r1]
+    b 4f
+3:  adds r2, #1
+    ands r2, #3f
+    strb r2, [r1]
+2:  ldr r3, =addr_CON_TX_TAIL
+    ldrb r3, [r3]
+    cmp r2, r3
+    bne 1f
     wfi
     b 2b
 1:  ldr r3, =addr_CON_TX
     strb r0, [r3, r2]
-    adds r2, #1
-    movs r3, #0x3f
-    ands r2, r3
-    strb r2, [r1]
-    pop {r1, r2, r3, pc}
+4:  pop {r1, r2, r3, pc}
 
 @ ---------------------------------------------------------------------
 @ -- IRQ handlers -----------------------------------------------------
@@ -308,6 +318,40 @@ debugmon_handler:
 
 pendsv_handler:
     b .
+
+usart1_handler:
+    ldr r1, =(UART1 + UART_SR)
+    ldr r1, [r1]
+    tst r1, #0x20
+    beq 1f
+    ldr r0, =addr_CON_RX
+    ldr r1, =addr_CON_RX_HEAD
+    ldr r2, [r1]
+    ldr r3, =(UART1 + UART_DR)
+    ldrb r3, [r3]
+    strb r3, [r0, r2]
+    adds r2, #1
+    ands r2, #0x3f
+    strb r2, [r1]
+1:  ldr r1, =(UART1 + UART_SR)
+    ldr r1, [r1]
+    tst r1, #0x80
+    beq 2f
+    ldr r1, =addr_CON_TX_HEAD
+    ldr r1, [r1]
+    ldr r2, =addr_CON_TX_TAIL
+    ldr r3, [r2]
+    cmp r1, r3
+    beq 2f
+    ldr r0, =addr_CON_TX
+    ldrb r1, [r0, r3]
+    ldr r0, =(UART1 + UART_DR)
+    strb r1, [r0]
+    adds r3, #1
+    ands r3, #0x3f
+    strb r3, [r2]
+
+2:  bx lr
 
 systick_handler:
 adc1_2_handler:
@@ -363,7 +407,6 @@ tim8_trg_com_handler:
 tim8_up_handler:
 uart4_handler:
 uart5_handler:
-usart1_handler:
 usart2_handler:
 usart3_handler:
 usb_hp_can_tx_handler:
