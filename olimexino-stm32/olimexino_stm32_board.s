@@ -168,7 +168,7 @@ init_board:
     mov r1, #0x20
     str r1, [r0, #4]
     ldr r0, =UART1
-    ldr r1, =0x20ac
+    ldr r1, =0x206c
     str r1, [r0, #UART_CR1]
 
     @ set UART baud rate
@@ -251,8 +251,7 @@ putchar_int:
     ldrb r3, [r3]
     cmp r2, r3
     bne 3f
-    ldr r1, =(UART1 + UART_DR)
-    strb r0, [r1]
+    bl putchar_polled
     b 4f
 3:  adds r2, #1
     ands r2, #3f
@@ -335,7 +334,7 @@ usart1_handler:
     strb r2, [r1]
 1:  ldr r1, =(UART1 + UART_SR)
     ldr r1, [r1]
-    tst r1, #0x80
+    tst r1, #0x60
     beq 2f
     ldr r1, =addr_CON_TX_HEAD
     ldr r1, [r1]
@@ -350,8 +349,10 @@ usart1_handler:
     adds r3, #1
     ands r3, #0x3f
     strb r3, [r2]
-
-2:  bx lr
+2:  movs r0, #0
+    ldr r1, =(UART1 + UART_SR)
+    str r0, [r1]
+    bx lr
 
 systick_handler:
 adc1_2_handler:
