@@ -61,7 +61,6 @@ _start:
     .long tim2_handler + 1
     .long tim3_handler + 1
     .long tim4_handler + 1
-end_of_irq:
     .long i2c1_ev_handler + 1
     .long i2c1_er_handler + 1
     .long i2c2_ev_handler + 1
@@ -91,6 +90,7 @@ end_of_irq:
     .long dma2_channel2_handler + 1
     .long dma2_channel3_handler + 1
     .long dma2_channel4_5_handler + 1
+end_of_irq:
 
     .org 0x150
 
@@ -214,6 +214,7 @@ readkey_polled:
     pop {r1, r2}
     bx lr
 
+putchar:
 putchar_polled:
     push {r1, r2}
     ldr r1, =UART1
@@ -242,7 +243,6 @@ readkey_int:
     strb r3, [r1]
     pop {r1, r2, r3, pc}
 
-putchar:
 putchar_int:
     push {r1, r2, r3, lr}
     ldr r1, =addr_CON_TX_HEAD
@@ -287,9 +287,9 @@ generic_forth_handler:
     ldr r6, =irq_stack_top
     mov r7, r0
     ldr r0, [r7]
-    add r7, r7, #4
+    adds r7, #4
     ldr r1, [r0]
-    add r1, r1, #1
+    adds r1, #1
     bx r1
 1:  bx lr
 
@@ -335,7 +335,7 @@ usart1_handler:
 1:  ldr r1, =(UART1 + UART_SR)
     ldr r1, [r1]
     tst r1, #0x60
-    beq 2f
+    b 2f
     ldr r1, =addr_CON_TX_HEAD
     ldr r1, [r1]
     ldr r2, =addr_CON_TX_TAIL
