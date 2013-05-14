@@ -61,6 +61,7 @@ _start:
     .long tim2_handler + 1
     .long tim3_handler + 1
     .long tim4_handler + 1
+end_of_irq:
     .long i2c1_ev_handler + 1
     .long i2c1_er_handler + 1
     .long i2c2_ev_handler + 1
@@ -90,7 +91,6 @@ _start:
     .long dma2_channel2_handler + 1
     .long dma2_channel3_handler + 1
     .long dma2_channel4_5_handler + 1
-end_of_irq:
 
     .org 0x150
 
