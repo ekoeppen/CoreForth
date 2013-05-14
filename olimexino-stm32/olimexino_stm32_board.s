@@ -131,19 +131,19 @@ init_board:
 
     @ reset the interrupt vector table
     ldr r0, =addr_IVT
-    mov r1, #0
-    mov r2, #(end_of_irq - _start) / 4
+    movs r1, #0
+    movs r2, #(end_of_irq - _start) / 4
 1:  str r1, [r0], #4
     subs r2, r2, #1
     bgt 1b
 
     @ enable PIC interrupts
-    mov r0, #0
+    movs r0, #0
     msr primask, r0
-    mov r0, #0
+    movs r0, #0
     msr basepri, r0
     ldr r0, =(NVIC + NVIC_SETENA_BASE)
-    mov r1, #0
+    movs r1, #0
     str r1, [r0]
 
     @ enable clocks
@@ -165,7 +165,7 @@ init_board:
 
     @ enable UART
     ldr r0, =(NVIC + NVIC_SETENA_BASE)
-    mov r1, #0x20
+    movs r1, #0x20
     str r1, [r0, #4]
     ldr r0, =UART1
     ldr r1, =0x206c
@@ -180,7 +180,7 @@ init_board:
     ldr r1, =0x00ffffff
     str r1, [r0]
     ldr r0, =STCTRL
-    mov r1, #5
+    movs r1, #5
     str r1, [r0]
 
     @ unlock flash controller
