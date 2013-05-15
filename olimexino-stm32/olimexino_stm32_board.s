@@ -98,14 +98,6 @@ end_of_irq:
 @ -- Board specific code and initialization ---------------------------
 
 init_board:
-    @ clear RAM
-    ldr r0, =0x20000000
-    ldr r1, =(0x5000 / 4)
-    movs r2, #0
-1:  str r2, [r0], #4
-    subs r1, #1
-    bgt 1b
-
     push {lr}
 
     @ switch to 72MHz clock
@@ -165,11 +157,21 @@ init_board:
     ldr r1, =0x00005e7d
     str r1, [r0, #RCC_APB2ENR]
 
-
     @ enable pins on GPIOA
     ldr r0, =GPIOA
     ldr r1, =0x444444b4
     str r1, [r0, #GPIO_CRH]
+
+    @ reset console buffers
+    movs r1, #0
+    ldr r2, =addr_CON_RX_TAIL
+    str r1, [r2]
+    ldr r2, =addr_CON_RX_HEAD
+    str r1, [r2]
+    ldr r2, =addr_CON_TX_TAIL
+    str r1, [r2]
+    ldr r2, =addr_CON_TX_HEAD
+    str r1, [r2]
 
     @ enable UART
     ldr r0, =(NVIC + NVIC_SETENA_BASE)
@@ -197,17 +199,6 @@ init_board:
     str r1, [r0, #FLASH_KEYR]
     ldr r1, =0xcdef89ab
     str r1, [r0, #FLASH_KEYR]
-
-    @ reset console buffers
-    movs r1, #0
-    ldr r2, =addr_CON_RX_TAIL
-    str r1, [r2]
-    ldr r2, =addr_CON_RX_HEAD
-    str r1, [r2]
-    ldr r2, =addr_CON_TX_TAIL
-    str r1, [r2]
-    ldr r2, =addr_CON_TX_HEAD
-    str r1, [r2]
 
     pop {pc}
     .ltorg
