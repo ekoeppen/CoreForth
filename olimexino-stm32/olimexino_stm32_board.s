@@ -98,6 +98,14 @@ end_of_irq:
 @ -- Board specific code and initialization ---------------------------
 
 init_board:
+    @ clear RAM
+    ldr r0, =0x20000000
+    ldr r1, =(0x5000 / 4)
+    movs r2, #0
+1:  str r2, [r0], #4
+    subs r1, #1
+    bgt 1b
+
     push {lr}
 
     @ switch to 72MHz clock
