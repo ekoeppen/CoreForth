@@ -222,7 +222,6 @@ readkey_polled:
     pop {r1, r2}
     bx lr
 
-putchar:
 putchar_polled:
     push {r1, r2}
     ldr r1, =UART1
@@ -237,9 +236,9 @@ readkey:
 readkey_int:
     push {r1, r2, r3, lr}
     ldr r1, =addr_CON_RX_TAIL
-    ldrb r3, [r1]
+    ldr r3, [r1]
 2:  ldr r2, =addr_CON_RX_HEAD
-    ldrb r2, [r2]
+    ldr r2, [r2]
     cmp r2, r3
     bne 1f
     wfi
@@ -248,24 +247,25 @@ readkey_int:
     ldrb r0, [r0, r3]
     adds r3, #1
     ands r3, #0x3f
-    strb r3, [r1]
+    str r3, [r1]
     pop {r1, r2, r3, pc}
 
+putchar:
 putchar_int:
     push {r1, r2, r3, lr}
     ldr r1, =addr_CON_TX_HEAD
-    ldrb r2, [r1]
+    ldr r2, [r1]
     ldr r3, =addr_CON_TX_TAIL
-    ldrb r3, [r3]
+    ldr r3, [r3]
     cmp r2, r3
     bne 3f
     bl putchar_polled
     b 4f
 3:  adds r2, #1
     ands r2, #3f
-    strb r2, [r1]
+    str r2, [r1]
 2:  ldr r3, =addr_CON_TX_TAIL
-    ldrb r3, [r3]
+    ldr r3, [r3]
     cmp r2, r3
     bne 1f
     wfi
@@ -305,7 +305,10 @@ nmi_handler:
     b .
 
 hardfault_handler:
-    mrs r0, psp
+    tst lr, #4
+    ite eq
+    mrseq r0, msp
+    mrsne r0, psp
     b .
 
 memmanage_handler:
@@ -339,11 +342,11 @@ usart1_handler:
     strb r3, [r0, r2]
     adds r2, #1
     ands r2, #0x3f
-    strb r2, [r1]
+    str r2, [r1]
 1:  ldr r1, =(UART1 + UART_SR)
     ldr r1, [r1]
     tst r1, #0x60
-    b 2f
+    beq 2f
     ldr r1, =addr_CON_TX_HEAD
     ldr r1, [r1]
     ldr r2, =addr_CON_TX_TAIL
@@ -356,11 +359,12 @@ usart1_handler:
     strb r1, [r0]
     adds r3, #1
     ands r3, #0x3f
-    strb r3, [r2]
+    str r3, [r2]
 2:  movs r0, #0
     ldr r1, =(UART1 + UART_SR)
     str r0, [r1]
     bx lr
+    .align 2,0
 
 systick_handler:
 adc1_2_handler:
