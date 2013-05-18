@@ -249,19 +249,21 @@ putchar_int:
     ldr r3, =addr_CON_TX_TAIL
     ldr r3, [r3]
     cmp r2, r3
-    bne 3f
+    bne 2f
     bl putchar_polled
     b 4f
-3:  adds r2, #1
-    ands r2, #3f
-    str r2, [r1]
 2:  ldr r3, =addr_CON_TX_TAIL
-    ldr r3, [r3]
+    adds r2, #1
+    ands r2, #0x3f
+3:  ldr r3, [r3]
     cmp r2, r3
     bne 1f
     wfi
-    b 2b
-1:  ldr r3, =addr_CON_TX
+    b 3b
+1:  str r2, [r1]
+    subs r2, #1
+    ands r2, #0x3f
+    ldr r3, =addr_CON_TX
     strb r0, [r3, r2]
 4:  pop {r1, r2, r3, pc}
 

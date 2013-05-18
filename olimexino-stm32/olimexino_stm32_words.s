@@ -79,12 +79,23 @@ sysclock:
     bne 1b
     NEXT
 
-    defvar "CON-RX", CON_RX, 64
-    defvar "CON-RX-HEAD", CON_RX_HEAD
+    defcode "CON-RX!", CON_RXSTORE
+    pop {r3}
+    ldr r0, =addr_CON_RX
+    ldr r1, =addr_CON_RX_HEAD
+    ldr r2, [r1]
+    strb r3, [r0, r2]
+    adds r2, #1
+    ands r2, #0x3f
+    str r2, [r1]
+    NEXT
+
     defvar "CON-RX-TAIL", CON_RX_TAIL
-    defvar "CON-TX", CON_TX, 64
-    defvar "CON-TX-HEAD", CON_TX_HEAD
+    defvar "CON-RX-HEAD", CON_RX_HEAD
+    defvar "CON-RX", CON_RX, 64
     defvar "CON-TX-TAIL", CON_TX_TAIL
+    defvar "CON-TX-HEAD", CON_TX_HEAD
+    defvar "CON-TX", CON_TX, 64
     defvar "UART0-TASK", UARTZ_TASK
 
     .ltorg
