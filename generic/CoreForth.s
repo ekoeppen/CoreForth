@@ -1019,31 +1019,39 @@ fill_done:
     defword "TYPE", TYPE
     .word TICKTYPE, FETCH, EXECUTE, EXIT
 
+    defword "4NUM", FOURNUM
+    .word NUM, NUM, NUM, NUM, EXIT
+
+    defword "(DUMP-ADDR)", XDUMP_ADDR
+    .word CR, DUP, LTNUM, FOURNUM, FOURNUM, NUMGT, TYPE, LIT, 58, EMIT, SPACE, EXIT
+
     defword "DUMP", DUMP
-    .word QDUP, QBRANCH, dump_end - .
+    .word BASE, FETCH, TOR, HEX, QDUP, QBRANCH, dump_end - .
     .word SWAP
 dump_start_line:
-    .word CR, DUP, DOTUH, LIT, 58, EMIT, SPACE
+    .word XDUMP_ADDR
 dump_line:
-    .word DUP, FETCHBYTE, DOTUH, SPACE, INCR
+    .word DUP, FETCHBYTE, LTNUM, NUM, NUM, NUMGT, TYPE, SPACE, INCR
     .word SWAP, DECR, QDUP, QBRANCH, dump_end - .
     .word SWAP, DUP, LIT, 7, AND, QBRANCH, dump_start_line - .
     .word BRANCH, dump_line - .
 dump_end:
-    .word DROP, EXIT
+    .word DROP, RFROM, BASE, STORE, EXIT
 
     defword "DUMPW", DUMPW
-    .word QDUP, QBRANCH, dumpw_end - .
+    .word BASE, FETCH, TOR, HEX, QDUP, QBRANCH, dumpw_end_final - .
     .word SWAP
 dumpw_start_line:
-    .word CR, DUP, DOTUH, LIT, 58, EMIT, SPACE
+    .word XDUMP_ADDR
 dumpw_line:
-    .word DUP, FETCH, DOTUH, SPACE, INCR4
+    .word DUP, FETCH, LTNUM, FOURNUM, FOURNUM, NUMGT, TYPE, SPACE, INCR4
     .word SWAP, DECR4, DUP, ZGT, QBRANCH, dumpw_end - .
     .word SWAP, DUP, LIT, 0x1f, AND, QBRANCH, dumpw_start_line - .
     .word BRANCH, dumpw_line - .
 dumpw_end:
-    .word TWODROP, EXIT
+    .word DROP
+dumpw_end_final:
+    .word DROP, RFROM, BASE, STORE, EXIT
 
     defword "SKIP", SKIP
     .word TOR
