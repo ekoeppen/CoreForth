@@ -691,6 +691,15 @@ fill_done:
     push {r2}
     NEXT
 
+    defcode "U/MOD", UDIVMOD
+    pop {r1}
+    pop {r0}
+    udiv r2, r0, r1
+    mls r0, r1, r2, r0
+    push {r0}
+    push {r2}
+    NEXT
+
     defcode "/", DIV
     pop {r1}
     pop {r0}
@@ -702,6 +711,14 @@ fill_done:
     pop {r1}
     pop {r0}
     sdiv r2, r0, r1
+    mls r0, r1, r2, r0
+    push {r0}
+    NEXT
+
+    defcode "UMOD", UMOD
+    pop {r1}
+    pop {r0}
+    udiv r2, r0, r1
     mls r0, r1, r2, r0
     push {r0}
     NEXT
