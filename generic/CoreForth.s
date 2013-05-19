@@ -136,6 +136,7 @@ cold_start:
     .word LIT, NOOP, DUP, TICKWAIT_KEY, STORE, TICKFINISH_OUTPUT, STORE
     .word LIT, XKEY, TICKKEY, STORE
     .word LIT, XEMIT, TICKEMIT, STORE
+    .word LIT, XTYPE, TICKTYPE, STORE
     .word LIT, READ_LINE, TICKACCEPT, STORE
     .word COLD
     .ltorg
@@ -917,11 +918,6 @@ fill_done:
     defword "SPACE", SPACE
     .word BL, EMIT, EXIT
 
-    defcode "TYPE", TYPE
-    pop {r1}
-    pop {r0}
-    bl putstring
-    NEXT
 
     defcode ".H", DOTH
     mov r0, '$'
@@ -983,11 +979,20 @@ fill_done:
     defword "(EMIT)", XEMIT
     .word FINISH_OUTPUT, PUTCHAR, EXIT
 
+    defcode "(TYPE)", XTYPE
+    pop {r1}
+    pop {r0}
+    bl putstring
+    NEXT
+
     defword "ACCEPT", ACCEPT
     .word TICKACCEPT, FETCH, EXECUTE, EXIT
 
     defword "EMIT", EMIT
     .word TICKEMIT, FETCH, EXECUTE, EXIT
+
+    defword "TYPE", TYPE
+    .word TICKTYPE, FETCH, EXECUTE, EXIT
 
     defword "DUMP", DUMP
     .word QDUP, QBRANCH, dump_end - .
@@ -1715,6 +1720,7 @@ print_xt_suffix:
     defvar "\047KEY", TICKKEY
     defvar "\047ACCEPT", TICKACCEPT
     defvar "\047EMIT", TICKEMIT
+    defvar "\047TYPE", TICKTYPE
     defvar "\047WAIT-KEY", TICKWAIT_KEY
     defvar "\047FINISH-OUTPUT", TICKFINISH_OUTPUT
 
