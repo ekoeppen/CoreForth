@@ -918,6 +918,34 @@ fill_done:
     defword "SPACE", SPACE
     .word BL, EMIT, EXIT
 
+    defword "HOLD", HOLD
+    .word LIT, 1, HP, SUBSTORE, HP, FETCH, CSTORE, EXIT
+
+    defword "<#", LTNUM
+    .word PAD, HP, STORE, EXIT
+
+    defword ">DIGIT", TODIGIT
+    .word DUP, LIT, 9, GT, LIT, 7, AND, PLUS, LIT, 48, PLUS, EXIT
+
+    defword "#", NUM
+    .word BASE, FETCH, UDIVMOD, SWAP, TODIGIT, HOLD, EXIT
+
+    defword "#S", NUMS
+1:  .word NUM, DUP, ZEQU, QBRANCH, 1b - ., EXIT
+
+    defword "#>", NUMGT
+    .word DROP, HP, FETCH, PAD, OVER, SUB, EXIT
+
+    defword "SIGN", SIGN
+    .word ZLT, QBRANCH, 1f - .
+    .word LIT, '-', HOLD
+1:  .word EXIT
+
+    defword "U.", UDOT
+    .word LTNUM, NUMS, NUMGT, TYPE, SPACE, EXIT
+
+    defword ".", DOT
+    .word LTNUM, DUP, ABS, NUMS, SWAP, SIGN, NUMGT, TYPE, SPACE, EXIT
 
     defcode ".H", DOTH
     mov r0, '$'
@@ -946,9 +974,6 @@ fill_done:
     pop {r0}
     bl puthexnumber
     NEXT
-
-    defword ".", DOT
-    .word DOTH, SPACE, EXIT
 
     defcode "READ-KEY", READ_KEY
     bl readkey
@@ -1717,6 +1742,7 @@ print_xt_suffix:
     defvar "SOURCE#", SOURCECOUNT
     defvar ">SOURCE", SOURCEINDEX
     defvar "UP", UP
+    defvar "HP", HP
     defvar "\047KEY", TICKKEY
     defvar "\047ACCEPT", TICKACCEPT
     defvar "\047EMIT", TICKEMIT
