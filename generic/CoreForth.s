@@ -943,25 +943,6 @@ fill_done:
     defword ".", DOT
     .word LTNUM, DUP, ABS, NUMS, SWAP, SIGN, NUMGT, TYPE, SPACE, EXIT
 
-    defcode ".H", DOTH
-    mov r0, '$'
-    bl putchar
-    pop {r0}
-    bl putsignedhexnumber
-    NEXT
-
-    defcode ".UH", DOTUH
-    mov r0, '$'
-    bl putchar
-    pop {r0}
-    bl puthexnumber
-    NEXT
-
-    defcode ".D", DOTD
-    pop {r0}
-    bl putnumber
-    NEXT
-
     defcode ".UX", DOTUX
     mov r0, '0'
     bl putchar
