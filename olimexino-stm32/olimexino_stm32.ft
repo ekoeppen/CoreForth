@@ -400,6 +400,12 @@ VARIABLE EP0-REQ-LENGTH
     USB-ENABLE
     ;
 
+: USB-CON
+    USB
+    ['] USB-EMIT 'EMIT !
+    ['] USB-TX 'TYPE !
+    ;
+
 : RINGBUF CREATE DUP , 0 , 0 , ALLOT ;
 : RINGBUF-EMPTY? 4+ DUP 4+ @ SWAP @ = ;
 : RINGBUF-FULL? DUP @ >R 4+ DUP 4+ @ 1+ R> SWAP 1- AND @ = ;
