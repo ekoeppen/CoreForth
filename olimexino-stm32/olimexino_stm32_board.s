@@ -252,7 +252,7 @@ putchar_int:
     bne 2f
     bl putchar_polled
     b 4f
-2:  ldr r3, =addr_CON_TX_TAIL
+2:  ldr r3, =addr_CON_TX_HEAD
     adds r2, #1
     ands r2, #0x3f
 3:  ldr r3, [r3]
