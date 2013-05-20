@@ -133,11 +133,7 @@ cold_start:
     .word LIT, 10, BASE, STORE
     .word LIT, data_start, DP, STORE
     .word LIT, last_word, LATEST, STORE
-    .word LIT, NOOP, DUP, TICKWAIT_KEY, STORE, TICKFINISH_OUTPUT, STORE
-    .word LIT, XKEY, TICKKEY, STORE
-    .word LIT, XEMIT, TICKEMIT, STORE
-    .word LIT, XTYPE, TICKTYPE, STORE
-    .word LIT, READ_LINE, TICKACCEPT, STORE
+    .word SERIAL_CON
     .word COLD
     .ltorg
 
@@ -1021,6 +1017,15 @@ fill_done:
 
     defword "4NUM", FOURNUM
     .word NUM, NUM, NUM, NUM, EXIT
+
+    defword "SERIAL-CON", SERIAL_CON
+    .word LIT, NOOP, DUP, TICKWAIT_KEY, STORE, TICKFINISH_OUTPUT, STORE
+    .word LIT, XKEY, TICKKEY, STORE
+    .word LIT, XEMIT, TICKEMIT, STORE
+    .word LIT, XTYPE, TICKTYPE, STORE
+    .word LIT, READ_LINE, TICKACCEPT, STORE
+    .word EXIT
+
 
     defword "(DUMP-ADDR)", XDUMP_ADDR
     .word CR, DUP, LTNUM, FOURNUM, FOURNUM, NUMGT, TYPE, LIT, 58, EMIT, SPACE, EXIT
