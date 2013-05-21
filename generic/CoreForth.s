@@ -1804,6 +1804,7 @@ print_xt_suffix:
     .set SLASH, DIV
     .set LTEQU, LE
     .set ZLTGT, ZNEQU
+    .set QNUMBER, ISNUMBER
 
 @ ---------------------------------------------------------------------
 
