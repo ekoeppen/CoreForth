@@ -401,6 +401,7 @@ VARIABLE EP0-REQ-LENGTH
     ;
 
 : USB-CON
+    0 UART1 UART-CR1 !
     USB
     ['] USB-EMIT 'EMIT !
     ['] USB-TX 'TYPE !
