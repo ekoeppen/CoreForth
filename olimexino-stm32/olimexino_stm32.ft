@@ -407,13 +407,17 @@ VARIABLE EP0-REQ-LENGTH
     ['] USB-TX 'TYPE !
     ;
 
-: USB-PMA! 1 USB-BTABLE-TX + . . CR ;
+: USB-PMA! ( c addr -- addr' )
+    TUCK
+    DUP 1 AND IF SWAP OVER 1- C@ 8 ROTATE + SWAP THEN H!
+    1+ DUP 3 AND 2 = 2 AND +
+    ;
 : CON-TX#   CON-TX-HEAD @ CON-TX-TAIL @ - DUP 0< 40 AND + ;
 : CON-TX>PMA
-    CR 0 CON-TX-TAIL @
+    CR 1 USB-BTABLE-TX CON-TX-TAIL @
     BEGIN
         DUP CON-TX-HEAD @ <> WHILE
-        DUP CON-TX + C@   ROT TUCK USB-PMA! 1+ SWAP
+        DUP CON-TX + C@   ROT USB-PMA! SWAP
         1+ 3F AND
     REPEAT
     2DROP
