@@ -75,6 +75,7 @@ _start:
     .long 0                           /* Reserved                     */
     .long 0                           /* Reserved                     */
     .space 33 * 4
+end_of_irq:
 
 @ ---------------------------------------------------------------------
 @ -- Board specific code and initialization ---------------------------

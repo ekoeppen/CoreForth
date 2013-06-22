@@ -133,10 +133,7 @@ cold_start:
     .word LIT, 10, BASE, STORE
     .word LIT, data_start, DP, STORE
     .word LIT, last_word, LATEST, STORE
-    .word LIT, NOOP, DUP, TICKWAIT_KEY, STORE, TICKFINISH_OUTPUT, STORE
-    .word LIT, XKEY, TICKKEY, STORE
-    .word LIT, XEMIT, TICKEMIT, STORE
-    .word LIT, READ_LINE, TICKACCEPT, STORE
+    .word SERIAL_CON
     .word COLD
     .ltorg
 
@@ -481,6 +478,18 @@ delay:
     strb r0, [r1]
     NEXT
 
+    defcode "H@", HFETCH
+    pop {r0}
+    ldrh r1, [r0]
+    push {r1}
+    NEXT
+
+    defcode "H!", HSTORE
+    pop {r1}
+    pop {r0}
+    strh r0, [r1]
+    NEXT
+
     defcode "@", FETCH
     pop {r0}
     ldr r1, [r0]
@@ -679,6 +688,15 @@ fill_done:
     push {r2}
     NEXT
 
+    defcode "U/MOD", UDIVMOD
+    pop {r1}
+    pop {r0}
+    udiv r2, r0, r1
+    mls r0, r1, r2, r0
+    push {r0}
+    push {r2}
+    NEXT
+
     defcode "/", DIV
     pop {r1}
     pop {r0}
@@ -690,6 +708,14 @@ fill_done:
     pop {r1}
     pop {r0}
     sdiv r2, r0, r1
+    mls r0, r1, r2, r0
+    push {r0}
+    NEXT
+
+    defcode "UMOD", UMOD
+    pop {r1}
+    pop {r0}
+    udiv r2, r0, r1
     mls r0, r1, r2, r0
     push {r0}
     NEXT
@@ -888,30 +914,34 @@ fill_done:
     defword "SPACE", SPACE
     .word BL, EMIT, EXIT
 
-    defcode "TYPE", TYPE
-    pop {r1}
-    pop {r0}
-    bl putstring
-    NEXT
+    defword "HOLD", HOLD
+    .word LIT, 1, HP, SUBSTORE, HP, FETCH, CSTORE, EXIT
 
-    defcode ".H", DOTH
-    mov r0, '$'
-    bl putchar
-    pop {r0}
-    bl putsignedhexnumber
-    NEXT
+    defword "<#", LTNUM
+    .word PAD, HP, STORE, EXIT
 
-    defcode ".UH", DOTUH
-    mov r0, '$'
-    bl putchar
-    pop {r0}
-    bl puthexnumber
-    NEXT
+    defword ">DIGIT", TODIGIT
+    .word DUP, LIT, 9, GT, LIT, 7, AND, PLUS, LIT, 48, PLUS, EXIT
 
-    defcode ".D", DOTD
-    pop {r0}
-    bl putnumber
-    NEXT
+    defword "#", NUM
+    .word BASE, FETCH, UDIVMOD, SWAP, TODIGIT, HOLD, EXIT
+
+    defword "#S", NUMS
+1:  .word NUM, DUP, ZEQU, QBRANCH, 1b - ., EXIT
+
+    defword "#>", NUMGT
+    .word DROP, HP, FETCH, PAD, OVER, SUB, EXIT
+
+    defword "SIGN", SIGN
+    .word ZLT, QBRANCH, 1f - .
+    .word LIT, '-', HOLD
+1:  .word EXIT
+
+    defword "U.", UDOT
+    .word LTNUM, NUMS, NUMGT, TYPE, SPACE, EXIT
+
+    defword ".", DOT
+    .word LTNUM, DUP, ABS, NUMS, SWAP, SIGN, NUMGT, TYPE, SPACE, EXIT
 
     defcode ".UX", DOTUX
     mov r0, '0'
@@ -921,9 +951,6 @@ fill_done:
     pop {r0}
     bl puthexnumber
     NEXT
-
-    defword ".", DOT
-    .word DOTH, SPACE, EXIT
 
     defcode "READ-KEY", READ_KEY
     bl readkey
@@ -954,24 +981,63 @@ fill_done:
     defword "(EMIT)", XEMIT
     .word FINISH_OUTPUT, PUTCHAR, EXIT
 
+    defcode "(TYPE)", XTYPE
+    pop {r1}
+    pop {r0}
+    bl putstring
+    NEXT
+
     defword "ACCEPT", ACCEPT
     .word TICKACCEPT, FETCH, EXECUTE, EXIT
 
     defword "EMIT", EMIT
     .word TICKEMIT, FETCH, EXECUTE, EXIT
 
+    defword "TYPE", TYPE
+    .word TICKTYPE, FETCH, EXECUTE, EXIT
+
+    defword "4NUM", FOURNUM
+    .word NUM, NUM, NUM, NUM, EXIT
+
+    defword "SERIAL-CON", SERIAL_CON
+    .word LIT, NOOP, DUP, TICKWAIT_KEY, STORE, TICKFINISH_OUTPUT, STORE
+    .word LIT, XKEY, TICKKEY, STORE
+    .word LIT, XEMIT, TICKEMIT, STORE
+    .word LIT, XTYPE, TICKTYPE, STORE
+    .word LIT, READ_LINE, TICKACCEPT, STORE
+    .word EXIT
+
+
+    defword "(DUMP-ADDR)", XDUMP_ADDR
+    .word CR, DUP, LTNUM, FOURNUM, FOURNUM, NUMGT, TYPE, LIT, 58, EMIT, SPACE, EXIT
+
     defword "DUMP", DUMP
-    .word QDUP, QBRANCH, dump_end - .
+    .word BASE, FETCH, TOR, HEX, QDUP, QBRANCH, dump_end - .
     .word SWAP
 dump_start_line:
-    .word CR, DUP, DOT, LIT, 58, EMIT, BL, EMIT
+    .word XDUMP_ADDR
 dump_line:
-    .word DUP, FETCHBYTE, DOT, INCR
+    .word DUP, FETCHBYTE, LTNUM, NUM, NUM, NUMGT, TYPE, SPACE, INCR
     .word SWAP, DECR, QDUP, QBRANCH, dump_end - .
     .word SWAP, DUP, LIT, 7, AND, QBRANCH, dump_start_line - .
     .word BRANCH, dump_line - .
 dump_end:
-    .word DROP, EXIT
+    .word DROP, RFROM, BASE, STORE, EXIT
+
+    defword "DUMPW", DUMPW
+    .word BASE, FETCH, TOR, HEX, QDUP, QBRANCH, dumpw_end_final - .
+    .word SWAP
+dumpw_start_line:
+    .word XDUMP_ADDR
+dumpw_line:
+    .word DUP, FETCH, LTNUM, FOURNUM, FOURNUM, NUMGT, TYPE, SPACE, INCR4
+    .word SWAP, DECR4, DUP, ZGT, QBRANCH, dumpw_end - .
+    .word SWAP, DUP, LIT, 0x1f, AND, QBRANCH, dumpw_start_line - .
+    .word BRANCH, dumpw_line - .
+dumpw_end:
+    .word DROP
+dumpw_end_final:
+    .word DROP, RFROM, BASE, STORE, EXIT
 
     defword "SKIP", SKIP
     .word TOR
@@ -1426,6 +1492,7 @@ QUOTE_CHARS:
     .ascii "0\001Z"
     .ascii "1\003ONE"
     .ascii "2\003TWO"
+    .ascii "4\004FOUR"
     .ascii "`\010BACKTICK"
     .ascii "~\005TILDE"
     .ascii "!\005STORE"
@@ -1669,9 +1736,11 @@ print_xt_suffix:
     defvar "SOURCE#", SOURCECOUNT
     defvar ">SOURCE", SOURCEINDEX
     defvar "UP", UP
+    defvar "HP", HP
     defvar "\047KEY", TICKKEY
     defvar "\047ACCEPT", TICKACCEPT
     defvar "\047EMIT", TICKEMIT
+    defvar "\047TYPE", TICKTYPE
     defvar "\047WAIT-KEY", TICKWAIT_KEY
     defvar "\047FINISH-OUTPUT", TICKFINISH_OUTPUT
 
@@ -1711,6 +1780,8 @@ print_xt_suffix:
     .set MINUSSTORE, SUBSTORE
     .set ONEPLUS, INCR
     .set ONEMINUS, DECR
+    .set FOURPLUS, INCR4
+    .set FOURMINUS, DECR4
     .set MINUSROT, ROTROT
     .set NUMTIB, TIBSIZE
     .set TIBNUM, TIBCOUNT
@@ -1730,6 +1801,10 @@ print_xt_suffix:
     .set LINKGTNAME, LINKTONAME
     .set LINKGTFLAGS, LINKTOFLAGS
     .set SEMI, SEMICOLON
+    .set SLASH, DIV
+    .set LTEQU, LE
+    .set ZLTGT, ZNEQU
+    .set QNUMBER, ISNUMBER
 
 @ ---------------------------------------------------------------------
 

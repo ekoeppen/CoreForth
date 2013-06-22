@@ -131,25 +131,30 @@ init_board:
 
     @ reset the interrupt vector table
     ldr r0, =addr_IVT
-    mov r1, #0
-    mov r2, #(end_of_irq - _start) / 4
+    movs r1, #0
+    movs r2, #(end_of_irq - _start) / 4
 1:  str r1, [r0], #4
     subs r2, r2, #1
     bgt 1b
 
     @ enable PIC interrupts
-    mov r0, #0
+    movs r0, #0
     msr primask, r0
-    mov r0, #0
+    movs r0, #0
     msr basepri, r0
     ldr r0, =(NVIC + NVIC_SETENA_BASE)
-    mov r1, #0
+    movs r1, #0
     str r1, [r0]
 
-    @ enable clocks on all timers, UARTS, ADC, PWM, SSI and I2C and GPIO ports
+    @ enable clocks
     ldr r0, =RCC
-    ldr r1, =0xffffffff
+
+    @ SPI2 PWR BKP WWD USB I2C2 I2C1 USART USART TIM4 TIM3 TIM2
+    ldr r1, =0x18e64807
     str r1, [r0, #RCC_APB1ENR]
+
+    @ ADC3 SPI1 TIM1 ADC2 ADC1 IOPE IOPD IOPC IOPB IOPA AFIO TIM1
+    ldr r1, =0x00005e7d
     str r1, [r0, #RCC_APB2ENR]
 
     @ enable pins on GPIOA
@@ -157,9 +162,23 @@ init_board:
     ldr r1, =0x444444b4
     str r1, [r0, #GPIO_CRH]
 
+    @ reset console buffers
+    movs r1, #0
+    ldr r2, =addr_CON_RX_TAIL
+    str r1, [r2]
+    ldr r2, =addr_CON_RX_HEAD
+    str r1, [r2]
+    ldr r2, =addr_CON_TX_TAIL
+    str r1, [r2]
+    ldr r2, =addr_CON_TX_HEAD
+    str r1, [r2]
+
     @ enable UART
+    ldr r0, =(NVIC + NVIC_SETENA_BASE)
+    movs r1, #0x20
+    str r1, [r0, #4]
     ldr r0, =UART1
-    ldr r1, =0x200c
+    ldr r1, =0x206c
     str r1, [r0, #UART_CR1]
 
     @ set UART baud rate
@@ -171,7 +190,7 @@ init_board:
     ldr r1, =0x00ffffff
     str r1, [r0]
     ldr r0, =STCTRL
-    mov r1, #5
+    movs r1, #5
     str r1, [r0]
 
     @ unlock flash controller
@@ -184,7 +203,7 @@ init_board:
     pop {pc}
     .ltorg
 
-readkey:
+readkey_polled:
     push {r1, r2}
     ldr r1, =UART1
 1:  ldr r2, [r1, #UART_SR]
@@ -194,7 +213,7 @@ readkey:
     pop {r1, r2}
     bx lr
 
-putchar:
+putchar_polled:
     push {r1, r2}
     ldr r1, =UART1
 1:  ldr r2, [r1, #UART_SR]
@@ -203,6 +222,50 @@ putchar:
     str r0, [r1, #UART_DR]
     pop {r1, r2}
     bx lr
+
+readkey:
+readkey_int:
+    push {r1, r2, r3, lr}
+    ldr r1, =addr_CON_RX_TAIL
+    ldr r3, [r1]
+2:  ldr r2, =addr_CON_RX_HEAD
+    ldr r2, [r2]
+    cmp r2, r3
+    bne 1f
+    wfi
+    b 2b
+1:  ldr r0, =addr_CON_RX
+    ldrb r0, [r0, r3]
+    adds r3, #1
+    ands r3, #0x3f
+    str r3, [r1]
+    pop {r1, r2, r3, pc}
+
+putchar:
+putchar_int:
+    push {r1, r2, r3, lr}
+    ldr r1, =addr_CON_TX_HEAD
+    ldr r2, [r1]
+    ldr r3, =addr_CON_TX_TAIL
+    ldr r3, [r3]
+    cmp r2, r3
+    bne 2f
+    bl putchar_polled
+    b 4f
+2:  ldr r3, =addr_CON_TX_HEAD
+    adds r2, #1
+    ands r2, #0x3f
+3:  ldr r3, [r3]
+    cmp r2, r3
+    bne 1f
+    wfi
+    b 3b
+1:  str r2, [r1]
+    subs r2, #1
+    ands r2, #0x3f
+    ldr r3, =addr_CON_TX
+    strb r0, [r3, r2]
+4:  pop {r1, r2, r3, pc}
 
 @ ---------------------------------------------------------------------
 @ -- IRQ handlers -----------------------------------------------------
@@ -225,9 +288,9 @@ generic_forth_handler:
     ldr r6, =irq_stack_top
     mov r7, r0
     ldr r0, [r7]
-    add r7, r7, #4
+    adds r7, #4
     ldr r1, [r0]
-    add r1, r1, #1
+    adds r1, #1
     bx r1
 1:  bx lr
 
@@ -235,7 +298,10 @@ nmi_handler:
     b .
 
 hardfault_handler:
-    mrs r0, psp
+    tst lr, #4
+    ite eq
+    mrseq r0, msp
+    mrsne r0, psp
     b .
 
 memmanage_handler:
@@ -255,6 +321,44 @@ debugmon_handler:
 
 pendsv_handler:
     b .
+
+usart1_handler:
+    ldr r1, =(UART1 + UART_SR)
+    ldr r1, [r1]
+    tst r1, #0x20
+    beq 1f
+    ldr r0, =addr_CON_RX
+    ldr r1, =addr_CON_RX_HEAD
+    ldr r2, [r1]
+    ldr r3, =(UART1 + UART_DR)
+    ldrb r3, [r3]
+    strb r3, [r0, r2]
+    adds r2, #1
+    ands r2, #0x3f
+    str r2, [r1]
+    b 2f
+1:  ldr r1, =(UART1 + UART_SR)
+    ldr r1, [r1]
+    tst r1, #0x60
+    beq 2f
+    ldr r1, =addr_CON_TX_HEAD
+    ldr r1, [r1]
+    ldr r2, =addr_CON_TX_TAIL
+    ldr r3, [r2]
+    cmp r1, r3
+    beq 2f
+    ldr r0, =addr_CON_TX
+    ldrb r1, [r0, r3]
+    ldr r0, =(UART1 + UART_DR)
+    strb r1, [r0]
+    adds r3, #1
+    ands r3, #0x3f
+    str r3, [r2]
+2:  movs r0, #0
+    ldr r1, =(UART1 + UART_SR)
+    str r0, [r1]
+    bx lr
+    .align 2,0
 
 systick_handler:
 adc1_2_handler:
@@ -310,7 +414,6 @@ tim8_trg_com_handler:
 tim8_up_handler:
 uart4_handler:
 uart5_handler:
-usart1_handler:
 usart2_handler:
 usart3_handler:
 usb_hp_can_tx_handler:

@@ -35,7 +35,7 @@ sysclock:
     defword ";I", SEMICOLONI, F_IMMED
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    defvar "IVT", IVT, (end_of_irq - _start) / 4
+    defvar "IVT", IVT, (end_of_irq - _start)
 
     defcode "KEY?", KEYQ
     mov r2, #0
@@ -79,9 +79,29 @@ sysclock:
     bne 1b
     NEXT
 
-    defvar "SBUF", SBUF, 16
-    defvar "SBUF-HEAD", SBUF_HEAD
-    defvar "SBUF-TAIL", SBUF_TAIL
+    defcode "CON-RX!", CON_RXSTORE
+    ldr r0, =addr_CON_RX
+    ldr r1, =addr_CON_RX_HEAD
+con_store:
+    pop {r3}
+    ldr r2, [r1]
+    strb r3, [r0, r2]
+    adds r2, #1
+    ands r2, #0x3f
+    str r2, [r1]
+    NEXT
+
+    defcode "CON-TX!", CON_TXSTORE
+    ldr r0, =addr_CON_TX
+    ldr r1, =addr_CON_TX_HEAD
+    b con_store
+
+    defvar "CON-RX-TAIL", CON_RX_TAIL
+    defvar "CON-RX-HEAD", CON_RX_HEAD
+    defvar "CON-RX", CON_RX, 64
+    defvar "CON-TX-TAIL", CON_TX_TAIL
+    defvar "CON-TX-HEAD", CON_TX_HEAD
+    defvar "CON-TX", CON_TX, 64
     defvar "UART0-TASK", UARTZ_TASK
 
     .ltorg
