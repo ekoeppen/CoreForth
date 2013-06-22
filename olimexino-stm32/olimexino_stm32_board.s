@@ -178,7 +178,7 @@ init_board:
     movs r1, #0x20
     str r1, [r0, #4]
     ldr r0, =UART1
-    ldr r1, =0x206c
+    ldr r1, =0x202c
     str r1, [r0, #UART_CR1]
 
     @ set UART baud rate
@@ -213,6 +213,7 @@ readkey_polled:
     pop {r1, r2}
     bx lr
 
+putchar:
 putchar_polled:
     push {r1, r2}
     ldr r1, =UART1
@@ -241,7 +242,6 @@ readkey_int:
     str r3, [r1]
     pop {r1, r2, r3, pc}
 
-putchar:
 putchar_int:
     push {r1, r2, r3, lr}
     ldr r1, =addr_CON_TX_HEAD
@@ -336,6 +336,7 @@ usart1_handler:
     adds r2, #1
     ands r2, #0x3f
     str r2, [r1]
+    b 2f
 1:  ldr r1, =(UART1 + UART_SR)
     ldr r1, [r1]
     tst r1, #0x60
