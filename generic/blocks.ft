@@ -1,12 +1,12 @@
 : LOAD   ( n -- )
     0 STATE !
-    BLOCK DUP C/BLK +               \ blk blk-end
-    BEGIN 2DUP <                    \ blk blk-end f
-    WHILE
-        SWAP C/L                    \ blk-end blk c/l
-        2DUP SOURCE# ! (SOURCE) ! 0 >SOURCE !
-        (INTERPRET) 2DROP
-        + SWAP                      \ blk' blk-end
-    REPEAT 2DROP ;
+    C/L SOURCE# !   BLOCK (SOURCE) !
+    C/BLK C/L / 0 DO    \ can't have anything on the stack within this loop
+                        \ as control structures might use the stack during parsing
+        0 >SOURCE !
+        (INTERPRET) 0= IF ." Error parsing line " I . CR THEN DROP
+        C/L (SOURCE) +!
+    LOOP
+    ;
 
 : THRU   ( start end -- )   SWAP DO I LOAD LOOP ;
