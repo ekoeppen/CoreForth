@@ -1,5 +1,3 @@
-*.bin
-*.elf
 *.o
 *.swp
 *.swo
