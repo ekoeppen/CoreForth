@@ -18,20 +18,6 @@
 @ ---------------------------------------------------------------------
 @ -- Macros -----------------------------------------------------------
 
-    .macro CHR, c
-    push {r0, r1}
-    movs r0, \c
-    bl putchar
-    pop {r0, r1}
-    .endm
-
-    .macro REG, r
-    push {r0, r1}
-    movs r0, \r
-    bl puthexnumber
-    pop {r0, r1}
-    .endm
-
     .macro NEXT
     ldr r0, [r7]
     adds r7, r7, #4
@@ -122,7 +108,7 @@
 
 reset_handler:
     bl init_board
-    mov r0, 64
+    movs r0, 64
     ldr r6, =addr_TASKZRTOS
     ldr r7, =cold_start
     NEXT
@@ -199,70 +185,6 @@ putstring_loop:
     subs r4, r4, #1
     bgt putstring_loop
     pop {r4, r5, pc}
-
-putnumber:
-    push {lr}
-    cmp r0, #0
-    bne 1f
-    movs r0, #48
-    bl putchar
-    pop {pc}
-1:  push {r4}
-    movs r4, #0
-    movs r3, #10
-    movs r1, #48
-2:  sdiv r2, r0, r3
-    mls r0, r3, r2, r0
-    adds r0, r1
-    push {r0}
-    adds r4, #1
-    mov r0, r2
-    cmp r0, #0
-    bgt 2b
-3:  pop {r0}
-    bl putchar
-    subs r4, #1
-    bne 3b
-    pop {r4, pc}
-
-puthexnumber:
-    push {r4, r5, lr}
-    movs r3, #0
-    movs r5, #8
-puthexnumber_loop:
-    rors r0, r0, #28
-    mov r4, r0
-    ands r0, r0, #15
-    cmp r3, #0
-    bgt 3f
-    cmp r0, #0
-    beq 2f
-    movs r3, #1
-3:  adds r0, r0, #'0'
-    cmp r0, #'9'
-    ble 1f
-    adds r0, r0, #'A' - '0' - 10
-1:  bl putchar
-2:  mov r0, r4
-    subs r5, r5, #1
-    bne puthexnumber_loop
-    cmp r3, #0
-    bne 4f
-    movs r0, #'0'
-    bl putchar
-4:  pop {r4, r5, pc}
-
-putsignedhexnumber:
-    push {lr}
-    cmp r0, #0
-    bge 1f
-    push {r0}
-    movs r0, #'-'
-    bl putchar
-    pop {r1}
-    negs r0, r1
-1:  bl puthexnumber
-    pop {pc}
 
 readline:
     push {r3, r4, r5, lr}
@@ -944,9 +866,9 @@ fill_done:
     .word LTNUM, DUP, ABS, NUMS, SWAP, SIGN, NUMGT, TYPE, SPACE, EXIT
 
     defcode ".UX", DOTUX
-    mov r0, '0'
+    movs r0, '0'
     bl putchar
-    mov r0, 'x'
+    movs r0, 'x'
     bl putchar
     pop {r0}
     bl puthexnumber
