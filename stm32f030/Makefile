@@ -1,7 +1,7 @@
 include ../generic/Makefile
 
 .s.o:
-	arm-none-eabi-as -gdwarf2 -mcpu=cortex-m0 -mthumb -I../generic/ -o $@ $<
+	arm-none-eabi-as -defsym THUMB1=1 -gdwarf2 -mcpu=cortex-m0 -mthumb -I../generic/ -o $@ $<
 
 GEN += stm32f030.gen.s stm32f030_ram.gen.s
 

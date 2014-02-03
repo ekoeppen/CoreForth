@@ -226,6 +226,47 @@ readline_end:
     subs r0, r5, r4
     pop {r3, r4, r5, pc}
 
+puthexnumber:
+    push {r4, r5, r6, r7, lr}
+    movs r3, #0
+    movs r5, #8
+    movs r6, #15
+    movs r7, #28
+puthexnumber_loop:
+    rors r0, r7
+    mov r4, r0
+    ands r0, r6
+    cmp r3, #0
+    bgt 3f
+    cmp r0, #0
+    beq 2f
+    movs r3, #1
+3:  adds r0, r0, #'0'
+    cmp r0, #'9'
+    ble 1f
+    adds r0, r0, #'A' - '0' - 10
+1:  bl putchar
+2:  mov r0, r4
+    subs r5, r5, #1
+    bne puthexnumber_loop
+    cmp r3, #0
+    bne 4f
+    movs r0, #'0'
+    bl putchar
+4:  pop {r4, r5, r6, r7, pc}
+
+putsignedhexnumber:
+    push {lr}
+    cmp r0, #0
+    bge 1f
+    push {r0}
+    movs r0, #'-'
+    bl putchar
+    pop {r1}
+    negs r0, r1
+1:  bl puthexnumber
+    pop {pc}
+
 printrstack:
     push {r4, lr}
     ldr r4, =addr_TASKZRTOS
@@ -604,8 +645,10 @@ fill_done:
     defcode "/MOD", DIVMOD
     pop {r1}
     pop {r0}
+    .ifndef THUMB1
     sdiv r2, r0, r1
     mls r0, r1, r2, r0
+    .endif
     push {r0}
     push {r2}
     NEXT
@@ -613,8 +656,10 @@ fill_done:
     defcode "U/MOD", UDIVMOD
     pop {r1}
     pop {r0}
+    .ifndef THUMB1
     udiv r2, r0, r1
     mls r0, r1, r2, r0
+    .endif
     push {r0}
     push {r2}
     NEXT
@@ -622,29 +667,37 @@ fill_done:
     defcode "/", DIV
     pop {r1}
     pop {r0}
+    .ifndef THUMB1
     sdiv r0, r0, r1
+    .endif
     push {r0}
     NEXT
 
     defcode "MOD", MOD
     pop {r1}
     pop {r0}
+    .ifndef THUMB1
     sdiv r2, r0, r1
     mls r0, r1, r2, r0
+    .endif
     push {r0}
     NEXT
 
     defcode "UMOD", UMOD
     pop {r1}
     pop {r0}
+    .ifndef THUMB1
     udiv r2, r0, r1
     mls r0, r1, r2, r0
+    .endif
     push {r0}
     NEXT
 
     defcode "2*", TWOMUL
     ldr r0, [sp]
+    .ifndef THUMB1
     lsls r0, r0, #1
+    .endif
     str r0, [sp]
     NEXT
 
@@ -888,6 +941,8 @@ fill_done:
     push {r0}
     NEXT
 
+    .ltorg
+
     defword "WAIT-KEY", WAIT_KEY
     .word TICKWAIT_KEY, FETCH, EXECUTE, EXIT
 
@@ -1119,17 +1174,41 @@ is_positive:
     NEXT
 
     defcode "I", INDEX
+    .ifndef THUMB1
     ldr r0, [r6, #-4]
+    .else
+    mov r0, r6
+    subs r0, #4
+    ldr r0, [r0]
+    .endif
     push {r0}
     NEXT
 
     defcode "(LOOP)", XLOOP
+    .ifndef THUMB1
     ldr r0, [r6, #-4]
+    .else
+    mov r0, r6
+    subs r0, #4
+    ldr r0, [r0]
+    .endif
     adds r0, r0, #1
+    .ifndef THUMB1
     ldr r1, [r6, #-8]
+    .else
+    mov r1, r6
+    subs r1, #8
+    ldr r1, [r1]
+    .endif
     cmp r0, r1
     bge 1f
+    .ifndef THUMB1
     str r0, [r6, #-4]
+    .else
+    mov r0, r6
+    subs r0, #4
+    str r0, [r0]
+    .endif
     movs r0, #0
     push {r0}
     NEXT
@@ -1173,6 +1252,8 @@ is_positive:
 
     defcode "HALT", HALT
     b .
+
+    .ltorg
 
     defword "HERE", HERE
     .word DP, FETCH, EXIT
