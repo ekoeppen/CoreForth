@@ -654,14 +654,34 @@ fill_done:
     NEXT
 
     defcode "U/MOD", UDIVMOD
+    .ifndef THUMB1
     pop {r1}
     pop {r0}
-    .ifndef THUMB1
     udiv r2, r0, r1
     mls r0, r1, r2, r0
-    .endif
     push {r0}
     push {r2}
+    .else
+    pop {r1}
+    pop {r0}
+    mov     r2, r1              @ put divisor in r2
+    mov     r3, r0
+    lsrs    r3, #1
+    cmp     r2, r3
+1:  bgt     3f
+    lsls    r2, #1             @ until r2 > r3 / 2
+    b       1b
+3:  movs    r3, #0             @ initialize quotient
+2:  cmp     r0, r2              @ can we subtract r2?
+    ble     4f
+    subs    r0, r0, r2         @ if we can, do so
+4:  adcs r3, r3     @ double r3
+    lsrs    r2, #1     @ halve r2,
+    cmp     r2, r1              @ and loop until
+    bhs     2b                     @ less than divisor
+    push {r0}
+    push {r3}
+    .endif
     NEXT
 
     defcode "/", DIV
