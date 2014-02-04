@@ -82,15 +82,15 @@ readkey:
     pop {r1, r2, r3, pc}
 
 putchar:
-    push {r2, r3, lr}
+    push {r1, r2, r3, lr}
     ldr r3, =UART1
     str r0, [r3, #UART_TDR]
     movs r2, #0x40
-1:  ldr r0, [r3, #UART_ISR]
-    ands r0, r2
-    cmp r0, r2
+1:  ldr r1, [r3, #UART_ISR]
+    ands r1, r2
+    cmp r1, r2
     bne 1b
-    pop {r2, r3, pc}
+    pop {r1, r2, r3, pc}
 
     .ltorg
 @ ---------------------------------------------------------------------
