@@ -642,28 +642,51 @@ fill_done:
     push {r0}
     NEXT
 
-    defcode "/MOD", DIVMOD
-    pop {r1}
-    pop {r0}
     .ifndef THUMB1
-    sdiv r2, r0, r1
-    mls r0, r1, r2, r0
-    .endif
-    push {r0}
-    push {r2}
-    NEXT
-
     defcode "U/MOD", UDIVMOD
-    .ifndef THUMB1
     pop {r1}
     pop {r0}
     udiv r2, r0, r1
     mls r0, r1, r2, r0
     push {r0}
     push {r2}
-    .else
+    NEXT
+
+    defcode "/MOD", DIVMOD
     pop {r1}
     pop {r0}
+    sdiv r2, r0, r1
+    mls r0, r1, r2, r0
+    push {r0}
+    push {r2}
+    NEXT
+
+    defcode "/", DIV
+    pop {r1}
+    pop {r0}
+    sdiv r0, r0, r1
+    push {r0}
+    NEXT
+
+    defcode "MOD", MOD
+    pop {r1}
+    pop {r0}
+    sdiv r2, r0, r1
+    mls r0, r1, r2, r0
+    push {r0}
+    NEXT
+
+    defcode "UMOD", UMOD
+    pop {r1}
+    pop {r0}
+    udiv r2, r0, r1
+    mls r0, r1, r2, r0
+    push {r0}
+    NEXT
+
+    .else
+
+unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
     mov     r2, r1              @ put divisor in r2
     mov     r3, r0
     lsrs    r3, #1
@@ -680,39 +703,57 @@ fill_done:
 4:  lsrs    r2, #1              @ halve r2,
     cmp     r2, r1              @ and loop until
     bhs     2b                  @ less than divisor
+    bx      lr
+
+    defcode "U/MOD", UDIVMOD
+    pop {r1}
+    pop {r0}
+    bl unsigned_div_mod
     push {r0}
     push {r3}
-    .endif
+    NEXT
+
+    defcode "/MOD", DIVMOD
+    pop {r1}
+    pop {r0}
+    bl unsigned_div_mod
+    push {r0}
+    push {r3}
     NEXT
 
     defcode "/", DIV
     pop {r1}
     pop {r0}
-    .ifndef THUMB1
-    sdiv r0, r0, r1
-    .endif
-    push {r0}
+    bl unsigned_div_mod
+    push {r3}
     NEXT
 
     defcode "MOD", MOD
     pop {r1}
     pop {r0}
-    .ifndef THUMB1
-    sdiv r2, r0, r1
-    mls r0, r1, r2, r0
-    .endif
+    movs r3, #0
+    movs r4, #1
+    movs r5, #0
+    subs r5, #1
+    cmp r0, r3
+    bge 1f
+    subs r4, #2
+    muls r0, r4
+1:  cmp r1, r3
+    bge 2f
+    muls r1, r5
+2:  bl unsigned_div_mod
+    muls r0, r4
     push {r0}
     NEXT
 
     defcode "UMOD", UMOD
     pop {r1}
     pop {r0}
-    .ifndef THUMB1
-    udiv r2, r0, r1
-    mls r0, r1, r2, r0
-    .endif
+    bl unsigned_div_mod
     push {r0}
     NEXT
+    .endif
 
     defcode "2*", TWOMUL
     ldr r0, [sp]
