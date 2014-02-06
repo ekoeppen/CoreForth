@@ -696,14 +696,16 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
     b       1b
 3:  movs    r3, #0              @ initialize quotient
 2:  cmp     r0, r2              @ can we subtract r2?
-    adcs    r3, r3              @ double r3
-    cmp     r0, r2
     ble     4f
+    adcs    r3, r3              @ double r3
     subs    r0, r0, r2          @ if we can, do so
 4:  lsrs    r2, #1              @ halve r2,
     cmp     r2, r1              @ and loop until
     bhs     2b                  @ less than divisor
-    bx      lr
+    cmp     r0, r1
+    bne     5f
+    movs    r0, #0
+5:  bx      lr
 
     defcode "U/MOD", UDIVMOD
     pop {r1}
