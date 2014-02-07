@@ -68,11 +68,7 @@ QUOTE_CHARS:
 4:  .word TWODROP, EXIT
 
     defword "VALID-ADDR?", ISVALIDADDR
-<<<<<<< HEAD
     .word DUP, LIT, cold_start, LIT, last_word, FROMLINK, CELL, ADD, WITHIN, QDUP, QBRANCH, 1f - .
-=======
-    .word DUP, LIT, code_start, LIT, last_word, FROMLINK, CELL, ADD, WITHIN, QDUP, QBRANCH, 1f - .
->>>>>>> origin/stm32f0xx
     .word NIP, EXIT
 1:  .word LIT, ram_start, LIT, ram_top, WITHIN, EXIT
 
