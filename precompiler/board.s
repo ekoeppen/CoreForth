@@ -80,6 +80,7 @@ end_of_irq:
 @ ---------------------------------------------------------------------
 @ -- Board specific code and initialization ---------------------------
 
+code_start:
 init_board:
     mov pc, lr
 

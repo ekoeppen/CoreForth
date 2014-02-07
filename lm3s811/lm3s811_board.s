@@ -116,6 +116,7 @@ _start:
 @ ---------------------------------------------------------------------
 @ -- Board specific code and initialization ---------------------------
 
+code_start:
 init_board:
     push {lr}
 
