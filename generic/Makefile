@@ -1,9 +1,11 @@
-GEN = ../generic/ansi.gen.s ../generic/systick.gen.s \
+CPU ?= cortex-m3
+
+GEN := ../generic/ansi.gen.s ../generic/systick.gen.s \
       ../generic/editor.gen.s ../generic/protothreads.gen.s \
       ../generic/find.gen.s ../generic/strings.gen.s ../generic/multitasking.gen.s \
       ../generic/blocks.gen.s ../generic/quit.gen.s
 
-REVISION:=$(shell git log -1 --abbrev=8 --pretty=format:%h)
+REVISION := $(shell git log -1 --abbrev=8 --pretty=format:%h)
 
 %.bin: %.elf
 	LC_CTYPE=C && LANG=C && sed -e "s/revision NNNNNNNN/revision $(REVISION)/" < $< > $<.bak && mv $<.bak $<
@@ -16,9 +18,9 @@ REVISION:=$(shell git log -1 --abbrev=8 --pretty=format:%h)
 	awk '{ print ".byte ", length($$0); gsub(/\\/, "\\\\\\"); gsub(/"/, "\\\""); print ".ascii \"" $$0 "\""} END{print ".align 2, 0"}' < $< > $@
 
 .s.o:
-	arm-none-eabi-as -gdwarf2 -mcpu=cortex-m3 -I../generic/ -o $@ $<
+	arm-none-eabi-as -gdwarf2 $(ASMFLAGS) -mcpu=$(CPU) -I../generic/ -o $@ $<
 
-all: coreforth.bin
+all: coreforth.bin coreforth.lst
 
 listing: coreforth.lst
 

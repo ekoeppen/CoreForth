@@ -26,11 +26,12 @@ _start:
     .long 0                           /* Reserved                     */
     .long 0                           /* Reserved                     */
 
-    .org 0x150
+    .org 0xc0
 
 @ ---------------------------------------------------------------------
 @ -- Board specific code and initialization ---------------------------
 
+code_start:
 init_board:
     push {lr}
 
