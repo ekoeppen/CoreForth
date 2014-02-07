@@ -80,7 +80,7 @@
     .word 0x40C
 
     defword "GPIO-IM", GPIO_IM, 0x0, REGISTER_XT
-    .word 0x410
+    .word TWOSWAP
 
     defword "GPIO-RIS", GPIO_RIS, 0x0, REGISTER_XT
     .word 0x414

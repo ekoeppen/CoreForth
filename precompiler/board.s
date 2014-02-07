@@ -133,6 +133,7 @@ systick_handler:
     .ltorg
 
     .include "CoreForth.s"
+    .include "see.s"
 
     defword "COLD", COLD
     .word PRECOMP_BEGIN, LIT, precompile_words, EVALUATE, PRECOMP_END
