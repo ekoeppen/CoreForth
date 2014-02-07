@@ -726,13 +726,6 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
     defcode "/", DIV
     pop {r1}
     pop {r0}
-    bl unsigned_div_mod
-    push {r3}
-    NEXT
-
-    defcode "MOD", MOD
-    pop {r1}
-    pop {r0}
     movs r3, #0
     movs r4, #1
     movs r5, #0
@@ -745,7 +738,26 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
     bge 2f
     muls r1, r5
 2:  bl unsigned_div_mod
+    push {r3}
+    NEXT
+
+    defcode "MOD", MOD
+    pop {r1}
+    pop {r0}
+    movs r3, #0
+    movs r4, #1
+    movs r5, #1
+    cmp r0, r3
+    bge 1f
+    subs r4, #2
     muls r0, r4
+1:  cmp r1, r3
+    bge 2f
+    subs r5, #2
+    muls r1, r5
+2:  bl unsigned_div_mod
+    muls r0, r4
+    muls r0, r5
     push {r0}
     NEXT
 
