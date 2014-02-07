@@ -695,15 +695,17 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
     lsls    r2, #1              @ until r2 > r3 / 2
     b       1b
 3:  movs    r3, #0              @ initialize quotient
-2:  cmp     r0, r2              @ can we subtract r2?
+2:  adds    r3, r3
+    cmp     r0, r2              @ can we subtract r2?
     ble     4f
-    adcs    r3, r3              @ double r3
+    adds    r3, #1
     subs    r0, r0, r2          @ if we can, do so
 4:  lsrs    r2, #1              @ halve r2,
     cmp     r2, r1              @ and loop until
     bhs     2b                  @ less than divisor
     cmp     r0, r1
     bne     5f
+    adds    r3, #1
     movs    r0, #0
 5:  bx      lr
 
@@ -728,24 +730,6 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
     pop {r0}
     movs r3, #0
     movs r4, #1
-    movs r5, #0
-    subs r5, #1
-    cmp r0, r3
-    bge 1f
-    subs r4, #2
-    muls r0, r4
-1:  cmp r1, r3
-    bge 2f
-    muls r1, r5
-2:  bl unsigned_div_mod
-    push {r3}
-    NEXT
-
-    defcode "MOD", MOD
-    pop {r1}
-    pop {r0}
-    movs r3, #0
-    movs r4, #1
     movs r5, #1
     cmp r0, r3
     bge 1f
@@ -756,8 +740,27 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
     subs r5, #2
     muls r1, r5
 2:  bl unsigned_div_mod
+    muls r3, r4
+    muls r3, r5
+    push {r3}
+    NEXT
+
+    defcode "MOD", MOD
+    pop {r1}
+    pop {r0}
+    movs r3, #0
+    movs r4, #1
+    movs r5, #0
+    subs r5, #1
+    cmp r0, r3
+    bge 1f
+    subs r4, #2
     muls r0, r4
-    muls r0, r5
+1:  cmp r1, r3
+    bge 2f
+    muls r1, r5
+2:  bl unsigned_div_mod
+    muls r0, r4
     push {r0}
     NEXT
 
