@@ -140,6 +140,7 @@ QUOTE_CHARS:
     .word DUP, DUP, FETCH, CELL, SUB, OVER, NEQU, QBRANCH, print_code - .
     .word DUP, FETCH
     .word DUP, ISVALIDADDR, QBRANCH, 1f - .
+    .word DUP, LIT, LIT, NEQU, QBRANCH, print_lit - .
     .word DUP, LIT, DOCOL, NEQU, QBRANCH, print_docol - .
     .word DUP, LIT, DOVAR, NEQU, QBRANCH, print_dovar - .
     .word DUP, LIT, DOCON, NEQU, QBRANCH, print_docon - .
@@ -150,6 +151,8 @@ QUOTE_CHARS:
     .word DUP, FETCH, LIT, 0x47884900, NEQU, QBRANCH, print_dodoes - .
     .word DOTLITORXT, TWODROP, CELL, EXIT
 1:  .word DOTUX, TWODROP, CELL, EXIT
+print_lit:
+    .word DROP, LIT, print_label_lit, COUNT, TYPE, XCSPACE, CELL, ADD, FETCH, DOTUX, DROP, LIT, 2, CELLS, EXIT
 print_code:
     .word DROP, LIT, print_label_code, COUNT, TYPE, DROP, CELL, EXIT
 print_docol:
