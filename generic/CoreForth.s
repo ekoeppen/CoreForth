@@ -1,5 +1,7 @@
 @ -- vim:syntax=asm:foldmethod=marker:foldmarker=@\ --\ ,@\ ---:
 
+    .global reset_handler
+
 @ ---------------------------------------------------------------------
 @ -- Variable definitions ---------------------------------------------
 
@@ -94,6 +96,7 @@
     .macro defvar name, label, size=4
     defconst \name,\label,ram_here
     .set addr_\label, ram_here
+    .global addr_\label
     .set ram_here, ram_here + \size
     .endm
 

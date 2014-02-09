@@ -49,7 +49,7 @@ sysclock:
     defword ";I", SEMICOLONI, F_IMMED
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    defvar "IVT", IVT, (end_of_irq - _start)
+    defvar "IVT", IVT, 0x140
 
     defcode "KEY?", KEYQ
     movs r2, #0
