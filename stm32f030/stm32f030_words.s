@@ -29,6 +29,19 @@
 1:  push {r2}
     NEXT
 
+    defcode "CHECK-EMULATION", CHECK_EMULATION
+    ldr r0, =0xe000ed00
+    ldr r0, [r0]
+    movs r1, #0
+    cmp r0, r1
+    bne 1f
+    movs r0, #0x80
+    ldr r1, =0x08000000
+    ldr r2, =addr_DP
+    ldr r2, [r2]
+    bkpt 0xab
+1:  NEXT
+
     defvar "SBUF", SBUF, 16
     defvar "SBUF-HEAD", SBUF_HEAD
     defvar "SBUF-TAIL", SBUF_TAIL

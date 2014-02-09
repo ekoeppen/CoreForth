@@ -197,12 +197,16 @@ adcomp_handler:
 
     .include "stm32f030_words.s"
     .ltorg
-    .include "precompiled_words.s"
-    .ltorg
 
     defword "COLD", COLD
     .word LIT, eval_words, EVALUATE
+    .word CHECK_EMULATION
+    .word LIT, startup_words, EVALUATE
 eval_words:
+    .include "stm32f030.gen.s"
+    .include "quit.gen.s"
+    .word 0xffffffff
+startup_words:
     .include "stm32f030_ram.gen.s"
     .word 0xffffffff
 
