@@ -1393,7 +1393,7 @@ is_positive:
     .word LATEST, FETCH
     .word HERE, LATEST, STORE
     .word COMMALINK
-    .word LIT_XT, F_MARKER, CCOMMA
+    .word LIT, F_MARKER, CCOMMA
     .word BL, WORD, FETCHBYTE, INCR, INCR, ALIGNED, DECR, ALLOT
     .word EXIT
 
