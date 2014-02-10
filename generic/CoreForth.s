@@ -118,7 +118,9 @@ cold_start:
     .word TASKZRTOS, RZ, STORE
     .word TASKZTOS, SZ, STORE
     .word LIT, 10, BASE, STORE
-    .word LIT, data_start, DP, STORE
+    .word RAM
+    .word LIT, data_start, ROM_DP, STORE
+    .word LIT, data_start, RAM_DP, STORE
     .word LIT, last_word, LATEST, STORE
     .word SERIAL_CON
     .word COLD
@@ -1331,11 +1333,28 @@ is_positive:
 
     .ltorg
 
+    defword "ROM", ROM
+    .word LIT, 1, ROM_ACTIVE, STORE, EXIT
+
+    defword "RAM", RAM
+    .word LIT, 0, ROM_ACTIVE, STORE, EXIT
+
+    defword "ROM?", ROMQ
+    .word ROM_ACTIVE, FETCH, EXIT
+
+    defword "DP", DP
+    .word ROMQ, QBRANCH, 1f - .
+    .word ROM_DP, EXIT
+1:  .word RAM_DP, EXIT
+
     defword "HERE", HERE
     .word DP, FETCH, EXIT
 
     defword "ALLOT", ALLOT
     .word DP, ADDSTORE, EXIT
+
+    defword "ALIGN", ALIGN
+    .word HERE, ALIGNED, DP, STORE, EXIT
 
     defword ",", COMMA
     .word HERE, STORE, CELL, ALLOT, EXIT
@@ -1370,7 +1389,7 @@ is_positive:
     .word LIT_XT, DODOES + 1, COMMA, EXIT
 
     defword "(CREATE)", XCREATE
-    .word HERE, ALIGNED, DP, STORE
+    .word ALIGN
     .word LATEST, FETCH
     .word HERE, LATEST, STORE
     .word COMMALINK
@@ -1585,7 +1604,9 @@ words_loop:
 @ -- System variables -------------------------------------------------
 
     defvar "STATE", STATE
-    defvar "DP", DP
+    defvar "RAM-DP", RAM_DP
+    defvar "ROM-DP", ROM_DP
+    defvar "ROM-ACTIVE", ROM_ACTIVE
     defvar "LATEST", LATEST
     defvar "BASE", BASE
     defvar "TIB", TIB, 132
