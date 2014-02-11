@@ -10,6 +10,7 @@
     .include "CoreForth.s"
 
     defword "COLD", COLD
+    .word LIT, here, DOTUX, CR, TIB, DOTUX, CR, LATEST, FETCH, DOTUX, CR, HERE, DOTUX, CR, ROM_DP, FETCH, DOTUX, CR, RAM_DP, FETCH, DOTUX, CR
     .word LIT, eval_words, EVALUATE
 eval_words:
     .include "thumbolator_ram.gen.s"
@@ -17,3 +18,4 @@ eval_words:
 
     .set last_word, link
     .set data_start, ram_here
+    .set here, .
