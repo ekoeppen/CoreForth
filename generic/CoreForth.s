@@ -1398,22 +1398,19 @@ is_positive:
     .word EXIT
 
     defword "CREATE", CREATE
-    .word XCREATE, LIT_XT, DOVAR, COMMAXT
-    .word EXIT
+    .word XCREATE, LIT_XT, DOVAR, COMMAXT, EXIT
 
     defword "DATA", DATA
     .word XCREATE, LIT_XT, DODATA, COMMAXT, EXIT
 
+    defword "BUFFER:", BUFFERCOLON
+    .word XCREATE, LIT_XT, DOCON, COMMAXT, HERE, CELL, ADD, COMMA, ALLOT, EXIT
+
     defword "VARIABLE", VARIABLE
-    .word CREATE, CELL, ALLOT, EXIT
+    .word CELL, BUFFERCOLON, EXIT
 
     defword "CONSTANT", CONSTANT
-    .word CREATE, COMMA, XDOES
-    .set DOCONSTANT, .
-    adds r0, r0, #4
-    ldr r0, [r0]
-    push {r0}
-    NEXT
+    .word XCREATE, LIT_XT, DOCON, COMMAXT, COMMA, EXIT
 
     defcode "LIT", LIT
     ldr r0, [r7]
