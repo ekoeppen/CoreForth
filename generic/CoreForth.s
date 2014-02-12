@@ -109,7 +109,6 @@
 
 reset_handler:
     bl init_board
-    movs r0, 64
     ldr r6, =addr_TASKZRTOS
     ldr r7, =cold_start
     NEXT
