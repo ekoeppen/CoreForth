@@ -118,12 +118,19 @@ cold_start:
     .word TASKZTOS, SZ, STORE
     .word LIT, 10, BASE, STORE
     .word RAM
-    .word LIT, data_start, ROM_DP, STORE
-    .word LIT, data_start, RAM_DP, STORE
-    .word LIT, last_word, LATEST, STORE
+    .word LIT, init_here, FETCH, ROM_DP, STORE
+    .word LIT, init_data_start, FETCH, RAM_DP, STORE
+    .word LIT, init_last_word, FETCH, LATEST, STORE
     .word SERIAL_CON
     .word COLD
     .ltorg
+
+init_here:
+    .word here
+init_data_start:
+    .word data_start
+init_last_word:
+    .word last_word
 
 @ ---------------------------------------------------------------------
 @ -- Interpreter code -------------------------------------------------
@@ -1314,9 +1321,25 @@ is_positive:
 @ ---------------------------------------------------------------------
 @ -- Compiler and interpreter ----------------------------------------
 
-    defcode "BYE", BYE
-    movs r0, #0x18
+    defcode "EMULATION?", EMULATIONQ
+    ldr r0, =0xe000ed00
+    ldr r0, [r0]
+    movs r1, #0
+    cmp r0, r1
+    bne 1f
+    subs r1, #1
+1:  push {r1}
+    NEXT
+
+    defcode "EMULATOR-BKPT", EMULATOR_BKPT
     bkpt 0xab
+    NEXT
+
+    defword "ROM-DUMP", ROM_DUMP
+    .word LIT, _start, ROM_DP, FETCH, LIT, 0x80, EMULATOR_BKPT, EXIT
+
+    defword "BYE", BYE
+    .word LIT, 0x18, EMULATOR_BKPT, EXIT
 
     defcode "WFI", WFI
     wfi
@@ -1349,11 +1372,14 @@ is_positive:
     defword "HERE", HERE
     .word DP, FETCH, EXIT
 
+    defword "ORG", ORG
+    .word DP, STORE, EXIT
+
     defword "ALLOT", ALLOT
     .word DP, ADDSTORE, EXIT
 
     defword "ALIGN", ALIGN
-    .word HERE, ALIGNED, DP, STORE, EXIT
+    .word HERE, ALIGNED, ORG, EXIT
 
     defword ",", COMMA
     .word HERE, STORE, CELL, ALLOT, EXIT
@@ -1402,11 +1428,16 @@ is_positive:
     defword "DATA", DATA
     .word XCREATE, LIT_XT, DODATA, COMMAXT, EXIT
 
-    defword "BUFFER:", BUFFERCOLON
-    .word XCREATE, LIT_XT, DOCON, COMMAXT, HERE, CELL, ADD, COMMA, ALLOT, EXIT
+    defword "BUFFER", BUFFER
+    .word XCREATE, LIT_XT, DOCON, COMMAXT
+    .word ROM_ACTIVE, FETCH
+    .word HERE, CELL, ALLOT
+    .word RAM, HERE, SWAP, STORE
+    .word SWAP, ALLOT
+    .word ROM_ACTIVE, STORE, EXIT
 
     defword "VARIABLE", VARIABLE
-    .word CELL, BUFFERCOLON, EXIT
+    .word CELL, BUFFER, EXIT
 
     defword "CONSTANT", CONSTANT
     .word XCREATE, LIT_XT, DOCON, COMMAXT, COMMA, EXIT
