@@ -8,6 +8,7 @@
     .set ram_start, 0x20000000
     .set eval_words, 0x00010000
 
+    .include "thumbolator_definitions.s"
     .include "CoreForth.s"
 
     defcode "RETI", RETI
@@ -26,7 +27,14 @@
     defword ";I", SEMICOLONI, F_IMMED
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
+    defcode "KEY?", KEYQ
+    ldr r0, =UART_DR
+    ldr r0, [r0]
+    push {r0}
+    NEXT
+
     defvar "IVT", IVT, 0x140
+    defvar "UART0-TASK", UARTZ_TASK
 
     defword "COLD", COLD
     .word EMULATIONQ, QBRANCH, 1f - .
