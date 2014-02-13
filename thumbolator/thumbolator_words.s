@@ -28,6 +28,8 @@ startup_words:
     .org . + 0x10000
 eval_words:
     @ .include "thumbolator.gen.s"
+    .include "ansi.gen.s"
     .include "quit.gen.s"
-    .word 0xffffffff
+    .byte 0
+    .align 2,0
 
