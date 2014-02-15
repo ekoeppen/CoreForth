@@ -8,7 +8,7 @@
     .set ram_start, 0x20000000
     .set eval_words, 0x00010000
 
-    .include "thumbolator_definitions.s"
+    .include "emulator_definitions.s"
     .include "CoreForth.s"
 
     defcode "RETI", RETI
@@ -43,10 +43,7 @@
     .word RAM_DP, FETCH, LIT, init_data_start, STORE
     .word LATEST, FETCH, LIT, init_last_word, STORE
     .word ROM_DUMP, BYE
-1:  .word RAM, LIT, startup_words, EVALUATE
-startup_words:
-    .include "thumbolator_ram.gen.s"
-    .align 2,0
+1:  .word LATEST, FETCH, FROMLINK, EXECUTE
 
     .set last_word, link
     .set data_start, ram_here

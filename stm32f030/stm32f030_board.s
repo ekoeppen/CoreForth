@@ -13,6 +13,9 @@
 
     .global _start
     .global reset_handler
+    .global putchar
+    .global init_board
+    .global readkey
 _start:
     .long addr_TASKZTOS               /* Top of Stack                 */
     .long reset_handler + 1           /* Reset Handler                */
@@ -27,22 +30,28 @@ _start:
     .long 0                           /* Reserved                     */
 
     .org 0xc0
+    .set end_of_irq, .
 
 @ ---------------------------------------------------------------------
 @ -- Board specific code and initialization ---------------------------
 
 code_start:
 init_board:
-    push {lr}
+    ldr r0, =0xe000ed00
+    ldr r0, [r0]
+    cmp r0, #0
+    bne 1f
+    bx lr
+1:  push {lr}
 
     @ reset the interrupt vector table
     ldr r0, =addr_IVT
     movs r1, #0
     movs r2, 48
-1:  str r1, [r0]
+2:  str r1, [r0]
     adds r0, r0, #4
     subs r2, r2, #1
-    bgt 1b
+    bgt 2b
 
     @ enable clocks on UART1 and GPIOA
     ldr r0, =RCC
@@ -72,26 +81,40 @@ init_board:
     pop {pc}
 
 readkey:
-    push {r1, r2, r3, lr}
+    ldr r0, =0xe000ed00
+    ldr r0, [r0]
+    cmp r0, #0
+    bne 1f
+    ldr r0, =0xe0000000
+    ldr r0, [r0]
+    bx lr
+1:  push {r1, r2, r3, lr}
     ldr r1, =UART1
     movs r2, #32
-1:  ldr r3, [r1, #UART_ISR]
+2:  ldr r3, [r1, #UART_ISR]
     ands r3, r2
     cmp r3, r2
-    bne 1b
+    bne 2b
     ldr r0, [r1, #UART_RDR]
     pop {r1, r2, r3, pc}
 
 putchar:
     push {r1, r2, r3, lr}
-    ldr r3, =UART1
+    ldr r1, =0xe000ed00
+    ldr r1, [r1]
+    cmp r1, #0
+    bne 1f
+    ldr r1, =0xe0000000
+    str r0, [r1]
+    b 3f
+1:  ldr r3, =UART1
     str r0, [r3, #UART_TDR]
     movs r2, #0x40
-1:  ldr r1, [r3, #UART_ISR]
+2:  ldr r1, [r3, #UART_ISR]
     ands r1, r2
     cmp r1, r2
-    bne 1b
-    pop {r1, r2, r3, pc}
+    bne 2b
+3:  pop {r1, r2, r3, pc}
 
     .ltorg
 @ ---------------------------------------------------------------------
@@ -184,31 +207,3 @@ timer2a_handler:
 timer2b_handler:
 adcomp_handler:
     b generic_forth_handler
-
-@ ---------------------------------------------------------------------
-@ -- CoreForth starts here --------------------------------------------
-
-    .ltorg
-
-    .include "CoreForth.s"
-
-@ ---------------------------------------------------------------------
-@ -- Board specific words ---------------------------------------------
-
-    .include "stm32f030_words.s"
-    .ltorg
-
-    defword "COLD", COLD
-    .word LIT, eval_words, EVALUATE
-    .word CHECK_EMULATION
-    .word LIT, startup_words, EVALUATE
-eval_words:
-    .include "stm32f030.gen.s"
-    .include "quit.gen.s"
-    .word 0xffffffff
-startup_words:
-    .include "stm32f030_ram.gen.s"
-    .word 0xffffffff
-
-    .set last_word, link
-    .set data_start, ram_here

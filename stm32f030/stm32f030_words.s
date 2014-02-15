@@ -1,4 +1,15 @@
-    .ltorg
+@ ---------------------------------------------------------------------
+@ -- CoreForth starts here --------------------------------------------
+
+    .syntax unified
+    .text
+
+    .org 0x400
+    .set ram_start, 0x20000000
+    .set eval_words, 0x00010000
+
+    .include "stm32f030_definitions.s"
+    .include "CoreForth.s"
 
     defcode "RETI", RETI
     pop {r4}
@@ -16,8 +27,6 @@
     defword ";I", SEMICOLONI, F_IMMED
     .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    defvar "IVT", IVT, 75 * 4
-
     defcode "KEY?", KEYQ
     movs r2, #0
     ldr r0, =(UART1 + UART_ISR)
@@ -34,5 +43,18 @@
     defvar "SBUF-TAIL", SBUF_TAIL
     defvar "IVT", IVT, 48 * 4
     defvar "UART0-TASK", UARTZ_TASK
+
+    defword "COLD", COLD
+    .word EMULATIONQ, QBRANCH, 1f - .
+    .word ROM, LIT, eval_words, DUP, LIT, 40, TYPE, CR, EVALUATE
+    .word HERE, LIT, init_here, STORE
+    .word RAM_DP, FETCH, LIT, init_data_start, STORE
+    .word LATEST, FETCH, LIT, init_last_word, STORE
+    .word ROM_DUMP, BYE
+1:  .word LATEST, FETCH, FROMLINK, EXECUTE
+
+    .set last_word, link
+    .set data_start, ram_here
+    .set here, .
 
     .ltorg
