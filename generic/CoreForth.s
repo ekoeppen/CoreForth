@@ -112,6 +112,8 @@ reset_handler:
     ldr r6, =addr_TASKZRTOS
     ldr r7, =cold_start
     NEXT
+
+    .align 2, 0
 cold_start:
     .word TASKZ, UPSTORE
     .word TASKZRTOS, RZ, STORE
