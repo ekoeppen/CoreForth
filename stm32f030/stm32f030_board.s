@@ -37,7 +37,7 @@ _start:
 
 code_start:
 init_board:
-    ldr r0, =0xe000ed00
+    ldr r0, =CPUID
     ldr r0, [r0]
     cmp r0, #0
     bne 1f
@@ -81,11 +81,11 @@ init_board:
     pop {pc}
 
 readkey:
-    ldr r0, =0xe000ed00
+    ldr r0, =CPUID
     ldr r0, [r0]
     cmp r0, #0
     bne 1f
-    ldr r0, =0xe0000000
+    ldr r0, =EMULATOR_UART
     ldr r0, [r0]
     bx lr
 1:  push {r1, r2, r3, lr}
@@ -100,11 +100,11 @@ readkey:
 
 putchar:
     push {r1, r2, r3, lr}
-    ldr r1, =0xe000ed00
+    ldr r1, =CPUID
     ldr r1, [r1]
     cmp r1, #0
     bne 1f
-    ldr r1, =0xe0000000
+    ldr r1, =EMULATOR_UART
     str r0, [r1]
     b 3f
 1:  ldr r3, =UART1
