@@ -4,7 +4,6 @@
     .syntax unified
     .text
 
-    .org 0x400
     .set ram_start, 0x20000000
     .set eval_words, 0x00010000
 
