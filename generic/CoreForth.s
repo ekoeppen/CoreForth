@@ -237,66 +237,6 @@ readline_end:
     subs r0, r5, r4
     pop {r3, r4, r5, pc}
 
-puthexnumber:
-    push {r4, r5, r6, r7, lr}
-    movs r3, #0
-    movs r5, #8
-    movs r6, #15
-    movs r7, #28
-puthexnumber_loop:
-    rors r0, r7
-    mov r4, r0
-    ands r0, r6
-    cmp r3, #0
-    bgt 3f
-    cmp r0, #0
-    beq 2f
-    movs r3, #1
-3:  adds r0, r0, #'0'
-    cmp r0, #'9'
-    ble 1f
-    adds r0, r0, #'A' - '0' - 10
-1:  bl putchar
-2:  mov r0, r4
-    subs r5, r5, #1
-    bne puthexnumber_loop
-    cmp r3, #0
-    bne 4f
-    movs r0, #'0'
-    bl putchar
-4:  pop {r4, r5, r6, r7, pc}
-
-putsignedhexnumber:
-    push {lr}
-    cmp r0, #0
-    bge 1f
-    push {r0}
-    movs r0, #'-'
-    bl putchar
-    pop {r1}
-    negs r0, r1
-1:  bl puthexnumber
-    pop {pc}
-
-printrstack:
-    push {r4, lr}
-    ldr r4, =addr_TASKZRTOS
-    adds r4, r4, #4
-1:  ldr r0, [r4]
-    bl puthexnumber
-    movs r0, #32
-    bl putchar
-    cmp r4, r6
-    beq 2f
-    adds r4, r4, #4
-    b 1b
-2:  movs r0, #13
-    bl putchar
-    movs r0, #10
-    bl putchar
-    pop {r4, pc}
-    .ltorg
-
     @ Busy delay with three ticks per count
 delay:
     subs r0, #1
@@ -950,14 +890,15 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
 
     .ltorg
 
-    defword ".S", PRINTSTACK
-    .word SPFETCH, SZ, FETCH
+    defword "(.S)", XPRINTSTACK
 1:  .word TWODUP, LTGT, QBRANCH, 2f - ., CELL, MINUS, DUP, FETCH, DOT, BRANCH, 1b - .
 2:  .word TWODROP, CR, EXIT
 
-    defcode ".R", PRINTRSTACK
-    bl printrstack
-    NEXT
+    defword ".S", PRINTSTACK
+    .word SPFETCH, SZ, FETCH, XPRINTSTACK, EXIT
+
+    defword ".R", PRINTRSTACK
+    .word RZ, FETCH, CELL, ADD, RPFETCH, CELL, ADD, XPRINTSTACK, EXIT
 
     defcode "PUTCHAR", PUTCHAR
     pop {r0}
@@ -1003,15 +944,6 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
 
     defword ".", DOT
     .word LTNUM, DUP, ABS, NUMS, SWAP, SIGN, NUMGT, TYPE, SPACE, EXIT
-
-    defcode ".UX", DOTUX
-    movs r0, '0'
-    bl putchar
-    movs r0, 'x'
-    bl putchar
-    pop {r0}
-    bl puthexnumber
-    NEXT
 
     defcode "READ-KEY", READ_KEY
     bl readkey
@@ -1137,15 +1069,6 @@ dumpw_end_final:
 
     defword ">NUMBER", TONUMBER
     .word BASE, FETCH, TOR, SETBASE
-/*
-    DUP WHILE
-        OVER C@ DIGIT?
-        0= IF DROP EXIT THEN
-        >R ROT BASE @ *
-        R> + ROT ROT
-        1 /STRING
-    REPEAT ;
-*/
 tonumber_loop:
     .word DUP, QBRANCH, tonumber_done - .
     .word OVER, FETCHBYTE, ISDIGIT

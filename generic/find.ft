@@ -8,3 +8,4 @@
         NIP DUP LINK> SWAP
         LINK>FLAGS C@ 1 AND 0= 1 OR \ 1 for immed, -1 otherwise
     THEN ;
+

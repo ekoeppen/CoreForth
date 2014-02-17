@@ -1,6 +1,15 @@
 @ ---------------------------------------------------------------------
 @ -- Disassembler -----------------------------------------------------
 
+    defcode ".UX", DOTUX
+    movs r0, '0'
+    bl putchar
+    movs r0, 'x'
+    bl putchar
+    pop {r0}
+    bl puthexnumber
+    NEXT
+
     defword "TYPE-ESCAPED", TYPE_ESCAPED
     .word QDUP, QBRANCH, 0x4c
     .word SWAP, DUP, CFETCH, DUP, LIT, '"', EQU, QBRANCH, 0x10

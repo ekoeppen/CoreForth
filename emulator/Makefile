@@ -12,6 +12,6 @@ coreforth.elf: $(OBJS)
 	
 coreforth.bin: coreforth.elf
 	arm-none-eabi-objcopy -Obinary $< $@
-	../emulator/emulator -d $@ -m 00010000 -d ../generic/ansi.ft -d ../generic/systick.ft -d ../generic/multitasking.ft -d ../generic/quit.ft -d emulator.ft -o $@
+	thumbulator -d $@ -m 00010000 -d ../generic/ansi.ft -d ../generic/systick.ft -d ../generic/multitasking.ft -d ../generic/quit.ft -d emulator.ft -o $@
 	LC_CTYPE=C && LANG=C && sed -e "s/revision NNNNNNNN/revision $(REVISION)/" < $@ > $@.bak && mv $@.bak $@
 
