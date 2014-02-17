@@ -82,20 +82,19 @@ end_of_irq:
 
 code_start:
 init_board:
-    mov pc, lr
+    bx lr
 
 readkey:
-    b .
+    ldr r1, =0xe0000000
+    ldr r0, [r1]
+    bx lr
 
 putchar:
-    push {r1, r2, r3, lr}
-    ldr r1, =UART0
-    movs r2, #UART_TXFF
-1:  ldr r3, [r1, #UART_FR]
-    ands r3, r3, r2
-    bne 1b
-    strb r0, [r1, #UART_DR]
-    pop {r1, r2, r3, pc}
+    ldr r1, =0xe0000000
+    str r0, [r1]
+    bx lr
+
+    mov pc, lr
 
 @ ---------------------------------------------------------------------
 @ -- IRQ handlers -----------------------------------------------------
