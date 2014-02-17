@@ -6,7 +6,7 @@
 
     .org 0x400
     .set ram_start, 0x20000000
-    .set eval_words, 0x00010000
+    .set eval_words, 0x00040000
 
     .include "emulator_definitions.s"
     .include "CoreForth.s"
@@ -45,6 +45,13 @@
     .word ROM_DUMP, BYE
 1:  .word LATEST, FETCH, FROMLINK, EXECUTE
 
+    .ltorg
+
     .set last_word, link
     .set data_start, ram_here
     .set here, .
+
+    .org 0x00010000
+    .set link, 0
+
+    .ltorg
