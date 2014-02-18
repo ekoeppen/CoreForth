@@ -45,7 +45,7 @@
 
     defword "COLD", COLD
     .word EMULATIONQ, QBRANCH, 1f - .
-    .word ROM, LIT, eval_words, DUP, LIT, 40, TYPE, CR, EVALUATE
+    .word ROM, LIT, eval_words, EVALUATE
     .word HERE, LIT, init_here, STORE
     .word RAM_DP, FETCH, LIT, init_data_start, STORE
     .word LATEST, FETCH, LIT, init_last_word, STORE
@@ -53,6 +53,7 @@
 1:  .word LATEST, FETCH, FROMLINK, EXECUTE
 
     .set last_word, link
+    .set last_host, link_host
     .set data_start, ram_here
     .set here, .
 

@@ -13,6 +13,7 @@
     .set F_FLAGSMASK,       0x7f
 
     .set link,                 0
+    .set link_host,            0
     .set ram_here, ram_start
 
 @ ---------------------------------------------------------------------
@@ -30,6 +31,18 @@
     .ifdef \name
     .print "Redefining \name"
     .endif
+    .endm
+
+    .macro host_only
+    .section .host
+    .set link_save, link
+    .set link, link_host
+    .endm
+
+    .macro end_host_only
+    .set link_host, link
+    .set link, link_save
+    .section .text
     .endm
 
     .macro defword name, label, flags=0, xt=DOCOL
@@ -1401,8 +1414,18 @@ is_positive:
     defword "SI=", SIEQU, 0x0
     .word GTR, RFETCH, DUP, QBRANCH, 0x24, DROP, TWODUP, CFETCH, UPPERCASE, SWAP, CFETCH, UPPERCASE, EQU, QBRANCH, 0x24, ONEPLUS, SWAP, ONEPLUS, RGT, ONEMINUS, GTR, BRANCH, 0xffffffac, TWODROP, RGT, ZEQU, EXIT
 
-    defword "FIND", FIND, 0x0
-    .word LATEST, FETCH, TWODUP, LINKGTNAME, OVER, CFETCH, ONEPLUS, SIEQU, ZEQU, DUP, QBRANCH, 0x10, DROP, FETCH, DUP, ZEQU, QBRANCH, 0xffffffc4, DUP, QBRANCH, 0x38, NIP, DUP, LINKGT, SWAP, LINKGTFLAGS, CFETCH, LIT, 0x1, AND, ZEQU, LIT, 0x1, OR, EXIT
+    defword "(FIND)", XFIND
+2:  .word TWODUP, LINKGTNAME, OVER, CFETCH, ONEPLUS, SIEQU, ZEQU, DUP, QBRANCH, 1f - .
+    .word DROP, FETCH, DUP
+1:  .word ZEQU, QBRANCH, 2b - .
+    .word DUP, QBRANCH, 3f - .
+    .word NIP, DUP, LINKGT, SWAP, LINKGTFLAGS, CFETCH, LIT, 0x1, AND, ZEQU, LIT, 0x1, OR
+3:  .word EXIT
+
+    defword "FIND", FIND
+    .word LATEST, FETCH, XFIND, QDUP, QBRANCH, 1f - ., EXIT
+1:  .word LIT, last_host, QDUP, QBRANCH, 2f - ., XFIND, EXIT
+2:  .word LIT, 0, EXIT
 
     defword "\\", BACKSLASH, F_IMMED
     .word SOURCECOUNT, FETCH, SOURCEINDEX, STORE, EXIT
@@ -1487,6 +1510,8 @@ interpret_not_found:
 interpret_eol:
     .word LIT, -1, EXIT
 
+    @ host_only
+
     defword "EVALUATE", EVALUATE
     .word XSOURCE, STORE
     .word LIT, 0, STATE, STORE
@@ -1503,6 +1528,8 @@ interpret_eol:
     .word SOURCECOUNT, FETCH, XSOURCE, ADDSTORE, BRANCH, 1b - .
 2:  .word DROP, EXIT
 3:  .word DROP, DUP, DOT, SPACE, COUNT, TYPE, LIT, '?', EMIT, CR, EXIT
+
+    @ end_host_only
 
     defword "FORGET", FORGET
     .word BL, WORD, FIND, DROP, TOLINK, FETCH, LATEST, STORE, EXIT
@@ -1528,12 +1555,17 @@ interpret_eol:
     defword ";", SEMICOLON, F_IMMED
     .word LIT_XT, EXIT, COMMAXT, REVEAL, LBRACKET, EXIT
 
+    host_only
+
     defword "WORDS", WORDS
     .word LATEST, FETCH
 words_loop:
     .word DUP, CELL, ADD, CHAR, ADD, COUNT, TYPE, SPACE
     .word FETCH, QDUP, ZEQU, QBRANCH, words_loop - .
     .word EXIT
+
+    end_host_only
+
 
     defword "DEFINED?", DEFINEDQ
     .word BL, WORD, FIND, NIP, EXIT

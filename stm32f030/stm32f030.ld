@@ -5,6 +5,7 @@ ENTRY(reset_handler)
 MEMORY
 {
     FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 0x00010000
+    HOST  (rx) : ORIGIN = 0x08200000, LENGTH = 0x00010000
     SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00001000
 }
 
@@ -15,6 +16,10 @@ SECTIONS
         *(.rodata)
         KEEP(*(interrupt_vector))
     } > FLASH
+
+    .host : {
+        *(.host)
+    } > HOST
 
     .data : {
         ram_start = . ;
