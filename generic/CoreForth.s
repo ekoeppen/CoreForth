@@ -1555,7 +1555,7 @@ interpret_eol:
     defword ";", SEMICOLON, F_IMMED
     .word LIT_XT, EXIT, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    host_only
+    @ host_only
 
     defword "WORDS", WORDS
     .word LATEST, FETCH
@@ -1564,7 +1564,7 @@ words_loop:
     .word FETCH, QDUP, ZEQU, QBRANCH, words_loop - .
     .word EXIT
 
-    end_host_only
+    @ end_host_only
 
 
     defword "DEFINED?", DEFINEDQ
