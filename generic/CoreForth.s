@@ -16,6 +16,8 @@
     .set link_host,            0
     .set ram_here, ram_start
 
+    .set FEATURE_COMPILER, 1
+
 @ ---------------------------------------------------------------------
 @ -- Macros -----------------------------------------------------------
 
@@ -33,16 +35,22 @@
     .endif
     .endm
 
-    .macro host_only
+    .macro target_conditional, feature
+    .ifndef \feature
     .section .host
     .set link_save, link
     .set link, link_host
+    .set conditional_feature, 1
+    .endif
     .endm
 
-    .macro end_host_only
+    .macro end_target_conditional
+    .if conditional_feature==1
     .set link_host, link
     .set link, link_save
     .section .text
+    .set conditional_feature, 0
+    .endif
     .endm
 
     .macro defword name, label, flags=0, xt=DOCOL
@@ -1136,6 +1144,8 @@ is_positive:
     adds r7, r7, #4
     NEXT
 
+    target_conditional FEATURE_COMPILER
+
     defword "POSTPONE", POSTPONE, F_IMMED
     .word BL, WORD, FIND
     .WORD ZLT, QBRANCH,  1f - .
@@ -1184,6 +1194,8 @@ is_positive:
 1:  .word DUP, QBRANCH, 2f - .
     .word THEN, BRANCH, 1b - .
 2:  .word DROP, EXIT
+
+    end_target_conditional
 
     defcode "(DO)", XDO
     pop {r0, r1}
@@ -1242,6 +1254,8 @@ is_positive:
     push {r0}
     NEXT
 
+    target_conditional FEATURE_COMPILER
+
     defword "DO", DO, F_IMMED
     .word LIT_XT, XDO, COMMAXT, HERE, EXIT
 
@@ -1255,6 +1269,8 @@ is_positive:
 
     defword "RECURSE", RECURSE, F_IMMED
     .word LATEST, FETCH, FROMLINK, COMMAXT, EXIT
+
+    end_target_conditional
 
 @ ---------------------------------------------------------------------
 @ -- Compiler and interpreter ----------------------------------------
@@ -1292,6 +1308,18 @@ is_positive:
     b .
 
     .ltorg
+
+    defcode "LIT", LIT
+    ldr r0, [r7]
+    adds r7, r7, #4
+    push {r0}
+    NEXT
+
+    defcode "LIT-XT", LIT_XT
+    ldr r0, [r7]
+    adds r7, r7, #4
+    push {r0}
+    NEXT
 
     defword "ROM", ROM
     .word LIT, 1, ROM_ACTIVE, STORE, EXIT
@@ -1333,6 +1361,62 @@ is_positive:
 
     defword "C,", CCOMMA
     .word HERE, STOREBYTE, LIT, 1, ALLOT, EXIT
+
+    defword ">UPPER", GTUPPER, 0x0
+    .word OVER, PLUS, SWAP, LPARENDORPAREN, I, CFETCH, UPPERCASE, I, CSTORE, LPARENLOOPRPAREN, QBRANCH, 0xffffffe4, EXIT
+
+    defword "UPPERCASE", UPPERCASE, 0x0
+    .word DUP, LIT, 0x61, LIT, 0x7b, WITHIN, LIT, 0x20, AND, XOR, EXIT
+
+    defword "SI=", SIEQU, 0x0
+    .word GTR, RFETCH, DUP, QBRANCH, 0x24, DROP, TWODUP, CFETCH, UPPERCASE, SWAP, CFETCH, UPPERCASE, EQU, QBRANCH, 0x24, ONEPLUS, SWAP, ONEPLUS, RGT, ONEMINUS, GTR, BRANCH, 0xffffffac, TWODROP, RGT, ZEQU, EXIT
+
+    defword "LINK>", FROMLINK
+    .word LINKTONAME, DUP, FETCHBYTE, LIT, F_LENMASK, AND, CHAR, ADD, ADD, ALIGNED, EXIT
+
+    defcode ">FLAGS", TOFLAGS
+    pop {r0}
+1:  subs r0, #1
+    ldrb r1, [r0]
+    cmp r1, #F_MARKER
+    blt 1b
+    push {r0}
+    NEXT
+
+    defword ">NAME", TONAME
+    .word TOFLAGS, CHAR, ADD, EXIT
+
+    .ltorg
+
+    defword ">LINK", TOLINK
+    .word TONAME, LIT, 5, SUB, EXIT
+
+    defword ">BODY", GTBODY
+    .word CELL, ADD, EXIT
+
+    defword "LINK>NAME", LINKTONAME
+    .word LIT, 5, ADD, EXIT
+
+    defword "LINK>FLAGS", LINKTOFLAGS
+    .word CELL, ADD, EXIT
+
+    defword "ANY>LINK", ANYTOLINK
+    .word LATEST
+1:  .word FETCH, TWODUP, GT, QBRANCH, 1b - .
+    .word NIP, EXIT
+
+    defcode "EXECUTE", EXECUTE
+    pop {r0}
+    ldr r1, [r0]
+    adds r1, r1, #1
+    mov pc, r1
+
+    target_conditional FEATURE_COMPILER
+
+    defword "MARKER", MARKER, 0X0
+    .word CREATE, LATEST, FETCH, FETCH, COMMA, LPARENDOESGTRPAREN
+    .set marker_XT, .
+    .word 0x47884900, DODOES + 1, FETCH, LATEST, STORE, EXIT
 
     defword "\'", TICK
     .word BL, WORD, FIND, DROP, EXIT  @ TODO abort if not found
@@ -1380,18 +1464,6 @@ is_positive:
     defword "CONSTANT", CONSTANT
     .word XCREATE, LIT_XT, DOCON, COMMAXT, COMMA, EXIT
 
-    defcode "LIT", LIT
-    ldr r0, [r7]
-    adds r7, r7, #4
-    push {r0}
-    NEXT
-
-    defcode "LIT-XT", LIT_XT
-    ldr r0, [r7]
-    adds r7, r7, #4
-    push {r0}
-    NEXT
-
     defword "DEFER", DEFER
     .word CREATE, LIT_XT, EXIT, COMMA, XDOES
     .set DEFER_XT, .
@@ -1404,15 +1476,6 @@ is_positive:
 
     defword "DECLARE", DECLARE
     .word CREATE, LATEST, FETCH, LINKTOFLAGS, DUP, FETCH, LIT, F_NODISASM, OR, SWAP, STORE, EXIT
-
-    defword ">UPPER", GTUPPER, 0x0
-    .word OVER, PLUS, SWAP, LPARENDORPAREN, I, CFETCH, UPPERCASE, I, CSTORE, LPARENLOOPRPAREN, QBRANCH, 0xffffffe4, EXIT
-
-    defword "UPPERCASE", UPPERCASE, 0x0
-    .word DUP, LIT, 0x61, LIT, 0x7b, WITHIN, LIT, 0x20, AND, XOR, EXIT
-
-    defword "SI=", SIEQU, 0x0
-    .word GTR, RFETCH, DUP, QBRANCH, 0x24, DROP, TWODUP, CFETCH, UPPERCASE, SWAP, CFETCH, UPPERCASE, EQU, QBRANCH, 0x24, ONEPLUS, SWAP, ONEPLUS, RGT, ONEMINUS, GTR, BRANCH, 0xffffffac, TWODROP, RGT, ZEQU, EXIT
 
     defword "(FIND)", XFIND
 2:  .word TWODUP, LINKGTNAME, OVER, CFETCH, ONEPLUS, SIEQU, ZEQU, DUP, QBRANCH, 1f - .
@@ -1445,51 +1508,6 @@ noskip_delim:
     .word HERE, INCR, SWAP, CMOVE
     .word HERE, EXIT
 
-    defword "LINK>", FROMLINK
-    .word LINKTONAME, DUP, FETCHBYTE, LIT, F_LENMASK, AND, CHAR, ADD, ADD, ALIGNED, EXIT
-
-    defcode ">FLAGS", TOFLAGS
-    pop {r0}
-1:  subs r0, #1
-    ldrb r1, [r0]
-    cmp r1, #F_MARKER
-    blt 1b
-    push {r0}
-    NEXT
-
-    defword ">NAME", TONAME
-    .word TOFLAGS, CHAR, ADD, EXIT
-
-    .ltorg
-
-    defword ">LINK", TOLINK
-    .word TONAME, LIT, 5, SUB, EXIT
-
-    defword ">BODY", GTBODY
-    .word CELL, ADD, EXIT
-
-    defword "LINK>NAME", LINKTONAME
-    .word LIT, 5, ADD, EXIT
-
-    defword "LINK>FLAGS", LINKTOFLAGS
-    .word CELL, ADD, EXIT
-
-    defword "ANY>LINK", ANYTOLINK
-    .word LATEST
-1:  .word FETCH, TWODUP, GT, QBRANCH, 1b - .
-    .word NIP, EXIT
-
-    defword "MARKER", MARKER, 0X0
-    .word CREATE, LATEST, FETCH, FETCH, COMMA, LPARENDOESGTRPAREN
-    .set marker_XT, .
-    .word 0x47884900, DODOES + 1, FETCH, LATEST, STORE, EXIT
-
-    defcode "EXECUTE", EXECUTE
-    pop {r0}
-    ldr r1, [r0]
-    adds r1, r1, #1
-    mov pc, r1
-
     defword "(INTERPRET)", XINTERPRET @ TODO restructure this
 interpret_loop:
     .word BL, WORD, DUP, FETCHBYTE, QBRANCH, interpret_eol - .
@@ -1510,8 +1528,6 @@ interpret_not_found:
 interpret_eol:
     .word LIT, -1, EXIT
 
-    @ host_only
-
     defword "EVALUATE", EVALUATE
     .word XSOURCE, STORE
     .word LIT, 0, STATE, STORE
@@ -1528,8 +1544,6 @@ interpret_eol:
     .word SOURCECOUNT, FETCH, XSOURCE, ADDSTORE, BRANCH, 1b - .
 2:  .word DROP, EXIT
 3:  .word DROP, DUP, DOT, SPACE, COUNT, TYPE, LIT, '?', EMIT, CR, EXIT
-
-    @ end_host_only
 
     defword "FORGET", FORGET
     .word BL, WORD, FIND, DROP, TOLINK, FETCH, LATEST, STORE, EXIT
@@ -1555,7 +1569,7 @@ interpret_eol:
     defword ";", SEMICOLON, F_IMMED
     .word LIT_XT, EXIT, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    @ host_only
+    end_target_conditional
 
     defword "WORDS", WORDS
     .word LATEST, FETCH
@@ -1563,9 +1577,6 @@ words_loop:
     .word DUP, CELL, ADD, CHAR, ADD, COUNT, TYPE, SPACE
     .word FETCH, QDUP, ZEQU, QBRANCH, words_loop - .
     .word EXIT
-
-    @ end_host_only
-
 
     defword "DEFINED?", DEFINEDQ
     .word BL, WORD, FIND, NIP, EXIT
