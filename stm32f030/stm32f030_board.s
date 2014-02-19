@@ -21,13 +21,47 @@ _start:
     .long reset_handler + 1           /* Reset Handler                */
     .long nmi_handler + 1             /* NMI Handler                  */
     .long hardfault_handler + 1       /* Hard Fault Handler           */
-    .long memmanage_handler + 1       /* MPU Fault Handler            */
-    .long busfault_handler + 1        /* Bus Fault Handler            */
-    .long usagefault_handler + 1      /* Usage Fault Handler          */
-    .long 0                           /* Reserved                     */
-    .long 0                           /* Reserved                     */
-    .long 0                           /* Reserved                     */
-    .long 0                           /* Reserved                     */
+    .long 0
+    .long 0
+    .long 0
+    .long 0
+    .long 0
+    .long 0
+    .long 0
+    .long generic_forth_handler + 1   /* SVCall handler               */
+    .long 0
+    .long 0
+    .long 0
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
 
     .org 0xc0
     .set end_of_irq, .
@@ -181,29 +215,3 @@ pendsv_handler:
 
 systick_handler:
     b .
-
-gpioa_handler:
-gpiob_handler:
-gpioc_handler:
-gpiod_handler:
-gpioe_handler:
-uart0_handler:
-uart1_handler:
-ssi_handler:
-i2c_handler:
-pwm0_handler:
-pwm1_handler:
-pwm2_handler:
-adcseq0_handler:
-adcseq1_handler:
-adcseq2_handler:
-adcseq3_handler:
-watchdog_handler:
-timer0a_handler:
-timer0b_handler:
-timer1a_handler:
-timer1b_handler:
-timer2a_handler:
-timer2b_handler:
-adcomp_handler:
-    b generic_forth_handler
