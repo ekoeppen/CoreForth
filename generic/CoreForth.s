@@ -16,7 +16,7 @@
     .set link_host,            0
     .set ram_here, ram_start
 
-    .set ENABLE_COMPILER, 1
+    .set ENABLE_COMPILER,      1
 
 @ ---------------------------------------------------------------------
 @ -- Macros -----------------------------------------------------------
@@ -1144,7 +1144,7 @@ is_positive:
     adds r7, r7, #4
     NEXT
 
-    target_conditional FEATURE_COMPILER
+    target_conditional ENABLE_COMPILER
 
     defword "POSTPONE", POSTPONE, F_IMMED
     .word BL, WORD, FIND
@@ -1254,7 +1254,7 @@ is_positive:
     push {r0}
     NEXT
 
-    target_conditional FEATURE_COMPILER
+    target_conditional ENABLE_COMPILER
 
     defword "DO", DO, F_IMMED
     .word LIT_XT, XDO, COMMAXT, HERE, EXIT
@@ -1289,7 +1289,7 @@ is_positive:
     bkpt 0xab
     NEXT
 
-    target_conditional ENABLE_NEVER
+    target_conditional ENABLE_COMPILER
 
     defword "ROM-DUMP", ROM_DUMP
     .word LIT, _start, ROM_DP, FETCH, LIT, 0x80, EMULATOR_BKPT, EXIT
@@ -1301,6 +1301,10 @@ is_positive:
 
     defcode "WFI", WFI
     wfi
+    NEXT
+
+    defcode "WFE", WFE
+    wfe
     NEXT
 
     defcode "RESET", RESET
@@ -1532,6 +1536,23 @@ interpret_not_found:
 interpret_eol:
     .word LIT, -1, EXIT
 
+    defword "EVALUATE", EVALUATE
+    .word XSOURCE, STORE
+    .word LIT, 0, STATE, STORE
+1:  .word XSOURCE, FETCH
+5:  .word DUP, FETCHBYTE, DUP, ZNEQU, QBRANCH, 2f - ., LIT, 10, EQU, QBRANCH, 7f - .
+    .word INCR, BRANCH, 5b - .
+7:  .word DUP
+6:  .word DUP, FETCHBYTE, LIT, 10, NEQU, QBRANCH, 4f - .
+    .word INCR, BRANCH, 6b - .
+4:  .word OVER, SUB
+    .word TWODUP, TYPE, CR
+    .word SOURCECOUNT, STORE, XSOURCE, STORE, LIT, 0, SOURCEINDEX, STORE
+    .word XINTERPRET, QBRANCH, 3f - ., DROP
+    .word SOURCECOUNT, FETCH, XSOURCE, ADDSTORE, BRANCH, 1b - .
+2:  .word DROP, EXIT
+3:  .word DROP, DUP, DOT, SPACE, COUNT, TYPE, LIT, '?', EMIT, CR, EXIT
+
     defword "FORGET", FORGET
     .word BL, WORD, FIND, DROP, TOLINK, FETCH, LATEST, STORE, EXIT
 
@@ -1555,27 +1576,6 @@ interpret_eol:
 
     defword ";", SEMICOLON, F_IMMED
     .word LIT_XT, EXIT, COMMAXT, REVEAL, LBRACKET, EXIT
-
-    end_target_conditional
-
-    target_conditional ENABLE_EVALUATE
-
-    defword "EVALUATE", EVALUATE
-    .word XSOURCE, STORE
-    .word LIT, 0, STATE, STORE
-1:  .word XSOURCE, FETCH
-5:  .word DUP, FETCHBYTE, DUP, ZNEQU, QBRANCH, 2f - ., LIT, 10, EQU, QBRANCH, 7f - .
-    .word INCR, BRANCH, 5b - .
-7:  .word DUP
-6:  .word DUP, FETCHBYTE, LIT, 10, NEQU, QBRANCH, 4f - .
-    .word INCR, BRANCH, 6b - .
-4:  .word OVER, SUB
-    .word TWODUP, TYPE, CR
-    .word SOURCECOUNT, STORE, XSOURCE, STORE, LIT, 0, SOURCEINDEX, STORE
-    .word XINTERPRET, QBRANCH, 3f - ., DROP
-    .word SOURCECOUNT, FETCH, XSOURCE, ADDSTORE, BRANCH, 1b - .
-2:  .word DROP, EXIT
-3:  .word DROP, DUP, DOT, SPACE, COUNT, TYPE, LIT, '?', EMIT, CR, EXIT
 
     end_target_conditional
 
