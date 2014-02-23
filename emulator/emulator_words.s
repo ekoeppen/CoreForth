@@ -24,7 +24,9 @@
     pop {r4 - r7, pc}
 
     defword ";I", SEMICOLONI, F_IMMED
-    .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
+    .short LIT
+    .word RETI
+    .short COMMAXT, REVEAL, LBRACKET, EXIT
 
     defcode "KEY?", KEYQ
     ldr r0, =UART_DR
@@ -36,13 +38,21 @@
     defvar "UART0-TASK", UARTZ_TASK
 
     defword "COLD", COLD
-    .word EMULATIONQ, QBRANCH, 1f - .
-    .word ROM, LIT, eval_words, EVALUATE
-    .word HERE, LIT, init_here, STORE
-    .word RAM_DP, FETCH, LIT, init_data_start, STORE
-    .word LATEST, FETCH, LIT, init_last_word, STORE
-    .word ROM_DUMP, BYE
-1:  .word LATEST, FETCH, FROMLINK, EXECUTE
+    .short EMULATIONQ, QBRANCH, 1f - .
+    .short ROM, LIT
+    .word eval_words
+    .short EVALUATE
+    .short HERE, LIT
+    .word init_here
+    .short STORE
+    .short RAM_DP, FETCH, LIT
+    .word init_data_start
+    .short STORE
+    .short LATEST, FETCH, LIT
+    .word init_last_word
+    .short STORE
+    .short ROM_DUMP, BYE
+1:  .short LATEST, FETCH, FROMLINK, EXECUTE
 
     .set last_word, link
     .set last_host, link_host
