@@ -161,8 +161,7 @@ next:
     bx r1
 
 DOCOL:
-    adds r6, r6, #4
-    str r7, [r6]
+    stm r6!, {r7}
     adds r7, r0, #4
     NEXT
 
@@ -182,8 +181,7 @@ DOCON:
     NEXT
 
 DODOES:
-    adds r6, r6, #4
-    str r7, [r6]
+    stm r6!, {r7}
     mov r7, lr
     adds r7, r7, #3
     adds r0, r0, #4
@@ -198,8 +196,8 @@ DOOFFSET:
     NEXT
 
     defcode "EXIT", EXIT
-    ldr r7, [r6]
     subs r6, r6, #4
+    ldr r7, [r6]
     NEXT
 
 @ ---------------------------------------------------------------------
@@ -345,18 +343,19 @@ delay:
 
     defcode ">R", TOR
     pop {r0}
-    adds r6, r6, #4
-    str r0, [r6]
+    stm r6!, {r0}
     NEXT
 
     defcode "R>", RFROM
-    ldr r0, [r6]
     subs r6, r6, #4
+    ldr r0, [r6]
     push {r0}
     NEXT
 
     defcode "R@", RFETCH
-    ldr r0, [r6]
+    mov r0, r6
+    subs r0, #4
+    ldr r0, [r0]
     push {r0}
     NEXT
 
@@ -1199,20 +1198,20 @@ is_positive:
 
     defcode "(DO)", XDO
     pop {r0, r1}
+    adds r6, r6, #4
     ldr r2, [r6]
     str r1, [r6]
     adds r6, r6, #4
     str r0, [r6]
-    adds r6, r6, #4
     str r2, [r6]
     NEXT
 
     defcode "I", INDEX
     .ifndef THUMB1
-    ldr r0, [r6, #-4]
+    ldr r0, [r6, #-8]
     .else
     mov r0, r6
-    subs r0, #4
+    subs r0, #8
     ldr r0, [r0]
     .endif
     push {r0}
@@ -1220,27 +1219,27 @@ is_positive:
 
     defcode "(LOOP)", XLOOP
     .ifndef THUMB1
-    ldr r0, [r6, #-4]
+    ldr r0, [r6, #-8]
     .else
     mov r0, r6
-    subs r0, #4
+    subs r0, #8
     ldr r0, [r0]
     .endif
     adds r0, r0, #1
     .ifndef THUMB1
-    ldr r1, [r6, #-8]
+    ldr r1, [r6, #-12]
     .else
     mov r1, r6
-    subs r1, #8
+    subs r1, #12
     ldr r1, [r1]
     .endif
     cmp r0, r1
     bge 1f
     .ifndef THUMB1
-    str r0, [r6, #-4]
+    str r0, [r6, #-8]
     .else
     mov r0, r6
-    subs r0, #4
+    subs r0, #8
     str r0, [r0]
     .endif
     movs r0, #0
