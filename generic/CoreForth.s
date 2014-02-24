@@ -22,11 +22,7 @@
 @ -- Macros -----------------------------------------------------------
 
     .macro NEXT
-    ldr r0, [r7]
-    adds r7, r7, #4
-    ldr r1, [r0]
-    adds r1, r1, #1
-    bx r1
+    bl next
     .endm
 
     .macro checkdef name
@@ -157,6 +153,12 @@ init_last_word:
 
 @ ---------------------------------------------------------------------
 @ -- Interpreter code -------------------------------------------------
+
+next:
+    ldm r7!, {r0}
+    ldr r1, [r0]
+    adds r1, r1, #1
+    bx r1
 
 DOCOL:
     adds r6, r6, #4
