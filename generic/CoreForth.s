@@ -550,6 +550,8 @@ fill_done:
     defword ">>SOURCE", GTGTSOURCE
     .word LIT, 1, SOURCEINDEX, ADDSTORE, EXIT
 
+    target_conditional ENABLE_COMPILER
+
     defword "S\"", SQUOT, F_IMMED
     .word LIT_XT, XSQUOTE, COMMAXT, LIT, '"', WORD
     .word FETCHBYTE, INCR, ALIGNED, ALLOT
@@ -563,6 +565,8 @@ fill_done:
     .word LIT, 1, OVER, ADDSTORE, LIT, 0, OVER, DUP, FETCHBYTE, ADD, STOREBYTE
     .word FETCHBYTE, INCR, ALIGNED, ALLOT
     .word GTGTSOURCE, EXIT
+
+    end_target_conditional
 
     defword "PAD", PAD
     .word HERE, LIT, 128, ADD, EXIT
@@ -1356,9 +1360,6 @@ is_positive:
 
     defword ",", COMMA
     .word HERE, STORE, CELL, ALLOT, EXIT
-
-    defword ",DEST", COMMADEST
-    .word COMMA, EXIT
 
     defword ",XT", COMMAXT
     .word COMMA, EXIT
