@@ -551,7 +551,7 @@ fill_done:
 
     defword "S\"", SQUOT, F_IMMED
     .word LIT_XT, XSQUOTE, COMMAXT, LIT, '"', WORD
-    .word FETCHBYTE, ALLOT, ALIGN
+    .word FETCHBYTE, INCR, ALIGNED, ALLOT
     .word GTGTSOURCE, EXIT
 
     defword ".\"", DOTQUOT, F_IMMED
@@ -560,7 +560,7 @@ fill_done:
     defword "SZ\"", SZQUOT, F_IMMED
     .word LIT_XT, XSQUOTE, COMMAXT, LIT, '"', WORD
     .word LIT, 1, OVER, ADDSTORE, LIT, 0, OVER, DUP, FETCHBYTE, ADD, STOREBYTE
-    .word FETCHBYTE, ALLOT, ALIGN
+    .word FETCHBYTE, INCR, ALIGNED, ALLOT
     .word GTGTSOURCE, EXIT
 
     defword "PAD", PAD
