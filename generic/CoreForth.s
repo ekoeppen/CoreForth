@@ -525,7 +525,7 @@ delay:
     defword "+!", ADDSTORE
     .short SWAP, OVER, FETCH, ADD, SWAP, STORE, EXIT
 
-    defcode "-!", SUBSTORE
+    defword "-!", SUBSTORE
     .short SWAP, OVER, FETCH, SWAP, SUB, SWAP, STORE, EXIT
 
     defcode "FILL", FILL
