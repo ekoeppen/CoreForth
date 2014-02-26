@@ -501,7 +501,13 @@ delay:
 
     defcode "@", FETCH
     pop {r0}
-    ldrh r1, [r0]
+    movs r1, #2
+    tst r0, r1
+    bne 1f
+    ldr r1, [r0]
+    push {r1}
+    NEXT
+1:  ldrh r1, [r0]
     ldrh r0, [r0, #2]
     lsls r0, #16
     orrs r1, r0
@@ -510,7 +516,13 @@ delay:
 
     defcode "!", STORE
     pop {r1}
+    movs r0, #2
+    tst r1, r0
+    bne 1f
     pop {r0}
+    str r0, [r1]
+    NEXT
+1:  pop {r0}
     strh r0, [r1]
     lsrs r0, #16
     strh r0, [r1, #2]
