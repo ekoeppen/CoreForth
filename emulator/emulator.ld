@@ -13,7 +13,7 @@ SECTIONS
     .flash : {
         *(.text)
         *(.rodata)
-        . = 0x00040000 ;
+        . = 0x0000e000 ;
         *(.host)
         KEEP(*(interrupt_vector))
     } > FLASH

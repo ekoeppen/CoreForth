@@ -23,8 +23,12 @@
     mov r8, r4
     pop {r4 - r7, pc}
 
+    target_conditional ENABLE_COMPILER
+
     defword ";I", SEMICOLONI, F_IMMED
     .short LIT_XT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
+
+    end_target_conditional
 
     defcode "KEY?", KEYQ
     movs r2, #0

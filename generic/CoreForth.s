@@ -17,12 +17,26 @@
     .set ram_here, ram_start
 
     .set ENABLE_COMPILER,      1
+    @ .set TRACE, 1
 
 @ ---------------------------------------------------------------------
 @ -- Macros -----------------------------------------------------------
 
 next:
     ldrh r0, [r7]
+    .ifdef TRACE
+    push {r0, r1, r2, r3}
+    bl puthexnumber
+    movs r0, #32
+    bl putchar
+    movs r0, r7
+    bl puthexnumber
+    movs r0, #13
+    bl putchar
+    movs r0, #10
+    bl putchar
+    pop {r0, r1, r2, r3}
+    .endif
     adds r7, r7, #2
     movs r1, #1
     tst r0, r1
@@ -149,7 +163,7 @@ cold_start:
     .short TASKZ, UPSTORE
     .short TASKZRTOS, RZ, STORE
     .short TASKZTOS, SZ, STORE
-    .short LIT, 10, 0, BASE, STORE
+    .short HLIT, 10, BASE, STORE
     .short RAM
     .short LIT
     .word init_here
@@ -230,8 +244,17 @@ DODATA:
 
 DOCON:
     movs r1, r0
+    ldrh r2, [r1, #2]
+    ldrh r1, [r1, #4]
+    lsls r1, #16
+    orrs r1, r2
+    push {r1}
+    NEXT
+
+DOCON16:
+    movs r1, r0
     adds r1, #2
-    ldr r1, [r1]
+    ldrh r1, [r1]
     push {r1}
     NEXT
 
@@ -441,7 +464,7 @@ delay:
     defconst "/DEST", PERDEST, 2
 
     defword "CELLS", CELLS
-    .short LIT, 4, 0, MUL, EXIT
+    .short HLIT, 4, MUL, EXIT
 
     defcode "ALIGNED", ALIGNED
     pop {r0}
@@ -478,14 +501,19 @@ delay:
 
     defcode "@", FETCH
     pop {r0}
-    ldr r1, [r0]
+    ldrh r1, [r0]
+    ldrh r0, [r0, #2]
+    lsls r0, #16
+    orrs r1, r0
     push {r1}
     NEXT
 
     defcode "!", STORE
     pop {r1}
     pop {r0}
-    str r0, [r1]
+    strh r0, [r1]
+    lsrs r0, #16
+    strh r0, [r1, #2]
     NEXT
 
     defword "2!", TWOSTORE
@@ -494,21 +522,11 @@ delay:
     defword "2@", TWOFETCH
     .short DUP, CELL, ADD, FETCH, SWAP, FETCH, EXIT
 
-    defcode "+!", ADDSTORE
-    pop {r1}
-    pop {r0}
-    ldr r2, [r1]
-    adds r2, r2, r0
-    str r2, [r1]
-    NEXT
+    defword "+!", ADDSTORE
+    .short SWAP, OVER, FETCH, ADD, SWAP, STORE, EXIT
 
     defcode "-!", SUBSTORE
-    pop {r1}
-    pop {r0}
-    ldr r2, [r1]
-    subs r2, r2, r0
-    str r2, [r1]
-    NEXT
+    .short SWAP, OVER, FETCH, SWAP, SUB, SWAP, STORE, EXIT
 
     defcode "FILL", FILL
     pop {r2}
@@ -598,7 +616,7 @@ fill_done:
     .short RFROM, COUNT, TWODUP, ADD, ALIGNED, TOR, EXIT
 
     defword ">>SOURCE", GTGTSOURCE
-    .short LIT, 1, 0, SOURCEINDEX, ADDSTORE, EXIT
+    .short HLIT, 1, SOURCEINDEX, ADDSTORE, EXIT
 
     defword "S\"", SQUOT, F_IMMED
     .short LIT_XT, XSQUOTE, COMMAXT, LIT, '"', 0, WORD
@@ -611,12 +629,12 @@ fill_done:
 
     defword "SZ\"", SZQUOT, F_IMMED
     .short LIT_XT, XSQUOTE, COMMAXT, LIT, '"', 0, WORD
-    .short LIT, 1, 0, OVER, ADDSTORE, LIT, 0, 0, OVER, DUP, FETCHBYTE, ADD, STOREBYTE
+    .short HLIT, 1, OVER, ADDSTORE, HLIT, 0, OVER, DUP, FETCHBYTE, ADD, STOREBYTE
     .short FETCHBYTE, ALLOT, ALIGN
     .short GTGTSOURCE, EXIT
 
     defword "PAD", PAD
-    .short HERE, LIT, 128, 0, ADD, EXIT
+    .short HERE, HLIT, 128, ADD, EXIT
 
 @ ---------------------------------------------------------------------
 @ -- Arithmetic ------------------------------------------------------
@@ -841,7 +859,7 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
     NEXT
 
     defword "ROTATE", ROTATE
-    .short DUP, ZGT, QBRANCH, 1f - ., LIT, 32, 0, SWAP, SUB, ROR, EXIT
+    .short DUP, ZGT, QBRANCH, 1f - ., HLIT, 32, SWAP, SUB, ROR, EXIT
 1:  .short NEGATE, ROR, EXIT
 
     defword "NEGATE", NEGATE
@@ -851,7 +869,7 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
     .short OVER, SUB, TOR, SUB, RFROM, ULT, EXIT
 
     defword "BITE", BITE
-    .short DUP, LIT, 0xff, 0, AND, SWAP, LIT, 8, 0, ROR, EXIT
+    .short DUP, HLIT, 0xff, AND, SWAP, HLIT, 8, ROR, EXIT
 
     defword "CHEW", CHEW
     .short BITE, BITE, BITE, BITE, DROP, EXIT
@@ -935,22 +953,22 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
     .short LT, INVERT, EXIT
 
     defword "0=", ZEQU
-    .short LIT, 0, 0, EQU, EXIT
+    .short HLIT, 0, EQU, EXIT
 
     defword "0<>", ZNEQU
-    .short LIT, 0, 0, NEQU, EXIT
+    .short HLIT, 0, NEQU, EXIT
 
     defword "0<", ZLT
-    .short LIT, 0, 0, LT, EXIT
+    .short HLIT, 0, LT, EXIT
 
     defword "0>", ZGT
-    .short LIT, 0, 0, GT, EXIT
+    .short HLIT, 0, GT, EXIT
 
     defword "0<=", ZLE
-    .short LIT, 0, 0, LE, EXIT
+    .short HLIT, 0, LE, EXIT
 
     defword "0>=", ZGE
-    .short LIT, 0, 0, GE, EXIT
+    .short HLIT, 0, GE, EXIT
 
 @ ---------------------------------------------------------------------
 @ -- Input/output ----------------------------------------------------
@@ -979,10 +997,10 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
     NEXT
 
     defword "LF", LF
-    .short LIT, 10, 0, EMIT, EXIT
+    .short HLIT, 10, EMIT, EXIT
 
     defword "CR", CR
-    .short LIT, 13, 0, EMIT, LF, EXIT
+    .short HLIT, 13, EMIT, LF, EXIT
 
     defconst "BL", BL, 32
 
@@ -990,13 +1008,13 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
     .short BL, EMIT, EXIT
 
     defword "HOLD", HOLD
-    .short LIT, 1, 0, HP, SUBSTORE, HP, FETCH, CSTORE, EXIT
+    .short HLIT, 1, HP, SUBSTORE, HP, FETCH, CSTORE, EXIT
 
     defword "<#", LTNUM
     .short PAD, HP, STORE, EXIT
 
     defword ">DIGIT", TODIGIT
-    .short DUP, LIT, 9, 0, GT, LIT, 7, 0, AND, PLUS, LIT, 48, 0, PLUS, EXIT
+    .short DUP, HLIT, 9, GT, HLIT, 7, AND, PLUS, HLIT, 48, PLUS, EXIT
 
     defword "#", NUM
     .short BASE, FETCH, UDIVMOD, SWAP, TODIGIT, HOLD, EXIT
@@ -1024,10 +1042,16 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
     NEXT
 
     defcode "READ-LINE", READ_LINE
-    ldr r0, =constaddr_TIB
-    ldr r0, [r0]
-    ldr r1, =constaddr_TIBSIZE
-    ldr r1, [r1]
+    ldr r1, =constaddr_TIB
+    ldrh r0, [r1]
+    ldrh r1, [r1, #2]
+    lsls r1, #16
+    orrs r0, r1
+    ldr r2, =constaddr_TIBSIZE
+    ldrh r1, [r2]
+    ldrh r2, [r2, #2]
+    lsls r2, #16
+    orrs r1, r2
     bl readline
     push {r0}
     NEXT
@@ -1076,7 +1100,7 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
     .short EXIT
 
     defword "(DUMP-ADDR)", XDUMP_ADDR
-    .short CR, DUP, LTNUM, FOURNUM, FOURNUM, NUMGT, TYPE, LIT, 58, 0, EMIT, SPACE, EXIT
+    .short CR, DUP, LTNUM, FOURNUM, FOURNUM, NUMGT, TYPE, HLIT, 58, EMIT, SPACE, EXIT
 
     defword "DUMP", DUMP
     .short BASE, FETCH, TOR, HEX, QDUP, QBRANCH, dump_end - .
@@ -1086,7 +1110,7 @@ dump_start_line:
 dump_line:
     .short DUP, FETCHBYTE, LTNUM, NUM, NUM, NUMGT, TYPE, SPACE, INCR
     .short SWAP, DECR, QDUP, QBRANCH, dump_end - .
-    .short SWAP, DUP, LIT, 7, 0, AND, QBRANCH, dump_start_line - .
+    .short SWAP, DUP, HLIT, 7, AND, QBRANCH, dump_start_line - .
     .short BRANCH, dump_line - .
 dump_end:
     .short DROP, RFROM, BASE, STORE, EXIT
@@ -1099,7 +1123,7 @@ dumpw_start_line:
 dumpw_line:
     .short DUP, FETCH, LTNUM, FOURNUM, FOURNUM, NUMGT, TYPE, SPACE, INCR4
     .short SWAP, DECR4, DUP, ZGT, QBRANCH, dumpw_end - .
-    .short SWAP, DUP, LIT, 0x1f, 0, AND, QBRANCH, dumpw_start_line - .
+    .short SWAP, DUP, HLIT, 0x1f, AND, QBRANCH, dumpw_start_line - .
     .short BRANCH, dumpw_line - .
 dumpw_end:
     .short DROP
@@ -1109,24 +1133,24 @@ dumpw_end_final:
     defword "SKIP", SKIP
     .short TOR
 1:  .short OVER, FETCHBYTE, RFETCH, EQU, OVER, ZGT, AND, QBRANCH, 2f - .
-    .short LIT, 1, 0, TRIMSTRING, BRANCH, 1b - .
+    .short HLIT, 1, TRIMSTRING, BRANCH, 1b - .
 2:  .short RDROP, EXIT
 
     defword "SCAN", SCAN
     .short TOR
 1:  .short OVER, FETCHBYTE, RFETCH, NEQU, OVER, ZGT, AND, QBRANCH, 2f - .
-    .short LIT, 1, 0, TRIMSTRING, BRANCH, 1b - .
+    .short HLIT, 1, TRIMSTRING, BRANCH, 1b - .
 2:  .short RDROP, EXIT
 
     defword "?SIGN", ISSIGN
-    .short OVER, FETCHBYTE, LIT, 0x2c, 0, SUB, DUP, ABS
-    .short LIT, 1, 0, EQU, AND, DUP, QBRANCH, 1f - .
-    .short INCR, TOR, LIT, 1, 0, TRIMSTRING, RFROM
+    .short OVER, FETCHBYTE, HLIT, 0x2c, SUB, DUP, ABS
+    .short HLIT, 1, EQU, AND, DUP, QBRANCH, 1f - .
+    .short INCR, TOR, HLIT, 1, TRIMSTRING, RFROM
 1:  .short EXIT
 
     defword "DIGIT?", ISDIGIT
-    .short DUP, LIT, '9', 0, GT, LIT, 0x100, 0, AND, ADD, DUP
-    .short LIT, 0x140, 0, GT, LIT, 0x107, 0, AND, SUB, LIT, 0x30, 0, SUB
+    .short DUP, LIT, '9', 0, GT, HLIT, 0x100, AND, ADD, DUP
+    .short HLIT, 0x140, GT, HLIT, 0x107, AND, SUB, HLIT, 0x30, SUB
     .short DUP, BASE, FETCH, ULT, EXIT
 
     defword "SETBASE", SETBASE
@@ -1136,7 +1160,7 @@ dumpw_end_final:
 2:  .short DUP, LIT, '%', 0, EQU, QBRANCH, 3f - ., BINARY, BRANCH, 4f - .
 3:  .short DROP, EXIT
 4:  .short DROP
-    .short LIT, 1, 0, TRIMSTRING, EXIT
+    .short HLIT, 1, TRIMSTRING, EXIT
 
     defword ">NUMBER", TONUMBER
     .short BASE, FETCH, TOR, SETBASE
@@ -1148,17 +1172,17 @@ tonumber_loop:
 tonumber_cont:
     .short TOR, ROT, BASE, FETCH, MUL
     .short RFROM, ADD, ROT, ROT
-    .short LIT, 1, 0, TRIMSTRING
+    .short HLIT, 1, TRIMSTRING
     .short BRANCH, tonumber_loop - .
 tonumber_done:
     .short RFROM, BASE, STORE, EXIT
 
     defword "?NUMBER", ISNUMBER /* ( c-addr -- n true | c-addr false ) */
     .short DUP
-    .short LIT, 0, 0, DUP, ROT, COUNT
+    .short HLIT, 0, DUP, ROT, COUNT
     .short ISSIGN, TOR, TONUMBER, QBRANCH, is_number - .
     .short RDROP, TWODROP, DROP
-    .short LIT, 0, 0, EXIT
+    .short HLIT, 0, EXIT
 is_number:
     .short TWOSWAP, TWODROP, DROP, RFROM, ZNEQU, QBRANCH, is_positive - ., NEGATE
 is_positive:
@@ -1167,16 +1191,16 @@ is_positive:
     .ltorg
 
     defword "DECIMAL", DECIMAL
-    .short LIT, 10, 0, BASE, STORE, EXIT
+    .short HLIT, 10, BASE, STORE, EXIT
 
     defword "HEX", HEX
-    .short LIT, 16, 0, BASE, STORE, EXIT
+    .short HLIT, 16, BASE, STORE, EXIT
 
     defword "OCTAL", OCTAL
-    .short LIT, 8, 0, BASE, STORE, EXIT
+    .short HLIT, 8, BASE, STORE, EXIT
 
     defword "BINARY", BINARY
-    .short LIT, 2, 0, BASE, STORE, EXIT
+    .short HLIT, 2, BASE, STORE, EXIT
 
 @ ---------------------------------------------------------------------
 @ -- Control flow -----------------------------------------------------
@@ -1214,6 +1238,9 @@ is_positive:
     defword "DEST!", DESTSTORE
     .short HSTORE, EXIT
 
+    defword "XT!", XTSTORE
+    .short HSTORE, EXIT
+
     defword "BEGIN", BEGIN, F_IMMED
     .short HERE, EXIT
 
@@ -1242,7 +1269,7 @@ is_positive:
     .short THEN, EXIT
 
     defword "CASE", CASE, F_IMMED
-    .short LIT, 0, 0, EXIT
+    .short HLIT, 0, EXIT
 
     defword "OF", OF, F_IMMED
     .short LIT_XT, OVER, COMMAXT
@@ -1355,12 +1382,12 @@ is_positive:
     .short LIT
     .word _start
     .short ROM_DP, FETCH
-    .short LIT, 0x80, 0, EMULATOR_BKPT, EXIT
+    .short HLIT, 0x80, EMULATOR_BKPT, EXIT
 
     end_target_conditional
 
     defword "BYE", BYE
-    .short LIT, 0x18, 0, EMULATOR_BKPT, EXIT
+    .short HLIT, 0x18, EMULATOR_BKPT, EXIT
 
     defcode "WFI", WFI
     wfi
@@ -1381,8 +1408,17 @@ is_positive:
     .ltorg
 
     defcode "LIT", LIT
-    ldr r0, [r7]
+    ldrh r0, [r7]
+    ldrh r1, [r7, #2]
+    lsls r1, #16
+    orrs r0, r1
     adds r7, r7, #4
+    push {r0}
+    NEXT
+
+    defcode "HLIT", HLIT
+    ldrh r0, [r7]
+    adds r7, r7, #2
     push {r0}
     NEXT
 
@@ -1426,25 +1462,25 @@ is_positive:
     .short HERE, STORE, CELL, ALLOT, EXIT
 
     defword ",XT", COMMAXT
-    .short DUP, LIT, 0, 0x2000, GE, QBRANCH, 1f - .
-    .short LIT, 1, 0, OR
-1:  .short HERE, HSTORE, PERXT, ALLOT, EXIT
+    .short DUP, LIT, 0, 0x0001, GE, QBRANCH, 1f - .
+    .short HLIT, 1, OR
+1:  .short HERE, XTSTORE, PERXT, ALLOT, EXIT
 
     defword ",DEST", COMMADEST
-    .short HERE, HSTORE, PERDEST, ALLOT, EXIT
+    .short HERE, DESTSTORE, PERDEST, ALLOT, EXIT
 
     defword ",LINK", COMMALINK
     .short COMMA, EXIT
 
     defword "C,", CCOMMA
-    .short HERE, STOREBYTE, LIT, 1, 0, ALLOT, EXIT
+    .short HERE, STOREBYTE, HLIT, 1, ALLOT, EXIT
 
     defword ">UPPER", GTUPPER
     .short OVER, PLUS, SWAP
 1:  .short LPARENDORPAREN, I, CFETCH, UPPERCASE, I, CSTORE, LPARENLOOPRPAREN, QBRANCH, 1b - ., EXIT
 
     defword "UPPERCASE", UPPERCASE
-    .short DUP, LIT, 0x61, 0, LIT, 0x7b, 0, WITHIN, LIT, 0x20, 0, AND, XOR, EXIT
+    .short DUP, HLIT, 0x61, HLIT, 0x7b, WITHIN, HLIT, 0x20, AND, XOR, EXIT
 
     defword "SI=", SIEQU
     .short GTR
@@ -1517,7 +1553,10 @@ is_positive:
     .short LIT_XT, LIT_XT, COMMAXT, COMMAXT, EXIT
 
     defword "(DOES>)", XDOES
-    .short RFROM, LATEST, FETCH, FROMLINK, STORE, EXIT
+    .short RFROM, LATEST, FETCH, FROMLINK
+    .short DUP, LIT, 0, 0x0001, GE, QBRANCH, 1f - .
+    .short HLIT, 1, OR
+1:  .short XTSTORE, EXIT
 
     defword "DOES>", DOES, F_IMMED
     .short LIT_XT, XDOES, COMMAXT
@@ -1588,8 +1627,8 @@ is_positive:
 1:  .short ZEQU, QBRANCH, 2b - .
     .short DUP, QBRANCH, 3f - .
     .short NIP, DUP, LINKGT, SWAP, LINKGTFLAGS, CFETCH
-    .short LIT, 1, 0, AND, ZEQU
-    .short LIT, 1, 0, OR
+    .short HLIT, 1, AND, ZEQU
+    .short HLIT, 1, OR
 3:  .short EXIT
 
     defword "FIND", FIND
@@ -1597,7 +1636,7 @@ is_positive:
 1:  .short LIT
     .word last_host
     .short QDUP, QBRANCH, 2f - ., XFIND, EXIT
-2:  .short LIT, 0, 0, EXIT
+2:  .short HLIT, 0, EXIT
 
     defword "\\", BACKSLASH, F_IMMED
     .short SOURCECOUNT, FETCH, SOURCEINDEX, STORE, EXIT
@@ -1635,24 +1674,24 @@ interpret_check_number:
     .short STATE, FETCH, QBRANCH, interpret_loop - .
     .short LIT_XT, LIT, COMMAXT, COMMA, BRANCH, interpret_loop - .
 interpret_not_found:
-    .short LIT, 0, 0, EXIT
+    .short HLIT, 0, EXIT
 interpret_eol:
     .short LIT, -1, -1, EXIT
 
     defword "EVALUATE", EVALUATE
     .short XSOURCE, STORE
-    .short LIT, 0, 0, STATE, STORE
+    .short HLIT, 0, STATE, STORE
 1:  .short XSOURCE, FETCH
 5:  .short DUP, FETCHBYTE, DUP, ZNEQU, QBRANCH, 2f - .
-    .short LIT, 10, 0, EQU, QBRANCH, 7f - .
+    .short HLIT, 10, EQU, QBRANCH, 7f - .
     .short INCR, BRANCH, 5b - .
 7:  .short DUP
-6:  .short DUP, FETCHBYTE, LIT, 10, 0, NEQU, QBRANCH, 4f - .
+6:  .short DUP, FETCHBYTE, HLIT, 10, NEQU, QBRANCH, 4f - .
     .short INCR, BRANCH, 6b - .
 4:  .short OVER, SUB
     .short TWODUP, TYPE, CR
     .short SOURCECOUNT, STORE, XSOURCE, STORE
-    .short LIT, 0, 0, SOURCEINDEX, STORE
+    .short HLIT, 0, SOURCEINDEX, STORE
     .short XINTERPRET, QBRANCH, 3f - ., DROP
     .short SOURCECOUNT, FETCH, XSOURCE, ADDSTORE, BRANCH, 1b - .
 2:  .short DROP, EXIT
@@ -1726,14 +1765,10 @@ words_loop:
     .short UP, STORE, EXIT
 
     defword "R0", RZ, , USER_XT
-    @ .short UPFETCH, LIT
     .word 0x04
-    @ .short ADD, EXIT
 
     defword "S0", SZ, , USER_XT
-    @ .short UPFETCH, LIT
     .word 0x08
-    @ .short ADD, EXIT
 
 @ ---------------------------------------------------------------------
 @ -- System variables -------------------------------------------------

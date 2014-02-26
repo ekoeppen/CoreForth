@@ -1,7 +1,5 @@
 DECIMAL
 
-: CONST CREATE , DOES> @ ;
-
 : INTERPRET
     0 STATE !   TIB (SOURCE) !   0 >SOURCE !
     ACCEPT   SOURCE# !   SPACE
