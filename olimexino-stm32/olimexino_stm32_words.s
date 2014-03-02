@@ -1,77 +1,77 @@
-    .ltorg
+@ ---------------------------------------------------------------------
+@ -- CoreForth starts here --------------------------------------------
 
-sysclock:
-    push {r4, r5}
-    ldr r0, =8000000
-    ldr r4, =RCC
-    ldr r4, [r4, #RCC_CFGR]
-    mov r5, r4
-    ands r5, #0x0c
-    beq 1f
-    cmp r5, #0x04
-    beq 1f
-    lsrs r4, #16
-    ands r4, #0x3f
-    mov r5, r4
-    ands r5, #0x01
-    beq 2f
-    ands r5, #0x02
-    beq 3f
-2:  lsrs r0, #1
-3:  lsrs r4, #2
-    adds r4, #2
-    mul r0, r0, r4
-1:  pop {r4, r5}
-    bx lr
+    .syntax unified
+    .text
 
-    defcode "SYSCLOCK", SYSCLOCK
-    bl sysclock
-    push {r0}
-    NEXT
+    .set ram_start, 0x20000000
+    .set eval_words, 0x00010000
+
+    .include "../stm32p103/stm32p103_definitions.s"
+    .include "CoreForth.s"
 
     defcode "RETI", RETI
-    pop {r4 - r12, pc}
+    pop {r4}
+    mov r12, r4
+    pop {r4}
+    mov r11, r4
+    pop {r4}
+    mov r10, r4
+    pop {r4}
+    mov r9, r4
+    pop {r4}
+    mov r8, r4
+    pop {r4 - r7, pc}
+
+    target_conditional ENABLE_COMPILER
 
     defword ";I", SEMICOLONI, F_IMMED
-    .word LIT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
+    .short LIT_XT, RETI, COMMAXT, REVEAL, LBRACKET, EXIT
 
-    defvar "IVT", IVT, (end_of_irq - _start)
+    end_target_conditional
+
+    defvar "IVT", IVT, 4 * 83
 
     defcode "KEY?", KEYQ
-    mov r2, #0
+    movs r1, #32
+    movs r2, #0
     ldr r0, =UART2
-    ldr r1, [r0, #UART_SR]
-    ands r3, #32
+    ldr r0, [r0, #UART_SR]
+    ands r0, r1
     beq 1f
-    mvn r2, #1
+    subs r2, #1
 1:  push {r2}
     NEXT
 
     defcode "ERASE-PAGE", ERASE_PAGE
     pop {r1}
     ldr r0, =FPEC
-    mov r2, #0x2
+    movs r2, #0x2
     str r2, [r0, #FLASH_CR]
     str r1, [r0, #FLASH_AR]
     ldr r2, [r0, #FLASH_CR]
-    orrs r2, #0x40
+    movs r3, #0x40
+    orrs r2, r3
     str r2, [r0, #FLASH_CR]
+    movs r3, #1
 1:  ldr r2, [r0, #FLASH_SR]
-    ands r2, #0x1
+    ands r2, r3
     bne 1b
     NEXT
 
     defcode "FLASH-PAGE", FLASH_PAGE
     pop {r2}
     pop {r3}
-    mov r4, #0x400
+    movs r4, #1
+    lsls r4, #10
     ldr r0, =FPEC
-1:  mov r1, #0x1
+1:  movs r1, #0x1
     str r1, [r0, #FLASH_CR]
     ldrh r1, [r3]
     strh r1, [r2]
+    movs r5, #1
 2:  ldr r1, [r0, #FLASH_SR]
-    ands r1, #0x1
+    ands r1, r5
     bne 2b
     adds r2, #2
     adds r3, #2
@@ -87,7 +87,8 @@ con_store:
     ldr r2, [r1]
     strb r3, [r0, r2]
     adds r2, #1
-    ands r2, #0x3f
+    movs r3, #0x3f
+    ands r2, r3
     str r2, [r1]
     NEXT
 
@@ -104,4 +105,27 @@ con_store:
     defvar "CON-TX", CON_TX, 64
     defvar "UART0-TASK", UARTZ_TASK
 
+    defword "COLD", COLD
+    .short EMULATIONQ, QBRANCH, 1f - .
+    .short ROM, LIT
+    .word eval_words
+    .short EVALUATE
+    .short HERE, LIT
+    .word init_here
+    .short STORE
+    .short RAM_DP, FETCH, LIT
+    .word init_data_start
+    .short STORE
+    .short LATEST, FETCH, LIT
+    .word init_last_word
+    .short STORE
+    .short ROM_DUMP, BYE
+1:  .short LATEST, FETCH, FROMLINK, EXECUTE
+
     .ltorg
+
+    .set last_word, link
+    .set last_host, link_host
+    .set data_start, ram_here
+    .set here, .
+

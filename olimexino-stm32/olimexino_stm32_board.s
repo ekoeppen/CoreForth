@@ -13,6 +13,9 @@
 
     .global _start
     .global reset_handler
+    .global putchar
+    .global init_board
+    .global readkey
 _start:
     .long addr_TASKZTOS               /* Top of Stack                 */
     .long reset_handler + 1           /* Reset Handler                */
@@ -97,12 +100,18 @@ end_of_irq:
 @ ---------------------------------------------------------------------
 @ -- Board specific code and initialization ---------------------------
 
+code_start:
 init_board:
-    push {lr}
+    ldr r0, =CPUID
+    ldr r0, [r0]
+    cmp r0, #0
+    bne 1f
+    bx lr
+1:  push {lr}
 
     @ switch to 72MHz clock
     ldr r0, =FPEC
-    mov r1, #0x32
+    movs r1, #0x32
     str r1, [r0, #FLASH_ACR]
     ldr r0, =RCC
     ldr r1, [r0, #RCC_CFGR]
@@ -126,16 +135,18 @@ init_board:
     ldr r1, [r0, #RCC_CFGR]
     ldr r2, =0xfffffffc
     ands r1, r2
-    orrs r1, #0x2
+    movs r2, #0x2
+    orrs r1, r2
     str r1, [r0, #RCC_CFGR]
 
     @ reset the interrupt vector table
     ldr r0, =addr_IVT
     movs r1, #0
-    movs r2, #(end_of_irq - _start) / 4
-1:  str r1, [r0], #4
+    movs r2, 48
+2:  str r1, [r0]
+    adds r0, r0, #4
     subs r2, r2, #1
-    bgt 1b
+    bgt 2b
 
     @ enable PIC interrupts
     movs r0, #0
@@ -203,69 +214,42 @@ init_board:
     pop {pc}
     .ltorg
 
+readkey:
 readkey_polled:
-    push {r1, r2}
+    ldr r0, =CPUID
+    ldr r0, [r0]
+    cmp r0, #0
+    bne 2f
+    ldr r0, =EMULATOR_UART
+    ldr r0, [r0]
+    bx lr
+2:  push {r1, r2, r3}
     ldr r1, =UART1
+    movs r2, #32
 1:  ldr r2, [r1, #UART_SR]
-    ands r2, #32
+    ands r2, r3
     beq 1b
     ldrb r0, [r1, #UART_DR]
-    pop {r1, r2}
+    pop {r1, r2, r3}
     bx lr
-
-putchar_polled:
-    push {r1, r2}
-    ldr r1, =UART1
-1:  ldr r2, [r1, #UART_SR]
-    ands r2, #0x80
-    beq 1b
-    str r0, [r1, #UART_DR]
-    pop {r1, r2}
-    bx lr
-
-readkey:
-readkey_int:
-    push {r1, r2, r3, lr}
-    ldr r1, =addr_CON_RX_TAIL
-    ldr r3, [r1]
-2:  ldr r2, =addr_CON_RX_HEAD
-    ldr r2, [r2]
-    cmp r2, r3
-    bne 1f
-    wfi
-    b 2b
-1:  ldr r0, =addr_CON_RX
-    ldrb r0, [r0, r3]
-    adds r3, #1
-    ands r3, #0x3f
-    str r3, [r1]
-    pop {r1, r2, r3, pc}
 
 putchar:
-putchar_int:
-    push {r1, r2, r3, lr}
-    ldr r1, =addr_CON_TX_HEAD
-    ldr r2, [r1]
-    ldr r3, =addr_CON_TX_TAIL
-    ldr r3, [r3]
-    cmp r2, r3
-    bne 2f
-    bl putchar_polled
-    b 4f
-2:  ldr r3, =addr_CON_TX_HEAD
-    adds r2, #1
-    ands r2, #0x3f
-3:  ldr r3, [r3]
-    cmp r2, r3
+putchar_polled:
+    push {r0, r1, r2, r3, lr}
+    ldr r1, =CPUID
+    ldr r1, [r1]
+    cmp r1, #0
     bne 1f
-    wfi
-    b 3b
-1:  str r2, [r1]
-    subs r2, #1
-    ands r2, #0x3f
-    ldr r3, =addr_CON_TX
-    strb r0, [r3, r2]
-4:  pop {r1, r2, r3, pc}
+    ldr r1, =EMULATOR_UART
+    str r0, [r1]
+    b 3f
+    ldr r1, =UART1
+    movs r3, #0x80
+1:  ldr r2, [r1, #UART_SR]
+    ands r2, r3
+    beq 1b
+    str r0, [r1, #UART_DR]
+3:  pop {r0, r1, r2, r3, pc}
 
 @ ---------------------------------------------------------------------
 @ -- IRQ handlers -----------------------------------------------------
@@ -278,13 +262,23 @@ putchar_int:
 generic_forth_handler:
     ldr r0, =addr_IVT
     mrs r1, ipsr
-    sub r1, r1, #1
-    lsl r1, #2
+    subs r1, #1
+    lsls r1, #2
     add r0, r0, r1
     ldr r2, [r0]
     cmp r2, #0
     beq 1f
-    push {r4 - r12, lr}
+    push {r4 - r7, lr}
+    mov r4, r8
+    push {r4}
+    mov r4, r9
+    push {r4}
+    mov r4, r10
+    push {r4}
+    mov r4, r11
+    push {r4}
+    mov r4, r12
+    push {r4}
     ldr r6, =irq_stack_top
     mov r7, r0
     ldr r0, [r7]
@@ -298,10 +292,6 @@ nmi_handler:
     b .
 
 hardfault_handler:
-    tst lr, #4
-    ite eq
-    mrseq r0, msp
-    mrsne r0, psp
     b .
 
 memmanage_handler:
@@ -323,43 +313,6 @@ pendsv_handler:
     b .
 
 usart1_handler:
-    ldr r1, =(UART1 + UART_SR)
-    ldr r1, [r1]
-    tst r1, #0x20
-    beq 1f
-    ldr r0, =addr_CON_RX
-    ldr r1, =addr_CON_RX_HEAD
-    ldr r2, [r1]
-    ldr r3, =(UART1 + UART_DR)
-    ldrb r3, [r3]
-    strb r3, [r0, r2]
-    adds r2, #1
-    ands r2, #0x3f
-    str r2, [r1]
-    b 2f
-1:  ldr r1, =(UART1 + UART_SR)
-    ldr r1, [r1]
-    tst r1, #0x60
-    beq 2f
-    ldr r1, =addr_CON_TX_HEAD
-    ldr r1, [r1]
-    ldr r2, =addr_CON_TX_TAIL
-    ldr r3, [r2]
-    cmp r1, r3
-    beq 2f
-    ldr r0, =addr_CON_TX
-    ldrb r1, [r0, r3]
-    ldr r0, =(UART1 + UART_DR)
-    strb r1, [r0]
-    adds r3, #1
-    ands r3, #0x3f
-    str r3, [r2]
-2:  movs r0, #0
-    ldr r1, =(UART1 + UART_SR)
-    str r0, [r1]
-    bx lr
-    .align 2,0
-
 systick_handler:
 adc1_2_handler:
 adc3_handler:
@@ -421,27 +374,3 @@ usb_lp_can_rx_handler:
 usbwakeup_handler:
 wwdg_handler:
     b generic_forth_handler
-
-@ ---------------------------------------------------------------------
-@ -- CoreForth starts here --------------------------------------------
-
-    .ltorg
-
-    .include "CoreForth.s"
-
-@ ---------------------------------------------------------------------
-@ -- Board specific words ---------------------------------------------
-
-    .include "olimexino_stm32_words.s"
-    .ltorg
-    .include "precompiled_words.s"
-    .ltorg
-
-    defword "COLD", COLD
-    .word LIT, eval_words, EVALUATE
-eval_words:
-    .include "olimexino_stm32_ram.gen.s"
-    .word 0xffffffff
-
-    .set last_word, link
-    .set data_start, ram_here

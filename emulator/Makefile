@@ -15,7 +15,7 @@ coreforth.bin: coreforth.elf
 	arm-none-eabi-objdump -D $< >coreforth.lst
 	arm-none-eabi-objcopy -Obinary $< $@
 	thumbulator -d $@ -m 00010000 $(FT_SRCS) \
-		-d ../generic/quit.ft -d emulator.ft \
+		-d emulator.ft \
 		-o $@
 	LC_CTYPE=C && LANG=C && sed -e "s/revision NNNNNNNN/revision $(REVISION)/" < $@ > $@.bak && mv $@.bak $@
 

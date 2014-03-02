@@ -46,6 +46,9 @@
     .set STRELOAD,      0xe000e014
     .set STCURRENT,     0xe000e018
 
+    .set CPUID,         0xe000ed00
+    .set EMULATOR_UART, 0xe0000000
+
     .set FPEC,          0x40022000
     .set FLASH_ACR,           0x00
     .set FLASH_KEYR,          0x04

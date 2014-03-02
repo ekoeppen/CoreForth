@@ -64,9 +64,9 @@
     .short ROM_DUMP, BYE
 1:  .short LATEST, FETCH, FROMLINK, EXECUTE
 
+    .ltorg
+
     .set last_word, link
     .set last_host, link_host
     .set data_start, ram_here
     .set here, .
-
-    .ltorg

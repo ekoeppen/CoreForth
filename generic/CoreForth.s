@@ -1707,8 +1707,8 @@ interpret_eol:
     .short XINTERPRET, QBRANCH, 3f - ., DROP
     .short SOURCECOUNT, FETCH, XSOURCE, ADDSTORE, BRANCH, 1b - .
 2:  .short DROP, EXIT
-3:  .short DROP, DUP, DOT, SPACE, COUNT, TYPE
-    .short LIT, '?', 0, EMIT, CR, EXIT
+3:  .short CR, CR, DROP, XSOURCE, FETCH, SOURCECOUNT, FETCH, TYPE, SPACE
+    .short HLIT, '?', EMIT, CR, EXIT
 
     defword "FORGET", FORGET
     .short BL, WORD, FIND, DROP, TOLINK, FETCH, LATEST, STORE, EXIT
@@ -1747,6 +1747,25 @@ interpret_eol:
 
     defword ";", SEMICOLON, F_IMMED
     .short LIT_XT, EXIT, COMMAXT, REVEAL, LBRACKET, EXIT
+
+    defword "INTERPRET", INTERPRET
+    .short HLIT, 0, STATE, STORE, TIB, XSOURCE, STORE, HLIT, 0, GTSOURCE, STORE
+    .short ACCEPT, SOURCENUM, STORE, SPACE
+    .short XINTERPRET, QBRANCH, 1f - .
+    .short DROP, LIT
+    .word ok_prompt
+    .short COUNT, TYPE, BRANCH, 2f - .
+1:  .short COUNT, TYPE, HLIT, '?', EMIT
+2:  .short CR, EXIT
+ok_prompt:
+    .ascii "\004 ok "
+
+    defword "QUIT", QUIT
+1:  .short INTERPRET, BRANCH, 1b - .
+
+    defword "?ABORT", QABORT
+    .short ROT, QBRANCH, 1f - ., TYPE, ABORT
+1:  .short TWODROP, EXIT
 
     end_target_conditional
 
@@ -1869,6 +1888,17 @@ words_loop:
     .set QNUMBER, ISNUMBER
 
 @ ---------------------------------------------------------------------
+
+    target_conditional ENABLE_COMPILER
+
+    defword "ABORT", "ABORT"
+    .short LIT
+    .word abort_prompt
+    .short HLIT, 34, TYPE, CR, QUIT
+abort_prompt:
+    .ascii "CoreForth revision NNNNNNNN ready."
+
+    end_target_conditional
 
     .set last_core_word, link
     .set end_of_core, .
