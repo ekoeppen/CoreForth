@@ -1048,6 +1048,9 @@ unsigned_div_mod:               @ r0 / r1 = r3, remainder = r0
     defword ".", DOT
     .short LTNUM, DUP, ABS, NUMS, SWAP, SIGN, NUMGT, TYPE, SPACE, EXIT
 
+    defword "?", QU
+    .short FETCH, DOT, EXIT
+
     defcode "READ-KEY", READ_KEY
     bl readkey
     push {r0}
