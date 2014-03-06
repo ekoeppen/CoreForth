@@ -226,9 +226,10 @@ readkey_polled:
 2:  push {r1, r2, r3}
     ldr r1, =UART1
     movs r2, #32
-1:  ldr r2, [r1, #UART_SR]
-    ands r2, r3
-    beq 1b
+1:  ldr r3, [r1, #UART_SR]
+    ands r3, r2
+    cmp r3, r2
+    bne 1b
     ldrb r0, [r1, #UART_DR]
     pop {r1, r2, r3}
     bx lr
