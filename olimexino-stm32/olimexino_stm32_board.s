@@ -189,7 +189,7 @@ init_board:
     movs r1, #0x20
     str r1, [r0, #4]
     ldr r0, =UART1
-    ldr r1, =0x206c
+    ldr r1, =0x200c
     str r1, [r0, #UART_CR1]
 
     @ set UART baud rate
@@ -235,7 +235,7 @@ readkey_polled:
 
 putchar:
 putchar_polled:
-    push {r0, r1, r2, r3, lr}
+    push {r1, r2, r3, lr}
     ldr r1, =CPUID
     ldr r1, [r1]
     cmp r1, #0
@@ -243,13 +243,13 @@ putchar_polled:
     ldr r1, =EMULATOR_UART
     str r0, [r1]
     b 3f
-    ldr r1, =UART1
+1:  ldr r1, =UART1
     movs r3, #0x80
-1:  ldr r2, [r1, #UART_SR]
+    ldr r2, [r1, #UART_SR]
     ands r2, r3
     beq 1b
     str r0, [r1, #UART_DR]
-3:  pop {r0, r1, r2, r3, pc}
+3:  pop {r1, r2, r3, pc}
 
 @ ---------------------------------------------------------------------
 @ -- IRQ handlers -----------------------------------------------------
