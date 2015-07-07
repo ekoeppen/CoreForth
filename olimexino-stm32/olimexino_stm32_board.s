@@ -10,8 +10,12 @@
 
     .text
     .syntax unified
+    .code 16
 
     .global _start
+    .global putchar
+    .global init_board
+    .global readkey
     .global reset_handler
 _start:
     .long addr_TASKZTOS               /* Top of Stack                 */
@@ -98,7 +102,12 @@ end_of_irq:
 @ -- Board specific code and initialization ---------------------------
 
 init_board:
-    push {lr}
+    ldr r0, =CPUID
+    ldr r0, [r0]
+    cmp r0, #0
+    bne 3f
+    bx lr
+3:  push {lr}
 
     @ switch to 72MHz clock
     ldr r0, =FPEC
@@ -225,7 +234,14 @@ putchar_polled:
 
 readkey:
 readkey_int:
-    push {r1, r2, r3, lr}
+    ldr r0, =CPUID
+    ldr r0, [r0]
+    cmp r0, #0
+    bne 3f
+    ldr r0, =EMULATOR_UART
+    ldr r0, [r0]
+    bx lr
+3:  push {r1, r2, r3, lr}
     ldr r1, =addr_CON_RX_TAIL
     ldr r3, [r1]
 2:  ldr r2, =addr_CON_RX_HEAD
@@ -244,7 +260,14 @@ readkey_int:
 putchar:
 putchar_int:
     push {r1, r2, r3, lr}
-    ldr r1, =addr_CON_TX_HEAD
+    ldr r1, =CPUID
+    ldr r1, [r1]
+    cmp r1, #0
+    bne 5f
+    ldr r1, =EMULATOR_UART
+    str r0, [r1]
+    b 4f
+5:  ldr r1, =addr_CON_TX_HEAD
     ldr r2, [r1]
     ldr r3, =addr_CON_TX_TAIL
     ldr r3, [r3]
@@ -421,27 +444,3 @@ usb_lp_can_rx_handler:
 usbwakeup_handler:
 wwdg_handler:
     b generic_forth_handler
-
-@ ---------------------------------------------------------------------
-@ -- CoreForth starts here --------------------------------------------
-
-    .ltorg
-
-    .include "CoreForth.s"
-
-@ ---------------------------------------------------------------------
-@ -- Board specific words ---------------------------------------------
-
-    .include "olimexino_stm32_words.s"
-    .ltorg
-    .include "precompiled_words.s"
-    .ltorg
-
-    defword "COLD", COLD
-    .word LIT, eval_words, EVALUATE
-eval_words:
-    .include "olimexino_stm32_ram.gen.s"
-    .word 0xffffffff
-
-    .set last_word, link
-    .set data_start, ram_here
