@@ -265,12 +265,12 @@ DATA NULL$
      00 C,
 
 DATA DEVICE$
-     12 C,  01 C,  01 C,  01 C,  02 C,  00 C,  00 C,  40 C,  0BA C,  15 C,  4E C,  0C0 C,  00 C,  00 C,  01 C,  02 C,
+     12 C,  01 C,  10 C,  01 C,  02 C,  00 C,  00 C,  40 C,  0BA C,  15 C,  4E C,  0C0 C,  00 C,  01 C,  01 C,  02 C,
      00 C,  01 C,
 
 DATA CONFIG$
      09 C,  02 C,  3E C,  00 C,  02 C,  01 C,  00 C, 0C0 C,  80 C,
-     09 C,  04 C,  00 C,  00 C,  01 C,  02 C,  02 C,  00 C,  00 C,
+     09 C,  04 C,  00 C,  00 C,  01 C,  02 C,  02 C,  01 C,  00 C,
 \    05 C,  24 C,  00 C,  01 C,  10 C,
      05 C,  24 C,  01 C,  00 C,  01 C,
      04 C,  24 C,  02 C,  06 C,
