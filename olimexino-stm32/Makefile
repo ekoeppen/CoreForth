@@ -1,5 +1,5 @@
 CPU := cortex-m3
-ASMFLAGS := -defsym THUMB1=0
+ASMFLAGS :=
 
 include ../generic/Makefile
 
