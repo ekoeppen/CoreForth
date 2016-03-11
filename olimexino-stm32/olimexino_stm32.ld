@@ -24,6 +24,10 @@ SECTIONS
         *(.bss)
     } >SRAM AT> FLASH
 
-    ram_top = 0x20000000 + 0x00002000 ;
+    ram_top = 0x20000000 + 0x00001c00 ;
     irq_stack_top = ram_top - 0x40;
+    trace_buffer = ram_top;
+    trace_ptr = trace_buffer + 0x100;
+    breakpoint = trace_ptr + 0x4;
+    breakpoint_cont = trace_ptr + 0x8;
 }

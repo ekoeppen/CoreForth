@@ -126,6 +126,13 @@
 
 reset_handler:
     bl init_board
+    movs r0, #0
+    ldr r6, =trace_ptr
+    str r0, [r6]
+    ldr r6, =breakpoint
+    str r0, [r6]
+    ldr r6, =breakpoint_cont
+    str r0, [r6]
     ldr r6, =addr_TASKZRTOS
     ldr r7, =cold_start
     NEXT
@@ -155,10 +162,28 @@ init_last_word:
 @ -- Interpreter code -------------------------------------------------
 
 next:
-    ldm r7!, {r0}
+    ldr r0, =trace_ptr
+    ldr r1, [r0]
+    ldr r2, =trace_buffer
+    adds r2, r1
+    str r7, [r2]
+    adds r1, #4
+    strb r1, [r0]
+
+2:  ldr r0, =breakpoint
+    ldr r1, [r0]
+    cmp r1, r7
+    bne 1f
+    ldr r0, =breakpoint_cont
+    str r7, [r0]
+    b 2b
+
+1:  ldm r7!, {r0}
     ldr r1, [r0]
     adds r1, r1, #1
     bx r1
+
+    .ltorg
 
 DOCOL:
     stm r6!, {r7}
@@ -1293,6 +1318,23 @@ is_positive:
     defcode "EMULATOR-BKPT", EMULATOR_BKPT
     bkpt 0xab
     NEXT
+
+    defword "(SETBP)", XSETBP
+    .word LIT, breakpoint, STORE, EXIT
+
+    defword "SETBP", SETBP
+    .word TICK, CELL, PLUS, XSETBP, EXIT
+
+    defword "CLRBP", CLRBP
+    .word LIT, 0, LIT, breakpoint, STORE, EXIT
+
+    defcode "CONTBP", CONTBP
+    ldr r0, =breakpoint_cont
+    ldr r7, [r0]
+    ldm r7!, {r0}
+    ldr r1, [r0]
+    adds r1, r1, #1
+    bx r1
 
     target_conditional ENABLE_COMPILER
 
