@@ -1229,20 +1229,21 @@ is_positive:
 
     defcode "(DO)", XDO
     pop {r0, r1}
-    adds r6, r6, #4
     ldr r2, [r6]
+    adds r6, r6, #4
     str r1, [r6]
     adds r6, r6, #4
     str r0, [r6]
+    adds r6, r6, #4
     str r2, [r6]
     NEXT
 
     defcode "I", INDEX
     .ifndef THUMB1
-    ldr r0, [r6, #-8]
+    ldr r0, [r6, #-4]
     .else
     mov r0, r6
-    subs r0, #8
+    subs r0, #4
     ldr r0, [r0]
     .endif
     push {r0}
@@ -1250,27 +1251,24 @@ is_positive:
 
     defcode "(LOOP)", XLOOP
     .ifndef THUMB1
-    ldr r0, [r6, #-8]
-    .else
-    mov r0, r6
-    subs r0, #8
-    ldr r0, [r0]
-    .endif
+    ldr r0, [r6, #-4]
     adds r0, r0, #1
-    .ifndef THUMB1
-    ldr r1, [r6, #-12]
-    .else
-    mov r1, r6
-    subs r1, #12
-    ldr r1, [r1]
-    .endif
+    ldr r1, [r6, #-8]
     cmp r0, r1
     bge 1f
-    .ifndef THUMB1
-    str r0, [r6, #-8]
+    str r0, [r6, #-4]
     .else
     mov r0, r6
-    subs r0, #8
+    subs r0, #4
+    ldr r0, [r0]
+    adds r0, r0, #1
+    mov r1, r6
+    subs r1, #8
+    ldr r1, [r1]
+    cmp r0, r1
+    bge 1f
+    mov r0, r6
+    subs r0, #4
     str r0, [r0]
     .endif
     movs r0, #0
@@ -1279,6 +1277,7 @@ is_positive:
 1:  ldr r0, [r6]
     subs r6, r6, #8
     str r0, [r6]
+    subs r6, #4
     movs r0, #0
     mvns r0, r0
     push {r0}
