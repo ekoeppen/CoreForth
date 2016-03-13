@@ -117,6 +117,8 @@ con_store:
     defvar "CON-TX", CON_TX, 64
     defvar "UART0-TASK", UARTZ_TASK
 
+    .ltorg
+
     defword "COLD", COLD
     .word EMULATIONQ, QBRANCH, 1f - .
     .word ROM, LIT, eval_words, EVALUATE
@@ -131,4 +133,3 @@ con_store:
     .set data_start, ram_here
     .set here, .
 
-    .ltorg
