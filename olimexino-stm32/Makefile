@@ -1,4 +1,5 @@
 CPU := cortex-m3
+#ASMFLAGS := -defsym TRACE_DEBUG=1
 ASMFLAGS :=
 
 include ../generic/Makefile

@@ -131,7 +131,9 @@ reset_handler:
     str r0, [r6]
     ldr r6, =breakpoint
     str r0, [r6]
-    ldr r6, =breakpoint_cont
+    ldr r6, =breakpoint_ip
+    str r0, [r6]
+    ldr r6, =breakpoint_rp
     str r0, [r6]
     ldr r6, =addr_TASKZRTOS
     ldr r7, =cold_start
@@ -162,6 +164,7 @@ init_last_word:
 @ -- Interpreter code -------------------------------------------------
 
 next:
+    .ifdef TRACE_DEBUG
     ldr r0, =trace_ptr
     ldr r1, [r0]
     ldr r2, =trace_buffer
@@ -174,9 +177,12 @@ next:
     ldr r1, [r0]
     cmp r1, r7
     bne 1f
-    ldr r0, =breakpoint_cont
+    ldr r0, =breakpoint_ip
     str r7, [r0]
+    ldr r0, =breakpoint_rp
+    str r6, [r0]
     b 2b
+    .endif
 
 1:  ldm r7!, {r0}
     ldr r1, [r0]
@@ -1328,8 +1334,10 @@ is_positive:
     .word LIT, 0, LIT, breakpoint, STORE, EXIT
 
     defcode "CONTBP", CONTBP
-    ldr r0, =breakpoint_cont
+    ldr r0, =breakpoint_ip
     ldr r7, [r0]
+    ldr r0, =breakpoint_rp
+    ldr r6, [r0]
     ldm r7!, {r0}
     ldr r1, [r0]
     adds r1, r1, #1

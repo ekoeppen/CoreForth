@@ -29,5 +29,6 @@ SECTIONS
     trace_buffer = ram_top;
     trace_ptr = trace_buffer + 0x100;
     breakpoint = trace_ptr + 0x4;
-    breakpoint_cont = trace_ptr + 0x8;
+    breakpoint_ip = trace_ptr + 0x8;
+    breakpoint_rp = trace_ptr + 0xc;
 }
