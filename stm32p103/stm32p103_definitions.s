@@ -55,3 +55,6 @@
     .set FLASH_AR,            0x14
     .set FLASH_OBR,           0x1C
     .set FLASH_WRPR,          0x20
+
+    .set CPUID,         0xe000ed00
+    .set EMULATOR_UART, 0xe0000000

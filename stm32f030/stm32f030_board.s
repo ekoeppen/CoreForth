@@ -13,36 +13,79 @@
 
     .global _start
     .global reset_handler
+    .global putchar
+    .global init_board
+    .global readkey
 _start:
     .long addr_TASKZTOS               /* Top of Stack                 */
     .long reset_handler + 1           /* Reset Handler                */
     .long nmi_handler + 1             /* NMI Handler                  */
     .long hardfault_handler + 1       /* Hard Fault Handler           */
-    .long memmanage_handler + 1       /* MPU Fault Handler            */
-    .long busfault_handler + 1        /* Bus Fault Handler            */
-    .long usagefault_handler + 1      /* Usage Fault Handler          */
-    .long 0                           /* Reserved                     */
-    .long 0                           /* Reserved                     */
-    .long 0                           /* Reserved                     */
-    .long 0                           /* Reserved                     */
+    .long 0
+    .long 0
+    .long 0
+    .long 0
+    .long 0
+    .long 0
+    .long 0
+    .long generic_forth_handler + 1   /* SVCall handler               */
+    .long 0
+    .long 0
+    .long 0
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
+    .long generic_forth_handler + 1
 
     .org 0xc0
+    .set end_of_irq, .
 
 @ ---------------------------------------------------------------------
 @ -- Board specific code and initialization ---------------------------
 
 code_start:
 init_board:
-    push {lr}
+    ldr r0, =CPUID
+    ldr r0, [r0]
+    cmp r0, #0
+    bne 1f
+    bx lr
+1:  push {lr}
 
     @ reset the interrupt vector table
     ldr r0, =addr_IVT
     movs r1, #0
     movs r2, 48
-1:  str r1, [r0]
+2:  str r1, [r0]
     adds r0, r0, #4
     subs r2, r2, #1
-    bgt 1b
+    bgt 2b
 
     @ enable clocks on UART1 and GPIOA
     ldr r0, =RCC
@@ -72,26 +115,40 @@ init_board:
     pop {pc}
 
 readkey:
-    push {r1, r2, r3, lr}
+    ldr r0, =CPUID
+    ldr r0, [r0]
+    cmp r0, #0
+    bne 1f
+    ldr r0, =EMULATOR_UART
+    ldr r0, [r0]
+    bx lr
+1:  push {r1, r2, r3, lr}
     ldr r1, =UART1
     movs r2, #32
-1:  ldr r3, [r1, #UART_ISR]
+2:  ldr r3, [r1, #UART_ISR]
     ands r3, r2
     cmp r3, r2
-    bne 1b
+    bne 2b
     ldr r0, [r1, #UART_RDR]
     pop {r1, r2, r3, pc}
 
 putchar:
     push {r1, r2, r3, lr}
-    ldr r3, =UART1
+    ldr r1, =CPUID
+    ldr r1, [r1]
+    cmp r1, #0
+    bne 1f
+    ldr r1, =EMULATOR_UART
+    str r0, [r1]
+    b 3f
+1:  ldr r3, =UART1
     str r0, [r3, #UART_TDR]
     movs r2, #0x40
-1:  ldr r1, [r3, #UART_ISR]
+2:  ldr r1, [r3, #UART_ISR]
     ands r1, r2
     cmp r1, r2
-    bne 1b
-    pop {r1, r2, r3, pc}
+    bne 2b
+3:  pop {r1, r2, r3, pc}
 
     .ltorg
 @ ---------------------------------------------------------------------
@@ -158,53 +215,3 @@ pendsv_handler:
 
 systick_handler:
     b .
-
-gpioa_handler:
-gpiob_handler:
-gpioc_handler:
-gpiod_handler:
-gpioe_handler:
-uart0_handler:
-uart1_handler:
-ssi_handler:
-i2c_handler:
-pwm0_handler:
-pwm1_handler:
-pwm2_handler:
-adcseq0_handler:
-adcseq1_handler:
-adcseq2_handler:
-adcseq3_handler:
-watchdog_handler:
-timer0a_handler:
-timer0b_handler:
-timer1a_handler:
-timer1b_handler:
-timer2a_handler:
-timer2b_handler:
-adcomp_handler:
-    b generic_forth_handler
-
-@ ---------------------------------------------------------------------
-@ -- CoreForth starts here --------------------------------------------
-
-    .ltorg
-
-    .include "CoreForth.s"
-
-@ ---------------------------------------------------------------------
-@ -- Board specific words ---------------------------------------------
-
-    .include "stm32f030_words.s"
-    .ltorg
-    .include "precompiled_words.s"
-    .ltorg
-
-    defword "COLD", COLD
-    .word LIT, eval_words, EVALUATE
-eval_words:
-    .include "stm32f030_ram.gen.s"
-    .word 0xffffffff
-
-    .set last_word, link
-    .set data_start, ram_here

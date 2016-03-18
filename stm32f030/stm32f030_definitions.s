@@ -54,3 +54,5 @@
     .set STCTRL,        0xe000e010
     .set STRELOAD,      0xe000e014
     .set STCURRENT,     0xe000e018
+    .set CPUID,         0xe000ed00
+    .set EMULATOR_UART, 0xe0000000

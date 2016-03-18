@@ -15,7 +15,9 @@ REVISION := $(shell git log -1 --abbrev=8 --pretty=format:%h)
 	arm-none-eabi-objdump -D $< >$@
 
 %.gen.s: %.ft
-	awk '{ print ".byte ", length($$0); gsub(/\\/, "\\\\\\"); gsub(/"/, "\\\""); print ".ascii \"" $$0 "\""} END{print ".align 2, 0"}' < $< > $@
+	awk '{ gsub(/\\/, "\\\\\\"); gsub(/"/, "\\\""); print ".ascii \"" $$0 "\\n\""}' < $< > $@
+# %.gen.s: %.ft
+#	awk '{ print ".byte ", length($$0); gsub(/\\/, "\\\\\\"); gsub(/"/, "\\\""); print ".ascii \"" $$0 "\""} END{print ".align 2, 0"}' < $< > $@
 
 .s.o:
 	arm-none-eabi-as -gdwarf2 $(ASMFLAGS) -mcpu=$(CPU) -I../generic/ -o $@ $<
@@ -24,7 +26,7 @@ all: coreforth.bin coreforth.lst
 
 listing: coreforth.lst
 
-coreforth.elf: $(GEN) precompiled_words.s Makefile ../generic/Makefile
+coreforth.elf: $(GEN) Makefile ../generic/Makefile
 
 coreforth.bin: coreforth.elf
 

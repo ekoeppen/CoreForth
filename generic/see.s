@@ -1,6 +1,53 @@
 @ ---------------------------------------------------------------------
 @ -- Disassembler -----------------------------------------------------
 
+puthexnumber:
+    push {r4, r5, r6, r7, lr}
+    movs r3, #0
+    movs r5, #8
+    movs r6, #15
+    movs r7, #28
+puthexnumber_loop:
+    rors r0, r7
+    mov r4, r0
+    ands r0, r6
+    cmp r3, #0
+    bgt 3f
+    cmp r0, #0
+    beq 2f
+    movs r3, #1
+3:  adds r0, r0, #'0'
+    cmp r0, #'9'
+    ble 1f
+    adds r0, r0, #'A' - '0' - 10
+1:  bl putchar
+2:  mov r0, r4
+    subs r5, r5, #1
+    bne puthexnumber_loop
+    cmp r3, #0
+    bne 4f
+    movs r0, #'0'
+    bl putchar
+4:  pop {r4, r5, r6, r7, pc}
+
+    defcode ".UX", DOTUX
+    movs r0, '0'
+    bl putchar
+    movs r0, 'x'
+    bl putchar
+    pop {r0}
+    bl puthexnumber
+    NEXT
+
+    defcode ".UX", DOTUX
+    movs r0, '0'
+    bl putchar
+    movs r0, 'x'
+    bl putchar
+    pop {r0}
+    bl puthexnumber
+    NEXT
+
     defword "TYPE-ESCAPED", TYPE_ESCAPED
     .word QDUP, QBRANCH, 0x4c
     .word SWAP, DUP, CFETCH, DUP, LIT, '"', EQU, QBRANCH, 0x10
@@ -145,7 +192,6 @@ QUOTE_CHARS:
     .word DUP, LIT, DOVAR, NEQU, QBRANCH, print_dovar - .
     .word DUP, LIT, DOCON, NEQU, QBRANCH, print_docon - .
     .word DUP, LIT, DODATA, NEQU, QBRANCH, print_dodata - .
-    .word DUP, LIT, DOCONSTANT, NEQU, QBRANCH, print_docon - .
     .word DUP, LIT, XDOES, NEQU, QBRANCH, print_xdoes - .
     .word DUP, LIT, XSQUOTE, NEQU, QBRANCH, print_xsquote - .
     .word DUP, FETCH, LIT, 0x47884900, NEQU, QBRANCH, print_dodoes - .
