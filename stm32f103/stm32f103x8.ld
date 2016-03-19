@@ -5,7 +5,7 @@ ENTRY(reset_handler)
 MEMORY
 {
     FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 0x00800000
-    SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00001000
+    SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00002000
 }
 
 SECTIONS
@@ -24,7 +24,7 @@ SECTIONS
         *(.bss)
     } >SRAM AT> FLASH
 
-    ram_top = 0x20000000 + 0x00000d00 ;
+    ram_top = 0x20000000 + 0x00001c00 ;
     irq_stack_top = ram_top - 0x40;
     trace_buffer = ram_top;
     trace_ptr = trace_buffer + 0x100;
