@@ -1,7 +1,8 @@
 Overview
 ========
 
-This is a simple Forth for the ARM Cortex M0/M3. It can currently run on the
+This is a simple token threaded Forth for the ARM Cortex M0/M3.
+It can currently run on the
 the Olimex STM32-P103 and the Olimexino STM32/LeafLabs Maple and supports
 generic STM32F103 and STM32F030 boards. Other targets boards should be easy to
 add. CoreForth consists of a small core written in ARM assembler, and
@@ -20,6 +21,13 @@ The motivation behind CoreForth is to provide a simple platform to explore
 Cortex M0/3 based development boards, not so much to be a fully fledged Forth
 implementation (neither is ANS Forth compliance a goal), but there is nothing
 preventing CoreForth to be taken into that direction.
+
+CoreForth SE
+============
+
+[CoreForth SE](https://github.com/ekoeppen/CoreForthSE) is a subroutine threaded
+variant of CoreForth. It is under active development and allows easier debugging
+and better performance.
 
 Forth Implementation
 ====================
