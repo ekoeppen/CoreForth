@@ -1,7 +1,7 @@
 Overview
 ========
 
-This is a simple token threaded Forth for the ARM Cortex M0/M3.
+This is a simple indirect threaded Forth for the ARM Cortex M0/M3.
 It can currently run on the
 the Olimex STM32-P103 and the Olimexino STM32/LeafLabs Maple and supports
 generic STM32F103 and STM32F030 boards. Other targets boards should be easy to
